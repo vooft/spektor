@@ -4,6 +4,7 @@ import java.nio.file.Path
 
 data class SpektorPath(
     val file: Path,
+    val tag: String,
     val operationId: String,
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,

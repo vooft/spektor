@@ -21,6 +21,7 @@ class SpektorParserTest {
             paths = listOf(
                 SpektorPath(
                     file = listFile.toAbsolutePath().normalize(),
+                    tag = "Book",
                     operationId = "list",
                     path = "/book",
                     requestBody = null,
@@ -37,6 +38,7 @@ class SpektorParserTest {
                 ),
                 SpektorPath(
                     file = pathVarFile.toAbsolutePath().normalize(),
+                    tag = "Author",
                     operationId = "get",
                     path = "/author/{id}",
                     requestBody = null,
@@ -58,6 +60,7 @@ class SpektorParserTest {
                 ),
                 SpektorPath(
                     file = requestBodyFile.toAbsolutePath().normalize(),
+                    tag = "Book",
                     operationId = "create",
                     path = "/book",
                     requestBody = SpektorType.RequiredWrapper(

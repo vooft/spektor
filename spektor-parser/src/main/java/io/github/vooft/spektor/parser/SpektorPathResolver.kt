@@ -14,6 +14,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
     fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
         file = file,
+        tag = operation.resolveTag(),
         operationId = operation.operationId ?: "operationPlaceholder-${operationIdCounter.getAndIncrement()}",
         path = path,
         requestBody = operation.requestBody?.let { rq ->
@@ -26,6 +27,18 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         queryVariables = operation.parameters?.extractParameters(ParameterLocation.QUERY) ?: listOf(),
         method = method
     )
+
+    private fun Operation.resolveTag(): String {
+        val tagsVal = this.tags ?: return TAG_PLACEHOLDER
+        if (tagsVal.size > 1) {
+            logger.warn { "Multiple tags found: $tagsVal, using the first one" }
+        }
+
+        return tagsVal.firstOrNull() ?: run {
+            logger.warn { "No tags found, using placeholder" }
+            TAG_PLACEHOLDER
+        }
+    }
 
     private fun Collection<Parameter>.extractParameters(location: ParameterLocation): List<SpektorPath.Variable> {
         return filter { it.`in` == location.value }
@@ -92,5 +105,6 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     companion object Companion {
         private val logger = KotlinLogging.logger { }
         private const val APPLICATION_JSON = "application/json"
+        private const val TAG_PLACEHOLDER = "SpektorDefault"
     }
 }

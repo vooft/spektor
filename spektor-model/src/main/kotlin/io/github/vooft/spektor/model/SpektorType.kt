@@ -3,7 +3,19 @@ package io.github.vooft.spektor.model
 import java.nio.file.Path
 
 sealed interface SpektorType {
-    data class MicroType(val type: String, val format: String?) : SpektorType
+    data class MicroType(val type: OpenApiMicroType, val format: String?) : SpektorType {
+        enum class OpenApiMicroType(val typeName: String) {
+            STRING("string"),
+            INTEGER("integer"),
+            BOOLEAN("boolean"),
+            NUMBER("number");
+
+            companion object {
+                fun from(typeName: String): OpenApiMicroType =
+                    entries.find { it.typeName == typeName } ?: error("Unsupported OpenAPI micro type: $typeName")
+            }
+        }
+    }
 
     data class List(val itemType: SpektorType) : SpektorType
 

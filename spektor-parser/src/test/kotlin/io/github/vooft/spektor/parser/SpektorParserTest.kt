@@ -3,6 +3,7 @@ package io.github.vooft.spektor.parser
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorSchema
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
 import io.github.vooft.spektor.test.TestFiles.authorModelFile
 import io.github.vooft.spektor.test.TestFiles.bookModelFile
 import io.github.vooft.spektor.test.TestFiles.listFile
@@ -53,7 +54,7 @@ class SpektorParserTest {
                     pathVariables = listOf(
                         SpektorPath.Variable(
                             name = "id",
-                            type = SpektorType.MicroType(type = "string", format = "uuid")
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid")
                         )
                     ),
                     queryVariables = emptyList(),
@@ -106,23 +107,23 @@ class SpektorParserTest {
                 ) to SpektorType.Object(
                     properties = mapOf(
                         "id" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "uuid"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
                             required = true
                         ),
                         "name" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = null),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = null),
                             required = true
                         ),
                         "dateOfBirth" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "date"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "date"),
                             required = true
                         ),
                         "dateOfDeath" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "date"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "date"),
                             required = false
                         ),
                         "createdAt" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "date-time"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "date-time"),
                             required = true
                         )
                     )
@@ -133,15 +134,15 @@ class SpektorParserTest {
                 ) to SpektorType.Object(
                     properties = mapOf(
                         "title" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = null),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = null),
                             required = true
                         ),
                         "nativeTitle" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = null),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = null),
                             required = false
                         ),
                         "authorId" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "uuid"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
                             required = true
                         )
                     )
@@ -152,15 +153,15 @@ class SpektorParserTest {
                 ) to SpektorType.Object(
                     properties = mapOf(
                         "id" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = "uuid"),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
                             required = true
                         ),
                         "title" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = null),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = null),
                             required = true
                         ),
                         "nativeTitle" to SpektorType.RequiredWrapper(
-                            type = SpektorType.MicroType(type = "string", format = null),
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = null),
                             required = false
                         ),
                         "author" to SpektorType.RequiredWrapper(

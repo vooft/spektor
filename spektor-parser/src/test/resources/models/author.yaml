@@ -1,0 +1,30 @@
+openapi: 3.0.1
+info:
+  title: Author Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        dateOfDeath:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - dateOfBirth
+        - createdAt
+

@@ -1,0 +1,17 @@
+openapi: 3.0.1
+info:
+  title: Book API
+  version: 1.0.0
+paths:
+  /book:
+    get:
+      tags:
+        - Book
+      operationId: list
+      responses:
+        200:
+          description: List is returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/book.yaml#/components/schemas/BooksList'

@@ -29,7 +29,7 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xcontext-receivers")
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xcontext-parameters")
         allWarningsAsErrors = true
         jvmTarget.set(JvmTarget.JVM_11)
     }
@@ -43,5 +43,3 @@ private fun DependencyHandler.addPlatform(project: Project, platform: Dependency
         add(configuration, platform)
     }
 }
-
-private fun <D : Dependency> DependencyHandler.addPlatform(project: Project, platform: Provider<D>) = addPlatform(project, platform.get())

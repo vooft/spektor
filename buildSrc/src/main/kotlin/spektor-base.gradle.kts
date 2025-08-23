@@ -18,7 +18,7 @@ detekt {
 }
 
 tasks.withType<Detekt> {
-    tasks.getByName("check").dependsOn(this)
+    tasks.findByName("check")?.dependsOn(this)
 }
 
 tasks.withType<JavaCompile> {

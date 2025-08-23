@@ -1,4 +1,4 @@
-package io.github.vooft.spektor.parser
+package io.github.vooft.spektor.model
 
 import java.nio.file.Path
 

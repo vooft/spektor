@@ -1,19 +1,20 @@
 package io.github.vooft.spektor.parser
 
+import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorSchema
+import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.test.TestFiles.authorModelFile
+import io.github.vooft.spektor.test.TestFiles.bookModelFile
+import io.github.vooft.spektor.test.TestFiles.listFile
+import io.github.vooft.spektor.test.TestFiles.pathVarFile
+import io.github.vooft.spektor.test.TestFiles.requestBodyFile
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.nio.file.Paths
 
 class SpektorParserTest {
     @Test
     fun test() {
         val parser = SpektorParser()
-
-        val listFile = Paths.get("./src/test/resources/api/list-book.yaml")
-        val pathVarFile = Paths.get("./src/test/resources/api/path-var-author.yaml")
-        val requestBodyFile = Paths.get("./src/test/resources/api/request-body-book.yaml")
-        val bookModelFile = Paths.get("./src/test/resources/models/book.yaml")
-        val authorModelFile = Paths.get("./src/test/resources/models/author.yaml")
 
         val schema = parser.parse(listOf(listFile, pathVarFile, requestBodyFile))
 

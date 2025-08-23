@@ -4,12 +4,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":spektor-model"))
-
     implementation(libs.swagger.parser)
     implementation(libs.kotlin.logging)
 
-    testImplementation(project(":spektor-testdata"))
     testImplementation(libs.kotest.assertions)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.junit.jupiter.engine)

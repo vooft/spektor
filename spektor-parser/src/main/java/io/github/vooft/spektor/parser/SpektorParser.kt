@@ -1,6 +1,9 @@
 package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorSchema
+import io.github.vooft.spektor.model.SpektorType
 import java.nio.file.Path
 
 class SpektorParser {

@@ -1,5 +1,7 @@
 package io.github.vooft.spektor.parser
 
+import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorType
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions

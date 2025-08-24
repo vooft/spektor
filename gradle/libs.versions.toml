@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.10"
-kotest = "5.9.1"
+kotest = "6.0.0"
 
 [libraries]
 

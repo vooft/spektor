@@ -1,3 +1,3 @@
 package io.github.vooft.spektor.model
 
-data class SpektorSchema(private val paths: List<SpektorPath>, private val refs: Map<SpektorType.Ref, SpektorType>)
+data class SpektorSchema(val paths: List<SpektorPath>, val refs: Map<SpektorType.Ref, SpektorType>)

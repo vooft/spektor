@@ -2,6 +2,7 @@ package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
 import io.swagger.v3.oas.models.media.Schema
 import java.net.URI
 import java.nio.file.Path
@@ -12,7 +13,7 @@ class SpektorTypeResolver(private val file: Path) {
         schema.`$ref` != null -> resolveRef(schema.`$ref`)
         schema.type == "object" -> resolveObject(schema)
         schema.type == "array" -> resolveArray(schema)
-        schema.type != null -> SpektorType.MicroType(type = schema.type, format = schema.format)
+        schema.type != null -> SpektorType.MicroType(type = OpenApiMicroType.from(schema.type), format = schema.format)
         else -> {
             logger.warn { "Schema in file $file is not a reference or primitive type: $schema" }
             null

@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen
 
+import io.github.vooft.spektor.codegen.codegen.SpektorRouteCodegen
 import io.github.vooft.spektor.codegen.codegen.SpektorServerApiCodegen
 import io.github.vooft.spektor.codegen.codegen.SpektorTypeCodegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
@@ -20,8 +21,10 @@ class SpektorCodegen(
         val context = SpektorCodegenContext(schema.paths, schema.refs)
         val typeCodegen = SpektorTypeCodegen(config, context)
         val apiCodegen = SpektorServerApiCodegen(config, context, typeCodegen)
+        val routeCodegen = SpektorRouteCodegen(config, context)
 
         apiCodegen.generate(schema.paths)
+        routeCodegen.generate(schema.paths)
 
         return context
     }
@@ -29,6 +32,10 @@ class SpektorCodegen(
     fun write(context: SpektorCodegenContext, outputRoot: Path) {
         val classWriter = SpektorClassWriter(outputRoot)
         for ((_, typeAndClass) in context.generatedTypeSpecs) {
+            classWriter.write(typeAndClass)
+        }
+
+        for ((_, typeAndClass) in context.generatedRouteSpecs) {
             classWriter.write(typeAndClass)
         }
 

@@ -9,16 +9,22 @@ data class SpektorCodegenConfig(
     val basePackage: String,
     val specRoot: Path,
     val dtoSuffix: String = "Dto",
-    val serverApiSuffix: String = "ServerApi"
+    val serverApiSuffix: String = "ServerApi",
+    val routesSuffix: String = "Routes"
 ) {
     fun classNameFor(ref: SpektorType.Ref): ClassName {
         val packageName = listOf(basePackage, ref.file.toPackageName(specRoot)).joinToString(".")
         return ClassName(packageName, ref.modelName + dtoSuffix)
     }
 
-    fun classNameFor(tagAndFile: TagAndFile): ClassName {
+    fun classNameForServerApi(tagAndFile: TagAndFile): ClassName {
         val packageName = listOf(basePackage, tagAndFile.path.toPackageName(specRoot)).joinToString(".")
         return ClassName(packageName, tagAndFile.tag + serverApiSuffix)
+    }
+
+    fun classNameForRoutes(tagAndFile: TagAndFile): ClassName {
+        val packageName = listOf(basePackage, tagAndFile.path.toPackageName(specRoot)).joinToString(".")
+        return ClassName(packageName, tagAndFile.tag + routesSuffix)
     }
 }
 

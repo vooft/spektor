@@ -50,9 +50,14 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     return@mapNotNull null
                 }
 
+                val microType = type as? SpektorType.MicroType ?: run {
+                    logger.warn { "Only micro types are supported for params, but got: $type for parameter ${parameter.name}, skipping" }
+                    return@mapNotNull null
+                }
+
                 SpektorPath.Variable(
                     name = parameter.name,
-                    type = type,
+                    type = microType,
                     required = parameter.required ?: false
                 )
             }

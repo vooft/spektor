@@ -8,13 +8,17 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import io.github.vooft.spektor.codegen.SpektorCodegenContext
-import io.github.vooft.spektor.codegen.SpektorCodegenContext.TypeAndClass
+import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
+import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
 
-class SpektorTypeCodegen(private val context: SpektorCodegenContext) {
+class SpektorTypeCodegen(
+    private val config: SpektorCodegenConfig,
+    private val context: SpektorCodegenContext
+) {
 
-    private val classCodegen = SpektorTypeObjectCodegen(this)
+    private val classCodegen = SpektorTypeObjectCodegen(config, this)
 
     fun generate(type: SpektorType): TypeName = when (type) {
         is SpektorType.List -> LIST.plusParameter(generate(type.itemType))
@@ -41,10 +45,10 @@ class SpektorTypeCodegen(private val context: SpektorCodegenContext) {
 
         val typeSpec = classCodegen.generate(lastRef, targetObject)
         refsTrace.forEach {
-            context.generatedTypeSpecs[it] = TypeAndClass(type = typeSpec, className = context.classNameFor(it))
+            context.generatedTypeSpecs[it] = TypeAndClass(type = typeSpec, className = config.classNameFor(it))
         }
 
-        return context.classNameFor(lastRef)
+        return config.classNameFor(lastRef)
     }
 
     private fun SpektorType.MicroType.toTypeName(): TypeName = when (type) {

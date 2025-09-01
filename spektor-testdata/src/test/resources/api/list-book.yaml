@@ -6,7 +6,7 @@ paths:
   /book:
     get:
       tags:
-        - Book
+        - BookList
       operationId: list
       responses:
         200:

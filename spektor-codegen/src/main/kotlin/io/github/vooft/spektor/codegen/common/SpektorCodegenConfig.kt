@@ -1,8 +1,8 @@
 package io.github.vooft.spektor.codegen.common
 
 import com.squareup.kotlinpoet.ClassName
-import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.TagAndFile
 import java.nio.file.Path
 
 data class SpektorCodegenConfig(
@@ -16,7 +16,7 @@ data class SpektorCodegenConfig(
         return ClassName(packageName, ref.modelName + dtoSuffix)
     }
 
-    fun classNameFor(tagAndFile: SpektorPath.TagAndFile): ClassName {
+    fun classNameFor(tagAndFile: TagAndFile): ClassName {
         val packageName = listOf(basePackage, tagAndFile.path.toPackageName(specRoot)).joinToString(".")
         return ClassName(packageName, tagAndFile.tag + serverApiSuffix)
     }

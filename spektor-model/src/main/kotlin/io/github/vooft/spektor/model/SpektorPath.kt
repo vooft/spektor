@@ -1,7 +1,5 @@
 package io.github.vooft.spektor.model
 
-import java.nio.file.Path
-
 data class SpektorPath(
     val tagAndFile: TagAndFile,
     val operationId: String,
@@ -36,8 +34,6 @@ data class SpektorPath(
         val type: SpektorType,
         val required: Boolean
     )
-
-    data class TagAndFile(val tag: String, val path: Path)
 
     enum class Method {
         GET,

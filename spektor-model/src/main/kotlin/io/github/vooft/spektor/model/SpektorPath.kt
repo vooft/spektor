@@ -31,7 +31,7 @@ data class SpektorPath(
 
     data class Variable(
         val name: String,
-        val type: SpektorType,
+        val type: SpektorType.MicroType,
         val required: Boolean
     )
 

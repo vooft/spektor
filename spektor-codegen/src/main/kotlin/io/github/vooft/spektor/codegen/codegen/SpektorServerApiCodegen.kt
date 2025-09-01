@@ -18,7 +18,7 @@ class SpektorServerApiCodegen(
 ) {
     fun generate(allPaths: Map<TagAndFile, List<SpektorPath>>) {
         for ((tagAndFile, paths) in allPaths) {
-            val className = config.classNameFor(tagAndFile)
+            val className = config.classNameForServerApi(tagAndFile)
             val typeSpec = generateSingleTag(className, paths)
             context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className)
         }

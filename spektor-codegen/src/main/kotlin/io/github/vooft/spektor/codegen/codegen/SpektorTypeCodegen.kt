@@ -25,7 +25,7 @@ class SpektorTypeCodegen(
         is SpektorType.MicroType -> type.toTypeName()
         is SpektorType.Object -> error("Generating object directly is not supported $type")
         is SpektorType.Ref -> generateRef(type)
-    }
+    }.also { context.resolvedTypes[type] = it }
 
     private fun SpektorType.Ref.traceRefs() = buildList {
         var current: SpektorType = this@traceRefs

@@ -9,21 +9,19 @@ import io.github.vooft.spektor.codegen.SpektorCodegenContext
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.TagAndFile
 
 class SpektorServerApiCodegen(
     private val config: SpektorCodegenConfig,
     private val context: SpektorCodegenContext,
     private val typeCodegen: SpektorTypeCodegen
 ) {
-    fun generate(paths: List<SpektorPath>) {
-        paths.validateSingleFilePerTag()
-        val byTagAndFile = paths.groupBy { it.tagAndFile }
-
-        byTagAndFile.map { (tagAndFile, paths) ->
+    fun generate(allPaths: Map<TagAndFile, List<SpektorPath>>) {
+        for ((tagAndFile, paths) in allPaths) {
             val className = config.classNameFor(tagAndFile)
             val typeSpec = generateSingleTag(className, paths)
-            TypeAndClass(type = typeSpec, className = className)
-        }.forEach { context.generatedPathSpecs.add(it) }
+            context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className)
+        }
     }
 
     private fun generateSingleTag(className: ClassName, paths: List<SpektorPath>) = TypeSpec.interfaceBuilder(className)
@@ -59,16 +57,6 @@ class SpektorServerApiCodegen(
         }
 
         return this
-    }
-
-    private fun List<SpektorPath>.validateSingleFilePerTag() {
-        val pathsByTag = groupBy { it.tagAndFile.tag }
-        val multipleFilesPerTag = pathsByTag.mapValues { (_, paths) -> paths.map { it.tagAndFile.path }.distinct() }
-            .filter { it.value.size > 1 }
-
-        require(multipleFilesPerTag.isEmpty()) {
-            "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
-        }
     }
 
     companion object {

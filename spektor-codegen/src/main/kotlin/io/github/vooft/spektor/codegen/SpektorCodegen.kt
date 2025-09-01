@@ -32,7 +32,7 @@ class SpektorCodegen(
             classWriter.write(typeAndClass)
         }
 
-        for (typeAndClass in context.generatedPathSpecs) {
+        for ((_, typeAndClass) in context.generatedPathSpecs) {
             classWriter.write(typeAndClass)
         }
     }

@@ -21,66 +21,72 @@ class SpektorParserTest {
         val schema = parser.parse(listOf(listFile, pathVarFile, requestBodyFile))
 
         schema shouldBe SpektorSchema(
-            paths = listOf(
-                SpektorPath(
-                    tagAndFile = TagAndFile("BookList", listFile.toAbsolutePath().normalize()),
-                    operationId = "list",
-                    path = "/book",
-                    requestBody = null,
-                    responseBody = SpektorType.RequiredWrapper(
-                        type = SpektorType.Ref(
-                            file = bookModelFile.toAbsolutePath().normalize(),
-                            modelName = "BooksList"
-                        ),
-                        required = true
-                    ),
-                    pathVariables = emptyList(),
-                    queryVariables = emptyList(),
-                    method = SpektorPath.Method.GET
-                ),
-                SpektorPath(
-                    tagAndFile = TagAndFile("Author", pathVarFile.toAbsolutePath().normalize()),
-                    operationId = "get",
-                    path = "/author/{id}",
-                    requestBody = null,
-                    responseBody = SpektorType.RequiredWrapper(
-                        type = SpektorType.Ref(
-                            file = authorModelFile.toAbsolutePath().normalize(),
-                            modelName = "Author"
-                        ),
-                        required = true
-                    ),
-                    pathVariables = listOf(
-                        SpektorPath.Variable(
-                            name = "id",
-                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
+            paths = mapOf(
+                TagAndFile("BookList", listFile.toAbsolutePath().normalize()) to listOf(
+                    SpektorPath(
+                        tagAndFile = TagAndFile("BookList", listFile.toAbsolutePath().normalize()),
+                        operationId = "list",
+                        path = "/book",
+                        requestBody = null,
+                        responseBody = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = bookModelFile.toAbsolutePath().normalize(),
+                                modelName = "BooksList"
+                            ),
                             required = true
-                        )
-                    ),
-                    queryVariables = emptyList(),
-                    method = SpektorPath.Method.GET
+                        ),
+                        pathVariables = emptyList(),
+                        queryVariables = emptyList(),
+                        method = SpektorPath.Method.GET
+                    )
                 ),
-                SpektorPath(
-                    tagAndFile = TagAndFile("Book", requestBodyFile.toAbsolutePath().normalize()),
-                    operationId = "create",
-                    path = "/book",
-                    requestBody = SpektorType.RequiredWrapper(
-                        type = SpektorType.Ref(
-                            file = bookModelFile.toAbsolutePath().normalize(),
-                            modelName = "BookRequest"
+                TagAndFile("Author", pathVarFile.toAbsolutePath().normalize()) to listOf(
+                    SpektorPath(
+                        tagAndFile = TagAndFile("Author", pathVarFile.toAbsolutePath().normalize()),
+                        operationId = "get",
+                        path = "/author/{id}",
+                        requestBody = null,
+                        responseBody = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = authorModelFile.toAbsolutePath().normalize(),
+                                modelName = "Author"
+                            ),
+                            required = true
                         ),
-                        required = true
-                    ),
-                    responseBody = SpektorType.RequiredWrapper(
-                        type = SpektorType.Ref(
-                            file = bookModelFile.toAbsolutePath().normalize(),
-                            modelName = "Book"
+                        pathVariables = listOf(
+                            SpektorPath.Variable(
+                                name = "id",
+                                type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
+                                required = true
+                            )
                         ),
-                        required = true
-                    ),
-                    pathVariables = emptyList(),
-                    queryVariables = emptyList(),
-                    method = SpektorPath.Method.POST
+                        queryVariables = emptyList(),
+                        method = SpektorPath.Method.GET
+                    )
+                ),
+                TagAndFile("Book", requestBodyFile.toAbsolutePath().normalize()) to listOf(
+                    SpektorPath(
+                        tagAndFile = TagAndFile("Book", requestBodyFile.toAbsolutePath().normalize()),
+                        operationId = "create",
+                        path = "/book",
+                        requestBody = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = bookModelFile.toAbsolutePath().normalize(),
+                                modelName = "BookRequest"
+                            ),
+                            required = true
+                        ),
+                        responseBody = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = bookModelFile.toAbsolutePath().normalize(),
+                                modelName = "Book"
+                            ),
+                            required = true
+                        ),
+                        pathVariables = emptyList(),
+                        queryVariables = emptyList(),
+                        method = SpektorPath.Method.POST
+                    )
                 )
             ),
             refs = mapOf(

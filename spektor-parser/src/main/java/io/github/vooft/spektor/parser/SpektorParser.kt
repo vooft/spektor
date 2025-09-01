@@ -29,7 +29,19 @@ class SpektorParser {
             resultRefs[ref] = type
         }
 
-        return SpektorSchema(paths = resultPaths, refs = resultRefs.toMap())
+        resultPaths.validateSingleFilePerTag()
+
+        return SpektorSchema(paths = resultPaths.groupBy { it.tagAndFile }, refs = resultRefs.toMap())
+    }
+
+    private fun List<SpektorPath>.validateSingleFilePerTag() {
+        val pathsByTag = groupBy { it.tagAndFile.tag }
+        val multipleFilesPerTag = pathsByTag.mapValues { (_, paths) -> paths.map { it.tagAndFile.path }.distinct() }
+            .filter { it.value.size > 1 }
+
+        require(multipleFilesPerTag.isEmpty()) {
+            "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
+        }
     }
 
     private fun SpektorPath.extractRefs(): Set<SpektorType.Ref> {

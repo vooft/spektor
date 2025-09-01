@@ -23,7 +23,7 @@ class SpektorParserTest {
             paths = listOf(
                 SpektorPath(
                     file = listFile.toAbsolutePath().normalize(),
-                    tag = "Book",
+                    tag = "BookList",
                     operationId = "list",
                     path = "/book",
                     requestBody = null,
@@ -54,7 +54,8 @@ class SpektorParserTest {
                     pathVariables = listOf(
                         SpektorPath.Variable(
                             name = "id",
-                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid")
+                            type = SpektorType.MicroType(type = OpenApiMicroType.STRING, format = "uuid"),
+                            required = true
                         )
                     ),
                     queryVariables = emptyList(),

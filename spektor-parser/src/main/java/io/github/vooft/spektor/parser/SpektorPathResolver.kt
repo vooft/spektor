@@ -53,6 +53,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                 SpektorPath.Variable(
                     name = parameter.name,
                     type = type,
+                    required = parameter.required ?: false
                 )
             }
     }

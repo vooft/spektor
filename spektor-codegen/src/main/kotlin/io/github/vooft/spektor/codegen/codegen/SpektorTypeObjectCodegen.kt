@@ -5,9 +5,13 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
+import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.model.SpektorType
 
-class SpektorTypeObjectCodegen(private val typeCodegen: SpektorTypeCodegen) {
+class SpektorTypeObjectCodegen(
+    private val config: SpektorCodegenConfig,
+    private val typeCodegen: SpektorTypeCodegen
+) {
 
     fun generate(ref: SpektorType.Ref, objectType: SpektorType.Object): TypeSpec {
         val fields = objectType.properties.map { (name, wrapper) ->
@@ -18,7 +22,7 @@ class SpektorTypeObjectCodegen(private val typeCodegen: SpektorTypeCodegen) {
             )
         }
 
-        return TypeSpec.classBuilder(ref.modelName)
+        return TypeSpec.classBuilder(config.classNameFor(ref))
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(fields)

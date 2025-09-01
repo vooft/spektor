@@ -1,13 +1,14 @@
 package io.github.vooft.spektor.codegen
 
+import io.github.vooft.spektor.codegen.codegen.SpektorServerApiCodegen
 import io.github.vooft.spektor.codegen.codegen.SpektorTypeCodegen
+import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.writer.SpektorClassWriter
 import io.github.vooft.spektor.model.SpektorSchema
 import java.nio.file.Path
 
 class SpektorCodegen(
-    private val specRoot: Path,
-    private val packagePrefix: String
+    private val config: SpektorCodegenConfig
 ) {
 
     fun generateAndWrite(schema: SpektorSchema, outputRoot: Path) {
@@ -16,21 +17,23 @@ class SpektorCodegen(
     }
 
     fun generate(schema: SpektorSchema): SpektorCodegenContext {
-        val context = SpektorCodegenContext(specRoot, packagePrefix, schema.paths, schema.refs)
-        val typeCodegen = SpektorTypeCodegen(context)
-        for ((ref, type) in schema.refs) {
-            if (type is io.github.vooft.spektor.model.SpektorType.Object) {
-                typeCodegen.generate(ref)
-            }
-        }
+        val context = SpektorCodegenContext(schema.paths, schema.refs)
+        val typeCodegen = SpektorTypeCodegen(config, context)
+        val apiCodegen = SpektorServerApiCodegen(config, context, typeCodegen)
+
+        apiCodegen.generate(schema.paths)
 
         return context
     }
 
     fun write(context: SpektorCodegenContext, outputRoot: Path) {
-        val classWriter = SpektorClassWriter(outputRoot, context)
-        for ((ref, _) in context.generatedTypeSpecs) {
-            classWriter.write(ref)
+        val classWriter = SpektorClassWriter(outputRoot)
+        for ((_, typeAndClass) in context.generatedTypeSpecs) {
+            classWriter.write(typeAndClass)
+        }
+
+        for (typeAndClass in context.generatedPathSpecs) {
+            classWriter.write(typeAndClass)
         }
     }
 }

@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import io.github.vooft.spektor.codegen.SpektorCodegenContext
+import io.github.vooft.spektor.codegen.SpektorCodegenContext.TypeAndClass
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
 
@@ -39,7 +40,9 @@ class SpektorTypeCodegen(private val context: SpektorCodegenContext) {
             ?: error("Only object references are supported, but got $target for ref $lastRef")
 
         val typeSpec = classCodegen.generate(lastRef, targetObject)
-        refsTrace.forEach { context.generatedTypeSpecs[it] = typeSpec }
+        refsTrace.forEach {
+            context.generatedTypeSpecs[it] = TypeAndClass(type = typeSpec, className = context.classNameFor(it))
+        }
 
         return context.classNameFor(lastRef)
     }

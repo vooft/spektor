@@ -7,10 +7,10 @@ import java.nio.file.Path
 
 class SpektorClassWriter(private val outputRoot: Path, private val context: SpektorCodegenContext) {
     fun write(ref: SpektorType.Ref) {
-        val className = context.classNameFor(ref)
+        val (type, className) = context.generatedTypeSpecs.getValue(ref)
 
-        FileSpec.Companion.builder(className)
-            .addType(context.generatedTypeSpecs.getValue(ref))
+        FileSpec.builder(className)
+            .addType(type)
             .build()
             .writeTo(outputRoot)
     }

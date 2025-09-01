@@ -11,7 +11,7 @@ class SpektorCodegenContext(
     val packagePrefix: String,
     val paths: List<SpektorPath>,
     val refs: Map<SpektorType.Ref, SpektorType>,
-    val generatedTypeSpecs: MutableMap<SpektorType.Ref, TypeSpec> = mutableMapOf(),
+    val generatedTypeSpecs: MutableMap<SpektorType.Ref, TypeAndClass> = mutableMapOf(),
 ) {
     val specRootNormalized = this@SpektorCodegenContext.specRoot.toAbsolutePath().normalize().toString()
 
@@ -25,4 +25,6 @@ class SpektorCodegenContext(
         val relativePath = thisNormalized.removePrefix(specRootNormalized).removePrefix("/").substringBeforeLast('/')
         return relativePath.replace("/", ".")
     }
+
+    data class TypeAndClass(val type: TypeSpec, val className: ClassName)
 }

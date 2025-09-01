@@ -16,9 +16,9 @@ data class SpektorCodegenConfig(
         return ClassName(packageName, ref.modelName + dtoSuffix)
     }
 
-    fun classNameFor(path: SpektorPath): ClassName {
-        val packageName = listOf(basePackage, path.file.toPackageName(specRoot)).joinToString(".")
-        return ClassName(packageName, path.tag.value + serverApiSuffix)
+    fun classNameFor(tagAndFile: SpektorPath.TagAndFile): ClassName {
+        val packageName = listOf(basePackage, tagAndFile.path.toPackageName(specRoot)).joinToString(".")
+        return ClassName(packageName, tagAndFile.tag + serverApiSuffix)
     }
 }
 

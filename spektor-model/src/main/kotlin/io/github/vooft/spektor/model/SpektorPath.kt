@@ -3,8 +3,7 @@ package io.github.vooft.spektor.model
 import java.nio.file.Path
 
 data class SpektorPath(
-    val file: Path,
-    val tag: Tag,
+    val tagAndFile: TagAndFile,
     val operationId: String,
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
@@ -38,8 +37,7 @@ data class SpektorPath(
         val required: Boolean
     )
 
-    @JvmInline
-    value class Tag(val value: String)
+    data class TagAndFile(val tag: String, val path: Path)
 
     enum class Method {
         GET,

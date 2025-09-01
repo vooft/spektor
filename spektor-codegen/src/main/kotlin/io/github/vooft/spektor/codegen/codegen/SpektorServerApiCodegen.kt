@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
@@ -15,23 +16,17 @@ class SpektorServerApiCodegen(
     private val typeCodegen: SpektorTypeCodegen
 ) {
     fun generate(paths: List<SpektorPath>) {
-        val pathsByTag = paths.groupBy { it.tag }
+        paths.validateSingleFilePerTag()
+        val byTagAndFile = paths.groupBy { it.tagAndFile }
 
-        val multipleFilesPerTag = pathsByTag.mapValues { (_, list) -> list.map { it.file }.distinct() }
-            .filterValues { it.size > 1 }
-
-        require(multipleFilesPerTag.isEmpty()) {
-            "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
-        }
-
-        pathsByTag.map { (_, paths) ->
-            val typeSpec = generateSingleTag(paths)
-            val className = config.classNameFor(paths.first())
+        byTagAndFile.map { (tagAndFile, paths) ->
+            val className = config.classNameFor(tagAndFile)
+            val typeSpec = generateSingleTag(className, paths)
             TypeAndClass(type = typeSpec, className = className)
         }.forEach { context.generatedPathSpecs.add(it) }
     }
 
-    private fun generateSingleTag(paths: List<SpektorPath>): TypeSpec = TypeSpec.interfaceBuilder(config.classNameFor(paths.first()))
+    private fun generateSingleTag(className: ClassName, paths: List<SpektorPath>) = TypeSpec.interfaceBuilder(className)
         .also { builder -> paths.forEach { builder.addFunction(it.toFunSpec()) } }
         .build()
 
@@ -64,6 +59,16 @@ class SpektorServerApiCodegen(
         }
 
         return this
+    }
+
+    private fun List<SpektorPath>.validateSingleFilePerTag() {
+        val pathsByTag = groupBy { it.tagAndFile.tag }
+        val multipleFilesPerTag = pathsByTag.mapValues { (_, paths) -> paths.map { it.tagAndFile.path }.distinct() }
+            .filter { it.value.size > 1 }
+
+        require(multipleFilesPerTag.isEmpty()) {
+            "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
+        }
     }
 
     companion object {

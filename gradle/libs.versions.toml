@@ -11,6 +11,8 @@ gradle-plugin-ktlint = { module = "org.jmailen.kotlinter:org.jmailen.kotlinter.g
 gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version = "2.0.0" }
 gradle-plugin-maven-central-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.34.0" }
 
+kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
+
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version = "2.1.33" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version = "2.2.0" }
 

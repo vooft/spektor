@@ -1,0 +1,23 @@
+openapi: 3.0.1
+info:
+  title: Book API
+  version: 1.0.0
+paths:
+  /book:
+    post:
+      tags:
+        - Book
+      operationId: create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../models/book.yaml#/components/schemas/BookRequest'
+      responses:
+        200:
+          description: Model was created
+          content:
+            application/json:
+              schema:
+                $ref: '../models/book.yaml#/components/schemas/Book'

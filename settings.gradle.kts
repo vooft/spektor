@@ -4,10 +4,8 @@ include(
     ":spektor-sample",
 )
 
-includeBuild("spektor-lib") {
+includeBuild("spektor-gradle-plugin") {
     dependencySubstitution {
-        listOf("spektor-codegen", "spektor-model", "spektor-parser", "spektor-testdata").forEach {
-            substitute(module("io.github.vooft:$it")).using(project(":$it"))
-        }
+        substitute(module("io.github.vooft:spektor-gradle-plugin")).using(project(":"))
     }
 }

@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 data class SpektorPath(
     val file: Path,
-    val tag: String,
+    val tag: Tag,
     val operationId: String,
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
@@ -37,6 +37,9 @@ data class SpektorPath(
         val type: SpektorType,
         val required: Boolean
     )
+
+    @JvmInline
+    value class Tag(val value: String)
 
     enum class Method {
         GET,

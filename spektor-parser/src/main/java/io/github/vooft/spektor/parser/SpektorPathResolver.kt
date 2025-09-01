@@ -2,6 +2,7 @@ package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorPath.Tag
 import io.github.vooft.spektor.model.SpektorType
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Content
@@ -30,13 +31,13 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         method = method
     )
 
-    private fun Operation.resolveTag(): String {
+    private fun Operation.resolveTag(): Tag {
         val tagsVal = this.tags ?: return TAG_PLACEHOLDER
         if (tagsVal.size > 1) {
             logger.warn { "Multiple tags found: $tagsVal, using the first one" }
         }
 
-        return tagsVal.firstOrNull() ?: run {
+        return tagsVal.firstOrNull()?.let { Tag(it) } ?: run {
             logger.warn { "No tags found, using placeholder" }
             TAG_PLACEHOLDER
         }
@@ -108,6 +109,6 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     companion object Companion {
         private val logger = KotlinLogging.logger { }
         private const val APPLICATION_JSON = "application/json"
-        private const val TAG_PLACEHOLDER = "SpektorDefault"
+        private val TAG_PLACEHOLDER = Tag("SpektorDefault")
     }
 }

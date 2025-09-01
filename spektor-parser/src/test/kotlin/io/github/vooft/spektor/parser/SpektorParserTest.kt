@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.parser
 
 import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorPath.Tag
 import io.github.vooft.spektor.model.SpektorSchema
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
@@ -23,7 +24,7 @@ class SpektorParserTest {
             paths = listOf(
                 SpektorPath(
                     file = listFile.toAbsolutePath().normalize(),
-                    tag = "BookList",
+                    tag = Tag("BookList"),
                     operationId = "list",
                     path = "/book",
                     requestBody = null,
@@ -40,7 +41,7 @@ class SpektorParserTest {
                 ),
                 SpektorPath(
                     file = pathVarFile.toAbsolutePath().normalize(),
-                    tag = "Author",
+                    tag = Tag("Author"),
                     operationId = "get",
                     path = "/author/{id}",
                     requestBody = null,
@@ -63,7 +64,7 @@ class SpektorParserTest {
                 ),
                 SpektorPath(
                     file = requestBodyFile.toAbsolutePath().normalize(),
-                    tag = "Book",
+                    tag = Tag("Book"),
                     operationId = "create",
                     path = "/book",
                     requestBody = SpektorType.RequiredWrapper(

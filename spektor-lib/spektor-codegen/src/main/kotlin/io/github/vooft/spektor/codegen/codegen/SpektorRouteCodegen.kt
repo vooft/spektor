@@ -60,48 +60,25 @@ class SpektorRouteCodegen(
 
                     // reading path variables
                     for (variable in path.pathVariables) {
-                        add(
-                            "  val %L = call.parameters[%S]?.let { %L }",
-                            variable.name,
-                            variable.name,
-                            variable.type.parseFromString("it")
-                        )
-
-                        if (variable.required) {
-                            add(" ?: throw IllegalArgumentException(%S)\n", "Path variable '${variable.name}' is required")
-                        } else {
-                            add("\n")
-                        }
+                        addVariable(variable, "call.parameters", "Path")
                     }
 
                     // reading query variables
                     for (variable in path.queryVariables) {
-                        add(
-                            "  val %L = call.request.queryParameters[%S]?.let { %L }\n",
-                            variable.name,
-                            variable.name,
-                            variable.type.parseFromString("it")
-                        )
-
-                        if (variable.required) {
-                            add(" ?: throw IllegalArgumentException(%S)\n", "Path variable '${variable.name}' is required")
-                        } else {
-                            add("\n")
-                        }
+                        addVariable(variable, "call.request.queryParameters", "Query")
                     }
 
                     // reading request body
                     val requestBody = path.requestBody
                     if (requestBody != null) {
-                        add("  val requestBody = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                        add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
                     }
 
                     // adding actual call
-//                    add("  val response = withApplicationCall {\n")
-//                    add("    $API_SERVICE_FIELD.%L(\n", path.operationId)
                     add("  val response = $API_SERVICE_FIELD.%L(\n", path.operationId)
+
                     if (requestBody != null) {
-                        add("      requestBody = requestBody,\n")
+                        add("      request = request,\n")
                     }
 
                     for (variable in path.pathVariables) {
@@ -112,8 +89,9 @@ class SpektorRouteCodegen(
                         add("      ${variable.name} = ${variable.name},\n")
                     }
 
+                    add("      call = call,\n")
+
                     add("    )\n")
-//                    add("  }\n")
 
                     // add response
                     add("  call.respond(response)\n")
@@ -124,15 +102,39 @@ class SpektorRouteCodegen(
         )
         .build()
 
-    private fun SpektorType.MicroType.parseFromString(varName: String): String = when (type) {
-        OpenApiMicroType.STRING -> varName
-        OpenApiMicroType.INTEGER -> "$varName.toInt()"
-        OpenApiMicroType.BOOLEAN -> "$varName.toBoolean()"
-        OpenApiMicroType.NUMBER -> "$varName.toDouble()"
+    private fun CodeBlock.Builder.addVariable(variable: SpektorPath.Variable, accessor: String, errorText: String) {
+        add(
+            "  val %L = %L[%S]?.let { v -> ",
+            variable.name,
+            accessor,
+            variable.name,
+        )
+
+        addParseFromString(variable.type, "v")
+
+        add(" }")
+
+        if (variable.required) {
+            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "$errorText variable '${variable.name}' is required")
+        } else {
+            add("\n")
+        }
+    }
+
+    private fun CodeBlock.Builder.addParseFromString(type: SpektorType.MicroType, varName: String) {
+        val converter = when (type.type) {
+            OpenApiMicroType.STRING -> varName
+            OpenApiMicroType.INTEGER -> "$varName.toInt()"
+            OpenApiMicroType.BOOLEAN -> "$varName.toBoolean()"
+            OpenApiMicroType.NUMBER -> "$varName.toDouble()"
+        }
+
+        add(converter)
     }
 
     companion object {
         private val KTOR_ROUTE_CLASS = ClassName("io.ktor.server.routing", "Route")
+        private val KTOR_BAD_REQUEST_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "BadRequestException")
 
         private const val API_SERVICE_FIELD = "apiService"
 

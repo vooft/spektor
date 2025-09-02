@@ -14,7 +14,7 @@ import io.github.vooft.spektor.model.TagAndFile
 class SpektorServerApiCodegen(
     private val config: SpektorCodegenConfig,
     private val context: SpektorCodegenContext,
-    private val typeCodegen: SpektorTypeCodegen
+    private val typeCodegen: SpektorTypeCodegen,
 ) {
     fun generate(allPaths: Map<TagAndFile, List<SpektorPath>>) {
         for ((tagAndFile, paths) in allPaths) {
@@ -42,11 +42,12 @@ class SpektorServerApiCodegen(
             .addModifiers(KModifier.ABSTRACT)
             .apply {
                 if (requestType != null) {
-                    addParameter("requestBody", requestType)
+                    addParameter("request", requestType)
                 }
             }
             .addParameters(pathVariables)
             .addParameters(queryVariables)
+            .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
             .build()
     }
 
@@ -61,5 +62,6 @@ class SpektorServerApiCodegen(
 
     companion object {
         private val UNIT_TYPENAME = Unit::class.asClassName()
+        private val KTOR_APPLICATION_CALL_TYPENAME = ClassName("io.ktor.server.application", "ApplicationCall")
     }
 }

@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
@@ -8,7 +9,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.model.SpektorType
 
-class SpektorTypeObjectCodegen(
+class SpektorTypeDtoCodegen(
     private val config: SpektorCodegenConfig,
     private val typeCodegen: SpektorTypeCodegen
 ) {
@@ -23,6 +24,7 @@ class SpektorTypeObjectCodegen(
         }
 
         return TypeSpec.classBuilder(config.classNameFor(ref))
+            .addAnnotation(SERIALIZABLE_ANNOTATION)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(fields)
@@ -55,6 +57,10 @@ class SpektorTypeObjectCodegen(
         }
 
         return this
+    }
+
+    companion object {
+        private val SERIALIZABLE_ANNOTATION = ClassName("kotlinx.serialization", "Serializable")
     }
 }
 

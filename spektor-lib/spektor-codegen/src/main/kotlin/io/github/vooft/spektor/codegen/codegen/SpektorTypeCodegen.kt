@@ -18,7 +18,7 @@ class SpektorTypeCodegen(
     private val context: SpektorCodegenContext
 ) {
 
-    private val classCodegen = SpektorTypeObjectCodegen(config, this)
+    private val classCodegen = SpektorTypeDtoCodegen(config, this)
 
     fun generate(type: SpektorType): TypeName = when (type) {
         is SpektorType.List -> LIST.plusParameter(generate(type.itemType))

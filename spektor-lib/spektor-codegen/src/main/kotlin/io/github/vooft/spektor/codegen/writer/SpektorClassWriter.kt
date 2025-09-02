@@ -7,6 +7,11 @@ import java.nio.file.Path
 class SpektorClassWriter(private val outputRoot: Path) {
     fun write(typeAndClass: TypeAndClass) {
         FileSpec.builder(typeAndClass.className)
+            .apply {
+                for (import in typeAndClass.imports) {
+                    addImport(import.packageName, import.name)
+                }
+            }
             .addType(typeAndClass.type)
             .build()
             .writeTo(outputRoot)

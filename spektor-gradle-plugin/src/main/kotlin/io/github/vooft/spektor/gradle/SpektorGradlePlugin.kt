@@ -3,6 +3,7 @@ package io.github.vooft.spektor.gradle
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import java.io.File
 
@@ -17,7 +18,7 @@ class SpektorGradlePlugin : Plugin<Project> {
         val outputDirectory = target.layout.buildDirectory.dir("openapi-generated")
 
         // add generated classes to the source set
-//        target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").kotlin.srcDir(outputDirectory)
+        target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").kotlin.srcDir(outputDirectory)
 
         // Run custom code after project is evaluated
         val spektorGenerate = target.tasks.register("spektorGenerate", SpektorGenerateTask::class.java) {

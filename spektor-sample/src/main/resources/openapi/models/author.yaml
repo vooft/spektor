@@ -27,4 +27,27 @@ components:
         - name
         - dateOfBirth
         - createdAt
+    AuthorsList:
+      type: object
+      properties:
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+      required:
+        - authors
+    AuthorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        dateOfDeath:
+          type: string
+          format: date
+      required:
+        - name
+        - dateOfBirth
 

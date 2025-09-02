@@ -1,0 +1,77 @@
+openapi: 3.0.1
+info:
+  title: Author API
+  version: 1.0.0
+paths:
+  /author:
+    get:
+      tags:
+        - Author
+      operationId: list
+      responses:
+        200:
+          description: List is returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/author.yaml#/components/schemas/AuthorsList'
+    post:
+      tags:
+        - Author
+      operationId: create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../models/author.yaml#/components/schemas/AuthorRequest'
+      responses:
+        200:
+          description: Model was created
+          content:
+            application/json:
+              schema:
+                $ref: '../models/author.yaml#/components/schemas/Author'
+  /author/{id}:
+    get:
+      tags:
+        - Author
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Retrieved by id
+          content:
+            application/json:
+              schema:
+                $ref: '../models/author.yaml#/components/schemas/Author'
+  /author/{id}/books:
+    get:
+      tags:
+        - Author
+      operationId: search
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: filter
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of books
+          content:
+            application/json:
+              schema:
+                $ref: '../models/book.yaml#/components/schemas/BooksList'

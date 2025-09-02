@@ -5,4 +5,5 @@ include(
     ":spektor-testdata",
     ":spektor-parser",
     ":spektor-codegen",
+    ":spektor-sample",
 )

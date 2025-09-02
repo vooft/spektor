@@ -1,0 +1,46 @@
+openapi: 3.0.1
+info:
+  title: Book Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        nativeTitle:
+          type: string
+        author:
+          $ref: "./author.yaml#/components/schemas/Author"
+      required:
+        - id
+        - title
+        - author
+    BooksList:
+      type: object
+      properties:
+        books:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+      required:
+        - books
+    BookRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        nativeTitle:
+          type: string
+        authorId:
+          type: string
+          format: uuid
+      required:
+        - title
+        - authorId
+

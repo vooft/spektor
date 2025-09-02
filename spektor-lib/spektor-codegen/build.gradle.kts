@@ -4,12 +4,12 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":spektor-model"))
-    implementation(project(":spektor-parser"))
+    api(project(":spektor-model"))
 
     implementation(libs.kotlinpoet)
     implementation(libs.kotlin.logging)
 
+    testImplementation(project(":spektor-parser"))
     testImplementation(project(":spektor-testdata"))
     testImplementation(libs.kotest.assertions)
     testImplementation(libs.kotest.runner)

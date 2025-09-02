@@ -6,8 +6,9 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm")
     id("spektor-base")
+    java
+    kotlin("jvm")
 }
 
 group = "io.github.vooft"

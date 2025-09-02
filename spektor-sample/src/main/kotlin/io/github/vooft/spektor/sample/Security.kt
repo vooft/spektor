@@ -2,21 +2,14 @@ package io.github.vooft.spektor.sample
 
 import io.ktor.server.application.Application
 import io.ktor.server.auth.UserIdPrincipal
-import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.basic
-import io.ktor.server.auth.form
-import io.ktor.server.auth.principal
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
 
 fun Application.configureSecurity() {
     authentication {
-        basic(name = "myauth1") {
-            realm = "Ktor Server"
+        basic(name = "admin") {
             validate { credentials ->
-                if (credentials.name == credentials.password) {
+                if (credentials.name == "admin" && credentials.password == "admin") {
                     UserIdPrincipal(credentials.name)
                 } else {
                     null
@@ -24,25 +17,13 @@ fun Application.configureSecurity() {
             }
         }
 
-        form(name = "myauth2") {
-            userParamName = "user"
-            passwordParamName = "password"
-            challenge {
-                /**/
-            }
-        }
-    }
-    routing {
-        authenticate("myauth1") {
-            get("/protected/route/basic") {
-                val principal = requireNotNull(call.principal<UserIdPrincipal>())
-                call.respondText("Hello ${principal.name}")
-            }
-        }
-        authenticate("myauth2") {
-            get("/protected/route/form") {
-                val principal = requireNotNull(call.principal<UserIdPrincipal>())
-                call.respondText("Hello ${principal.name}")
+        basic(name = "user") {
+            validate { credentials ->
+                if (credentials.name == "user" && credentials.password == "user") {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
             }
         }
     }

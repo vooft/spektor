@@ -29,6 +29,8 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
+
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 
 [plugins]
@@ -40,4 +42,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 
 [bundles]
-ktor = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-serialization-kotlinx-json", "ktor-server-auth", "ktor-server-cio", "ktor-server-config-yaml"]
+ktor = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-serialization-kotlinx-json", "ktor-server-auth", "ktor-server-cio", "ktor-server-config-yaml", "ktor-server-di"]

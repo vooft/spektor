@@ -55,7 +55,7 @@ paths:
     get:
       tags:
         - Author
-      operationId: search
+      operationId: searchBooks
       parameters:
         - name: id
           in: path

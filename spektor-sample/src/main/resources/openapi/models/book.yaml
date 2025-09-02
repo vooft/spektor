@@ -17,10 +17,14 @@ components:
           type: string
         author:
           $ref: "./author.yaml#/components/schemas/Author"
+        createdAt:
+          type: string
+          format: date-time
       required:
         - id
         - title
         - author
+        - createdAt
     BooksList:
       type: object
       properties:

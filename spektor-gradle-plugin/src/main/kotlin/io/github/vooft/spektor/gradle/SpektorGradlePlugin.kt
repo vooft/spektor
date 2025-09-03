@@ -15,7 +15,7 @@ class SpektorGradlePlugin : Plugin<Project> {
         // Add dependency to api configuration
 //        target.dependencies.add("api", "io.github.vooft:spektor-api:${BuildConfig.VERSION}")
 
-        val outputDirectory = target.layout.buildDirectory.dir("openapi-generated")
+        val outputDirectory = target.layout.buildDirectory.dir("spektor-generated")
 
         // add generated classes to the source set
         target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").kotlin.srcDir(outputDirectory)

@@ -7,13 +7,10 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.Test
 
-class ApplicationTest {
-
+class AuthorTest {
     @Test
     fun testRoot() = testApplication {
-        application {
-            module()
-        }
+        application { module() }
         client.get("/").apply {
             status shouldBe HttpStatusCode.OK
         }

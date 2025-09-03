@@ -32,4 +32,18 @@ class AuthorTest {
         dto.dateOfBirth shouldBe dob
         dto.dateOfDeath shouldBe dod
     }
+
+    @Test
+    fun `should fail to create author with 401`() = testClient("not admin") { client ->
+        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        val response = api.create(
+            AuthorRequestTestDto(
+                name = "test",
+                dateOfBirth = LocalDate.parse("1800-01-01"),
+            )
+        )
+
+        response.status shouldBe 401
+    }
 }

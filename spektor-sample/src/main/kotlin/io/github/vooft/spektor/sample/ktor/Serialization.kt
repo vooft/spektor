@@ -1,4 +1,4 @@
-package io.github.vooft.spektor.sample
+package io.github.vooft.spektor.sample.ktor
 
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application

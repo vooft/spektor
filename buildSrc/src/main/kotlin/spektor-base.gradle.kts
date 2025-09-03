@@ -19,6 +19,7 @@ detekt {
 
 tasks.withType<Detekt> {
     tasks.findByName("check")?.dependsOn(this)
+    exclude { it.file.path.contains("generated/") }
 }
 
 tasks.withType<JavaCompile> {
@@ -28,15 +29,11 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<LintTask> {
     source("build.gradle.kts", "settings.gradle.kts")
-    exclude {
-        it.file.path.startsWith("${layout.buildDirectory.get()}") && !it.file.path.endsWith("gradle.kts")
-    }
+    exclude { it.file.path.contains("generated/") }
     dependsOn("formatKotlin")
 }
 
 tasks.withType<FormatTask> {
     source("build.gradle.kts", "settings.gradle.kts")
-    exclude {
-        it.file.path.startsWith("${layout.buildDirectory.get()}") && !it.file.path.endsWith("gradle.kts")
-    }
+    exclude { it.file.path.contains("generated/") }
 }

@@ -27,19 +27,15 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.kotlin.logging)
     implementation(libs.slf4j.simple)
+    implementation("io.ktor:ktor-client-auth:3.2.3")
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.kotest.assertions)
     testImplementation(libs.junit.jupiter.engine)
 
-    testImplementation(platform(libs.okhttp.bom))
-    testImplementation("com.squareup.okhttp3:okhttp")
-    testImplementation("com.squareup.okhttp3:logging-interceptor")
-    testImplementation("com.squareup.okhttp3:okhttp-urlconnection")
-
-    testImplementation(platform(libs.jackson.bom))
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    testImplementation(libs.ktor.client.content.negotiation)
+    testImplementation(libs.kotlinx.dateime)
 }
 
 tasks.withType<FormatTask> {
@@ -50,6 +46,7 @@ listOf("src/main/resources/openapi/api/author.yaml", "src/main/resources/openapi
     val taskName = "generateTestClientOpenApi$index"
     tasks.register<GenerateTask>(taskName) {
         generatorName.set("kotlin")
+        library.set("multiplatform")
         skipOverwrite.set(true)
 
         inputSpec.set(file(specPath).absolutePath)
@@ -57,21 +54,21 @@ listOf("src/main/resources/openapi/api/author.yaml", "src/main/resources/openapi
 
         packageName.set("io.github.vooft.spektor.test")
 
-        typeMappings.put("DateTime", "java.time.Instant")
-        typeMappings.put("java.time.OffsetDateTime", "java.time.Instant")
-        importMappings.put("DateTime", "java.time.Instant")
-        importMappings.put("java.time.OffsetDateTime", "java.time.Instant")
-
         modelNameSuffix.set("TestDto")
+
+        additionalProperties.set(
+            mapOf(
+                "dateLibrary" to "kotlinx-datetime",
+            )
+        )
 
         configOptions.set(
             mapOf(
-                "serializationLibrary" to "jackson",
                 "interfaceOnly" to "true",
                 "useTags" to "true",
                 "enumPropertyNaming" to "original",
                 "skipDefaultInterface" to "true",
-                "apiSuffix" to "ClientApi"
+                "apiSuffix" to "TestApi"
             )
         )
     }
@@ -85,4 +82,4 @@ listOf("src/main/resources/openapi/api/author.yaml", "src/main/resources/openapi
     }
 }
 
-kotlin.sourceSets["test"].kotlin.srcDir("${layout.buildDirectory.get().asFile.absolutePath}/test-generated/src/main/kotlin")
+kotlin.sourceSets["test"].kotlin.srcDir("${layout.buildDirectory.get().asFile.absolutePath}/test-generated/src/commonMain/kotlin")

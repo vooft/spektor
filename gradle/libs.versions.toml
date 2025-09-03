@@ -22,6 +22,7 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 
 kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "7.0.13" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }
+kotlinx-dateime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.2" }
 
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
@@ -29,6 +30,9 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+
 ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref = "ktor" }
 
 [plugins]
@@ -38,6 +42,7 @@ plugin-publish = { id = "com.gradle.plugin-publish", version = "1.3.1" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.7" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+openapi = { id = "org.openapi.generator", version = "7.14.0" }
 
 [bundles]
-ktor = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-serialization-kotlinx-json", "ktor-server-auth", "ktor-server-cio", "ktor-server-config-yaml"]
+ktor = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-serialization-kotlinx-json", "ktor-server-auth", "ktor-server-cio", "ktor-server-config-yaml", "ktor-server-di"]

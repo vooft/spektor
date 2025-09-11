@@ -16,7 +16,4 @@ data class BookModel(
 
 @Serializable
 @JvmInline
-value class BookId(
-    val value: @Contextual
-    UUID
-)
+value class BookId(@Contextual val value: UUID)

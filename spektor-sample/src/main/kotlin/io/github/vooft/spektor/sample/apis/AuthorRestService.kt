@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.sample.apis
 
 import io.github.vooft.spektor.sample.apis.Mappers.toDto
+import io.github.vooft.spektor.sample.models.AuthorId
 import io.github.vooft.spektor.sample.models.AuthorModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
@@ -20,7 +21,7 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
 
     override fun create(request: AuthorRequestDto, call: ApplicationCall): AuthorDto {
         val author = AuthorModel(
-            id = UUID.randomUUID(),
+            id = AuthorId(UUID.randomUUID()),
             name = request.name,
             dateOfBirth = request.dateOfBirth,
             dateOfDeath = request.dateOfDeath,
@@ -32,12 +33,12 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
     }
 
     override fun get(id: UUID, call: ApplicationCall): AuthorDto {
-        val author = authors.single { it.id == id }
+        val author = authors.single { it.id.value == id }
         return author.toDto()
     }
 
     override fun searchBooks(id: UUID, filter: String, call: ApplicationCall): BooksListDto {
-        val books = books.filter { it.authorId == id }.filter { it.title.contains(filter, ignoreCase = true) }
+        val books = books.filter { it.authorId.value == id }.filter { it.title.contains(filter, ignoreCase = true) }
         return BooksListDto(books = books.map { it.toDto(authors) })
     }
 }

@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen
 
+import com.squareup.kotlinpoet.ClassName
 import io.github.vooft.spektor.codegen.codegen.SpektorRouteCodegen
 import io.github.vooft.spektor.codegen.codegen.SpektorServerApiCodegen
 import io.github.vooft.spektor.codegen.codegen.SpektorTypeCodegen
@@ -19,6 +20,8 @@ class SpektorCodegen(
 
     fun generate(schema: SpektorSchema): SpektorCodegenContext {
         val context = SpektorCodegenContext(schema.paths, schema.refs)
+        context.substituteRefsFromConfig()
+
         val typeCodegen = SpektorTypeCodegen(config, context)
         val apiCodegen = SpektorServerApiCodegen(config, context, typeCodegen)
         val routeCodegen = SpektorRouteCodegen(config, context)
@@ -41,6 +44,12 @@ class SpektorCodegen(
 
         for ((_, typeAndClass) in context.generatedPathSpecs) {
             classWriter.write(typeAndClass)
+        }
+    }
+
+    private fun SpektorCodegenContext.substituteRefsFromConfig() {
+        for ((ref, clazz) in config.dtoSubstitutions) {
+            resolvedTypes[ref] = ClassName.bestGuess(clazz)
         }
     }
 }

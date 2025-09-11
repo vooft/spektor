@@ -1,4 +1,5 @@
-
+import io.github.vooft.spektor.gradle.ModelRef
+import io.github.vooft.spektor.gradle.PropertyRef
 import io.github.vooft.spektor.gradle.SpektorGenerateTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
@@ -21,6 +22,43 @@ application {
 
 spektor {
     specRoot = file("src/main/resources/openapi")
+
+    dtoSubstitutions.put(
+        ModelRef(file = file("src/main/resources/openapi/models/money.yaml"), modelName = "Money"),
+        "io.github.vooft.spektor.sample.models.Money"
+    )
+
+    microtypeSubstitutions.put(
+        PropertyRef(
+            ref = ModelRef(file = file("src/main/resources/openapi/models/book.yaml"), modelName = "Book"),
+            propertyName = "id"
+        ),
+        "io.github.vooft.spektor.sample.models.BookId"
+    )
+
+    microtypeSubstitutions.put(
+        PropertyRef(
+            ref = ModelRef(file = file("src/main/resources/openapi/models/book.yaml"), modelName = "Book"),
+            propertyName = "authorId"
+        ),
+        "io.github.vooft.spektor.sample.models.AuthorId"
+    )
+
+    microtypeSubstitutions.put(
+        PropertyRef(
+            ref = ModelRef(file = file("src/main/resources/openapi/models/book.yaml"), modelName = "BookRequest"),
+            propertyName = "authorId"
+        ),
+        "io.github.vooft.spektor.sample.models.AuthorId"
+    )
+
+    microtypeSubstitutions.put(
+        PropertyRef(
+            ref = ModelRef(file = file("src/main/resources/openapi/models/author.yaml"), modelName = "Author"),
+            propertyName = "id"
+        ),
+        "io.github.vooft.spektor.sample.models.AuthorId"
+    )
 }
 
 dependencies {

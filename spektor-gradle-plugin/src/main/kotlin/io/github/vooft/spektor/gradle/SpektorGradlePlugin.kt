@@ -5,7 +5,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
-import java.io.File
 
 class SpektorGradlePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -28,22 +27,17 @@ class SpektorGradlePlugin : Plugin<Project> {
             it.serverApiSuffix.set(extension.serverApiSuffix)
             it.routesSuffix.set(extension.routesSuffix)
             it.specRoot.set(extension.requireSpecRoot())
+
+            it.dtoSubstitutions.set(extension.dtoSubstitutions)
+            it.microtypeSubstitutions.set(extension.microtypeSubstitutions)
+
+            it.substitutionFingerprint.set(extension.dtoSubstitutions.toString() + extension.microtypeSubstitutions.toString())
         }
 
         target.tasks.withType(KotlinCompilationTask::class.java) {
             it.dependsOn(spektorGenerate)
         }
     }
-}
-
-open class SpektorExtension {
-    var specRoot: File? = null
-
-    var basePackage: String = "spektor.example"
-    var enabled: Boolean = true
-    var dtoSuffix: String = "Dto"
-    var serverApiSuffix: String = "ServerApi"
-    var routesSuffix: String = "Routes"
 }
 
 private fun SpektorExtension.requireSpecRoot() = specRoot ?: throw GradleException("spektor.specRoot is not set")

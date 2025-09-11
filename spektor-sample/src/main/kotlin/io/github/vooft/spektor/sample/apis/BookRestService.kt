@@ -1,8 +1,8 @@
 package io.github.vooft.spektor.sample.apis
 
 import io.github.vooft.spektor.sample.apis.Mappers.toDto
+import io.github.vooft.spektor.sample.models.BookId
 import io.github.vooft.spektor.sample.models.BookModel
-import io.github.vooft.spektor.sample.models.MoneyModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.ApplicationCall
@@ -18,11 +18,11 @@ class BookRestService(
 ) : BookServerApi {
     override fun create(request: BookRequestDto, call: ApplicationCall): BookDto {
         val book = BookModel(
-            id = UUID.randomUUID(),
+            id = BookId(UUID.randomUUID()),
             title = request.title,
             nativeTitle = request.nativeTitle,
             authorId = request.authorId,
-            price = request.price?.let { MoneyModel(it.minorUnits, it.currency) },
+            price = request.price,
             createdAt = Instant.now()
         )
 

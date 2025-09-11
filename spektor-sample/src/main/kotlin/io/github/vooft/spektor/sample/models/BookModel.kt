@@ -1,16 +1,22 @@
 package io.github.vooft.spektor.sample.models
 
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.UUID
 
 data class BookModel(
-    val id: UUID,
+    val id: BookId,
     val title: String,
     val nativeTitle: String?,
-    val authorId: UUID,
+    val authorId: AuthorId,
     val price: Money?,
     val createdAt: Instant
 )
 
+@Serializable
 @JvmInline
-value class BookId(val value: UUID)
+value class BookId(
+    val value: @Contextual
+    UUID
+)

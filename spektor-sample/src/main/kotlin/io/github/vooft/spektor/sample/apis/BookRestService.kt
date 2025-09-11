@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.sample.apis
 
 import io.github.vooft.spektor.sample.apis.Mappers.toDto
+import io.github.vooft.spektor.sample.models.BookId
 import io.github.vooft.spektor.sample.models.BookModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
@@ -17,7 +18,7 @@ class BookRestService(
 ) : BookServerApi {
     override fun create(request: BookRequestDto, call: ApplicationCall): BookDto {
         val book = BookModel(
-            id = UUID.randomUUID(),
+            id = BookId(UUID.randomUUID()),
             title = request.title,
             nativeTitle = request.nativeTitle,
             authorId = request.authorId,

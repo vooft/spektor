@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
+import io.github.vooft.spektor.codegen.common.SpektorPropertyRef
 import io.github.vooft.spektor.model.SpektorType
 
 class SpektorTypeDtoCodegen(
@@ -16,9 +17,11 @@ class SpektorTypeDtoCodegen(
 
     fun generate(ref: SpektorType.Ref, objectType: SpektorType.Object): TypeSpec {
         val fields = objectType.properties.map { (name, wrapper) ->
+            val substituted = config.microtypeSubstitutions[SpektorPropertyRef(ref, name)]?.let { ClassName.bestGuess(it) }
+
             FieldInfo(
                 name = name,
-                typeName = typeCodegen.generate(wrapper.type),
+                typeName = substituted ?: typeCodegen.generate(wrapper.type),
                 required = wrapper.required,
                 contextual = wrapper.type.isContextual
             )

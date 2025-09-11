@@ -46,6 +46,14 @@ spektor {
 
     microtypeSubstitutions.put(
         PropertyRef(
+            ref = ModelRef(file = file("src/main/resources/openapi/models/book.yaml"), modelName = "BookRequest"),
+            propertyName = "authorId"
+        ),
+        "io.github.vooft.spektor.sample.models.AuthorId"
+    )
+
+    microtypeSubstitutions.put(
+        PropertyRef(
             ref = ModelRef(file = file("src/main/resources/openapi/models/author.yaml"), modelName = "Author"),
             propertyName = "id"
         ),

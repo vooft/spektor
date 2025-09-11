@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.bundles.ktor)
     implementation(libs.kotlin.logging)
     implementation(libs.slf4j.simple)
-    implementation("io.ktor:ktor-client-auth:3.2.3")
+    implementation("io.ktor:ktor-client-auth:3.3.0")
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotest.runner)

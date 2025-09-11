@@ -11,15 +11,19 @@ class SpektorParser {
         val absolutePaths = files.map { it.toAbsolutePath().normalize() }
 
         val spektorFiles = mutableMapOf<Path, SpektorFile>()
+
+        val allRefs = mutableSetOf<SpektorType.Ref>()
+
         val resultPaths = absolutePaths.map { path ->
-            SpektorFile(path).also { spektorFiles[path] = it }
+            SpektorFile(path, allRefs).also { spektorFiles[path] = it }
         }.flatMap { it.parsePaths() }
 
-        val allRefs = resultPaths.flatMap { it.extractRefs() }.toSet()
-
         val resultRefs = mutableMapOf<SpektorType.Ref, SpektorType>()
-        for (ref in allRefs) {
-            val file = spektorFiles.computeIfAbsent(ref.file) { SpektorFile(it) }
+        while (allRefs.isNotEmpty()) {
+            val ref = allRefs.first()
+            allRefs.remove(ref)
+
+            val file = spektorFiles.computeIfAbsent(ref.file) { SpektorFile(it, allRefs) }
             val type = file.parseModel(ref)
             if (type == null) {
                 logger.warn { "Cannot resolve reference $ref in file ${ref.file}" }
@@ -27,6 +31,8 @@ class SpektorParser {
             }
 
             resultRefs[ref] = type
+
+            allRefs.removeAll(resultRefs.keys)
         }
 
         resultPaths.validateSingleFilePerTag()
@@ -42,21 +48,6 @@ class SpektorParser {
         require(multipleFilesPerTag.isEmpty()) {
             "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
         }
-    }
-
-    private fun SpektorPath.extractRefs(): Set<SpektorType.Ref> {
-        val reqBodyRefs = requestBody?.type?.extractRefs() ?: emptySet()
-        val respBodyRefs = responseBody?.type?.extractRefs() ?: emptySet()
-        val pathVarRefs = pathVariables.flatMap { it.type.extractRefs() }.toSet()
-        val queryVarRefs = queryVariables.flatMap { it.type.extractRefs() }.toSet()
-        return reqBodyRefs + respBodyRefs + pathVarRefs + queryVarRefs
-    }
-
-    private fun SpektorType.extractRefs(): Set<SpektorType.Ref> = when (this) {
-        is SpektorType.MicroType -> emptySet()
-        is SpektorType.List -> itemType.extractRefs()
-        is SpektorType.Object -> properties.values.flatMap { it.type.extractRefs() }.toSet()
-        is SpektorType.Ref -> setOf(this)
     }
 
     companion object {

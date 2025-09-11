@@ -8,14 +8,14 @@ import io.swagger.v3.parser.core.models.ParseOptions
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
-class SpektorFile(private val file: Path) {
+class SpektorFile(private val file: Path, allRefs: MutableSet<SpektorType.Ref>) {
     private val parsed = OpenAPIV3Parser().read(file.absolutePathString(), null, ParseOptions().apply { isResolve = false })
 
     init {
         require(file.isAbsolute) { "File path must be absolute: $file" }
     }
 
-    private val typeResolver = SpektorTypeResolver(file)
+    private val typeResolver = SpektorTypeResolver(file, allRefs)
     private val pathResolver = SpektorPathResolver(typeResolver)
 
     fun parseModel(ref: SpektorType.Ref): SpektorType? {

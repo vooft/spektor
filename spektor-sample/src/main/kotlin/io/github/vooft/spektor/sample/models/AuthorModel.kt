@@ -11,3 +11,6 @@ data class AuthorModel(
     val dateOfDeath: LocalDate?,
     val createdAt: Instant,
 )
+
+@JvmInline
+value class AuthorId(val value: UUID)

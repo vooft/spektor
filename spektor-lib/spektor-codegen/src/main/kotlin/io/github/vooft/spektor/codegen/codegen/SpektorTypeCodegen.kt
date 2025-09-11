@@ -24,12 +24,19 @@ class SpektorTypeCodegen(
 
     private val classCodegen = SpektorTypeDtoCodegen(config, this)
 
-    fun generate(type: SpektorType): TypeName = when (type) {
-        is SpektorType.List -> LIST.plusParameter(generate(type.itemType))
-        is SpektorType.MicroType -> type.toTypeName()
-        is SpektorType.Object -> error("Generating object directly is not supported $type")
-        is SpektorType.Ref -> generateRef(type)
-    }.also { context.resolvedTypes[type] = it }
+    fun generate(type: SpektorType): TypeName {
+        val resolvedType = context.resolvedTypes[type]
+        if (resolvedType != null) {
+            return resolvedType
+        }
+
+        return when (type) {
+            is SpektorType.List -> LIST.plusParameter(generate(type.itemType))
+            is SpektorType.MicroType -> type.toTypeName()
+            is SpektorType.Object -> error("Generating object directly is not supported $type")
+            is SpektorType.Ref -> generateRef(type)
+        }.also { context.resolvedTypes[type] = it }
+    }
 
     private fun SpektorType.Ref.traceRefs() = buildList {
         var current: SpektorType = this@traceRefs

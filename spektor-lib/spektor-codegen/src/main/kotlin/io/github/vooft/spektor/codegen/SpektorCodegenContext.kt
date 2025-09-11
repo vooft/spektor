@@ -6,7 +6,7 @@ import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
 
-class SpektorCodegenContext(
+data class SpektorCodegenContext(
     val paths: Map<TagAndFile, List<SpektorPath>>,
     val refs: Map<SpektorType.Ref, SpektorType>,
     val resolvedTypes: MutableMap<SpektorType, TypeName> = mutableMapOf(),

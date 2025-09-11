@@ -8,6 +8,9 @@ data class BookModel(
     val title: String,
     val nativeTitle: String?,
     val authorId: UUID,
-    val price: MoneyModel?,
+    val price: Money?,
     val createdAt: Instant
 )
+
+@JvmInline
+value class BookId(val value: UUID)

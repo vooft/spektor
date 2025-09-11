@@ -10,7 +10,9 @@ data class SpektorCodegenConfig(
     val specRoot: Path,
     val dtoSuffix: String = "Dto",
     val serverApiSuffix: String = "ServerApi",
-    val routesSuffix: String = "Routes"
+    val routesSuffix: String = "Routes",
+    val dtoSubstitutions: Map<SpektorType.Ref, String> = emptyMap(),
+    val microtypeSubstitutions: Map<SpektorPropertyRef, String> = emptyMap()
 ) {
     fun classNameFor(ref: SpektorType.Ref): ClassName {
         val packageName = listOf(basePackage, ref.file.toPackageName(specRoot)).joinToString(".")
@@ -27,6 +29,8 @@ data class SpektorCodegenConfig(
         return ClassName(packageName, tagAndFile.tag + routesSuffix)
     }
 }
+
+data class SpektorPropertyRef(val ref: SpektorType.Ref, val propertyName: String)
 
 fun Path.toPackageName(specRoot: Path): String {
     val specRootNormalized = specRoot.toAbsolutePath().normalize().toString()

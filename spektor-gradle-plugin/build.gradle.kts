@@ -28,9 +28,9 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.vooft:spektor-codegen")
-    implementation("io.github.vooft:spektor-model")
-    implementation("io.github.vooft:spektor-parser")
+    implementation("io.github.vooft:spektor-codegen:${project.version}")
+    implementation("io.github.vooft:spektor-model:${project.version}")
+    implementation("io.github.vooft:spektor-parser:${project.version}")
 
     implementation(libs.kotlin.gradle.plugin.api)
 }

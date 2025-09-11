@@ -19,7 +19,8 @@ class SpektorTypeDtoCodegen(
             FieldInfo(
                 name = name,
                 typeName = typeCodegen.generate(wrapper.type),
-                required = wrapper.required
+                required = wrapper.required,
+                contextual = wrapper.type.isContextual
             )
         }
 
@@ -52,6 +53,11 @@ class SpektorTypeDtoCodegen(
             addProperty(
                 PropertySpec.builder(field.name, field.typeName.copy(nullable = !field.required))
                     .initializer(field.name)
+                    .apply {
+                        if (field.contextual) {
+                            addAnnotation(ClassName("kotlinx.serialization", "Contextual"))
+                        }
+                    }
                     .build()
             )
         }
@@ -64,4 +70,4 @@ class SpektorTypeDtoCodegen(
     }
 }
 
-private data class FieldInfo(val name: String, val typeName: TypeName, val required: Boolean)
+private data class FieldInfo(val name: String, val typeName: TypeName, val required: Boolean, val contextual: Boolean)

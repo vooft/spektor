@@ -2,16 +2,20 @@ package io.github.vooft.spektor.codegen.codegen
 
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.DOUBLE
+import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asClassName
 import io.github.vooft.spektor.codegen.SpektorCodegenContext
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorType
-import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
 
 class SpektorTypeCodegen(
     private val config: SpektorCodegenConfig,
@@ -51,10 +55,18 @@ class SpektorTypeCodegen(
         return config.classNameFor(lastRef)
     }
 
-    private fun SpektorType.MicroType.toTypeName(): TypeName = when (type) {
-        OpenApiMicroType.STRING -> STRING
-        OpenApiMicroType.INTEGER -> INT
-        OpenApiMicroType.BOOLEAN -> BOOLEAN
-        OpenApiMicroType.NUMBER -> DOUBLE
+    private fun SpektorType.MicroType.toTypeName(): TypeName = when (this) {
+        is SpektorType.MicroType.BooleanMicroType -> BOOLEAN
+        is SpektorType.MicroType.IntegerMicroType -> INT
+        is SpektorType.MicroType.NumberMicroType -> when (format) {
+            SpektorType.MicroType.NumberFormat.FLOAT -> FLOAT
+            SpektorType.MicroType.NumberFormat.DOUBLE -> DOUBLE
+        }
+        is SpektorType.MicroType.StringMicroType -> when (format) {
+            SpektorType.MicroType.StringFormat.PLAIN -> STRING
+            SpektorType.MicroType.StringFormat.UUID -> UUID::class.asClassName()
+            SpektorType.MicroType.StringFormat.DATE_TIME -> Instant::class.asClassName()
+            SpektorType.MicroType.StringFormat.DATE -> LocalDate::class.asClassName()
+        }
     }
 }

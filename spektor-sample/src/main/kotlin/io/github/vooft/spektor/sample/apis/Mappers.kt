@@ -8,18 +8,18 @@ import spektor.example.models.BookDto
 
 object Mappers {
     fun AuthorModel.toDto() = AuthorDto(
-        id = id.toString(),
+        id = id,
         name = name,
-        dateOfBirth = dateOfBirth.toString(),
-        dateOfDeath = dateOfDeath?.toString(),
-        createdAt = createdAt.toString(),
+        dateOfBirth = dateOfBirth,
+        dateOfDeath = dateOfDeath,
+        createdAt = createdAt,
     )
 
     fun BookModel.toDto(authors: AuthorRepository) = BookDto(
-        id = id.toString(),
+        id = id,
         title = title,
         nativeTitle = nativeTitle,
         author = authors.single { it.id == authorId }.toDto(),
-        createdAt = createdAt.toString()
+        createdAt = createdAt
     )
 }

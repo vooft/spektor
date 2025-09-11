@@ -12,8 +12,10 @@ import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
-import io.github.vooft.spektor.model.SpektorType.MicroType.OpenApiMicroType
 import io.github.vooft.spektor.model.TagAndFile
+import java.time.Instant
+import java.time.LocalDate
+import java.util.UUID
 
 @OptIn(ExperimentalKotlinPoetApi::class)
 class SpektorRouteCodegen(
@@ -122,14 +124,20 @@ class SpektorRouteCodegen(
     }
 
     private fun CodeBlock.Builder.addParseFromString(type: SpektorType.MicroType, varName: String) {
-        val converter = when (type.type) {
-            OpenApiMicroType.STRING -> varName
-            OpenApiMicroType.INTEGER -> "$varName.toInt()"
-            OpenApiMicroType.BOOLEAN -> "$varName.toBoolean()"
-            OpenApiMicroType.NUMBER -> "$varName.toDouble()"
+        when (type) {
+            is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
+            is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
+            is SpektorType.MicroType.NumberMicroType -> when (type.format) {
+                SpektorType.MicroType.NumberFormat.FLOAT -> add("$varName.toFloat()")
+                SpektorType.MicroType.NumberFormat.DOUBLE -> add("$varName.toDouble()")
+            }
+            is SpektorType.MicroType.StringMicroType -> when (type.format) {
+                SpektorType.MicroType.StringFormat.PLAIN -> add(varName)
+                SpektorType.MicroType.StringFormat.UUID -> add("%T.fromString($varName)", UUID::class)
+                SpektorType.MicroType.StringFormat.DATE_TIME -> add("%T.parse($varName)", Instant::class)
+                SpektorType.MicroType.StringFormat.DATE -> add("%T.parse($varName)", LocalDate::class)
+            }
         }
-
-        add(converter)
     }
 
     companion object {

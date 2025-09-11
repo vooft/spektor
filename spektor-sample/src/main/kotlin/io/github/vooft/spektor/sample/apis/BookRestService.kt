@@ -20,7 +20,7 @@ class BookRestService(
             id = UUID.randomUUID(),
             title = request.title,
             nativeTitle = request.nativeTitle,
-            authorId = UUID.fromString(request.authorId),
+            authorId = request.authorId,
             createdAt = Instant.now()
         )
 

@@ -11,7 +11,6 @@ import spektor.example.models.AuthorRequestDto
 import spektor.example.models.AuthorsListDto
 import spektor.example.models.BooksListDto
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 class AuthorRestService(private val authors: AuthorRepository, private val books: BookRepository) : AuthorServerApi {
@@ -23,8 +22,8 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
         val author = AuthorModel(
             id = UUID.randomUUID(),
             name = request.name,
-            dateOfBirth = LocalDate.parse(request.dateOfBirth),
-            dateOfDeath = request.dateOfDeath?.let { LocalDate.parse(it) },
+            dateOfBirth = request.dateOfBirth,
+            dateOfDeath = request.dateOfDeath,
             createdAt = Instant.now()
         )
 
@@ -32,14 +31,13 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
         return author.toDto()
     }
 
-    override fun get(id: String, call: ApplicationCall): AuthorDto {
-        val author = authors.single { it.id.toString() == id }
+    override fun get(id: UUID, call: ApplicationCall): AuthorDto {
+        val author = authors.single { it.id == id }
         return author.toDto()
     }
 
-    override fun searchBooks(id: String, filter: String, call: ApplicationCall): BooksListDto {
-        val authorId = UUID.fromString(id)
-        val books = books.filter { it.authorId == authorId }.filter { it.title.contains(filter, ignoreCase = true) }
+    override fun searchBooks(id: UUID, filter: String, call: ApplicationCall): BooksListDto {
+        val books = books.filter { it.authorId == id }.filter { it.title.contains(filter, ignoreCase = true) }
         return BooksListDto(books = books.map { it.toDto(authors) })
     }
 }

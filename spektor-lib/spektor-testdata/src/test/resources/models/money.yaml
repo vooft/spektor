@@ -1,0 +1,18 @@
+openapi: 3.0.1
+info:
+  title: Book Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    Money:
+      type: object
+      properties:
+        minorUnits:
+          type: integer
+        currency:
+          type: string
+      required:
+        - minorUnits
+        - currency
+

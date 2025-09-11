@@ -6,10 +6,10 @@ import io.swagger.v3.oas.models.media.Schema
 import java.net.URI
 import java.nio.file.Path
 
-class SpektorTypeResolver(private val file: Path) {
+class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSet<SpektorType.Ref>) {
 
     fun resolve(schema: Schema<*>): SpektorType? = when {
-        schema.`$ref` != null -> resolveRef(schema.`$ref`)
+        schema.`$ref` != null -> resolveRef(schema.`$ref`)?.also { allRefs.add(it) }
         schema.type == "object" -> resolveObject(schema)
         schema.type == "array" -> resolveArray(schema)
         schema.type != null -> SpektorType.MicroType.from(schema.type, schema.format)

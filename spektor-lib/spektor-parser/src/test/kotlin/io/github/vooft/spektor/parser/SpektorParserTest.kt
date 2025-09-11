@@ -9,6 +9,7 @@ import io.github.vooft.spektor.model.TagAndFile
 import io.github.vooft.spektor.test.TestFiles.authorModelFile
 import io.github.vooft.spektor.test.TestFiles.bookModelFile
 import io.github.vooft.spektor.test.TestFiles.listFile
+import io.github.vooft.spektor.test.TestFiles.moneyModelFile
 import io.github.vooft.spektor.test.TestFiles.pathVarFile
 import io.github.vooft.spektor.test.TestFiles.requestBodyFile
 import io.kotest.matchers.shouldBe
@@ -150,6 +151,13 @@ class SpektorParserTest {
                         "authorId" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.UUID),
                             required = true
+                        ),
+                        "price" to SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = moneyModelFile.toAbsolutePath().normalize(),
+                                modelName = "Money"
+                            ),
+                            required = false
                         )
                     )
                 ),
@@ -176,8 +184,30 @@ class SpektorParserTest {
                                 modelName = "Author"
                             ),
                             required = true
+                        ),
+                        "price" to SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = moneyModelFile.toAbsolutePath().normalize(),
+                                modelName = "Money"
+                            ),
+                            required = false
                         )
-                    )
+                    ),
+                ),
+                SpektorType.Ref(
+                    file = moneyModelFile.toAbsolutePath().normalize(),
+                    modelName = "Money"
+                ) to SpektorType.Object(
+                    properties = mapOf(
+                        "minorUnits" to SpektorType.RequiredWrapper(
+                            type = SpektorType.MicroType.IntegerMicroType(null),
+                            required = true
+                        ),
+                        "currency" to SpektorType.RequiredWrapper(
+                            type = StringMicroType(format = StringFormat.PLAIN),
+                            required = true
+                        ),
+                    ),
                 )
             )
         )

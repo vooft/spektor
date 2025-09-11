@@ -17,6 +17,8 @@ components:
           type: string
         author:
           $ref: "./author.yaml#/components/schemas/Author"
+        price:
+          $ref: "./money.yaml#/components/schemas/Money"
       required:
         - id
         - title
@@ -40,6 +42,8 @@ components:
         authorId:
           type: string
           format: uuid
+        price:
+          $ref: "./money.yaml#/components/schemas/Money"
       required:
         - title
         - authorId

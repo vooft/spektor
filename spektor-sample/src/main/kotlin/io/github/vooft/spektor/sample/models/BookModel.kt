@@ -8,5 +8,6 @@ data class BookModel(
     val title: String,
     val nativeTitle: String?,
     val authorId: UUID,
+    val price: MoneyModel?,
     val createdAt: Instant
 )

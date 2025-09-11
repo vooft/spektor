@@ -10,4 +10,5 @@ object TestFiles {
     val requestBodyFile: Path = rootPath.resolve("api/request-body-book.yaml")
     val bookModelFile: Path = rootPath.resolve("models/book.yaml")
     val authorModelFile: Path = rootPath.resolve("models/author.yaml")
+    val moneyModelFile: Path = rootPath.resolve("models/money.yaml")
 }

@@ -29,7 +29,7 @@ class SpektorRouteCodegen(
             context.generatedRouteSpecs[tagAndFile] = TypeAndClass(
                 type = typeSpec,
                 className = className,
-                imports = KTOR_METHOD_IMPORTS + KTOR_RECEIVE_METHOD_IMPORT + KTOR_RESPOND_METHOD_IMPORT
+                imports = IMPORTS,
             )
         }
     }
@@ -131,6 +131,7 @@ class SpektorRouteCodegen(
                 SpektorType.MicroType.NumberFormat.FLOAT -> add("$varName.toFloat()")
                 SpektorType.MicroType.NumberFormat.DOUBLE -> add("$varName.toDouble()")
             }
+
             is SpektorType.MicroType.StringMicroType -> when (type.format) {
                 SpektorType.MicroType.StringFormat.PLAIN -> add(varName)
                 SpektorType.MicroType.StringFormat.UUID -> add("%T.fromString($varName)", UUID::class)
@@ -152,5 +153,17 @@ class SpektorRouteCodegen(
 
         private val KTOR_RECEIVE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receive")
         private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
+
+        /**
+         * Required for ktor 2.x versions
+         */
+        private val KTOR_CALL_EXTENSION_IMPORT = TypeAndClass.Import("io.ktor.server.application", "call")
+
+        private val IMPORTS = buildSet {
+            addAll(KTOR_METHOD_IMPORTS)
+            add(KTOR_RECEIVE_METHOD_IMPORT)
+            add(KTOR_RESPOND_METHOD_IMPORT)
+            add(KTOR_CALL_EXTENSION_IMPORT)
+        }
     }
 }

@@ -31,9 +31,10 @@ class SpektorTypeCodegen(
         }
 
         return when (type) {
-            is SpektorType.List -> LIST.plusParameter(generate(type.itemType))
+            is SpektorType.Array -> LIST.plusParameter(generate(type.itemType))
             is SpektorType.MicroType -> type.toTypeName()
             is SpektorType.Object -> error("Generating object directly is not supported $type")
+            is SpektorType.Enum -> error("Generating enum directly is not supported $type")
             is SpektorType.Ref -> generateRef(type)
         }.also { context.resolvedTypes[type] = it }
     }
@@ -50,11 +51,14 @@ class SpektorTypeCodegen(
         val refsTrace = ref.traceRefs()
         val lastRef = refsTrace.last()
 
-        val target = context.refs.getValue(lastRef)
-        val targetObject = target as? SpektorType.Object
-            ?: error("Only object references are supported, but got $target for ref $lastRef")
+        val typeSpec =  when (val target = context.refs.getValue(lastRef)) {
+            is SpektorType.Object -> classCodegen.generate(lastRef, target)
+            is SpektorType.Enum -> classCodegen.generate(lastRef, target)
+            is SpektorType.Array,
+            is SpektorType.MicroType,
+            is SpektorType.Ref -> error("Only object and enum references are supported, but got $target for ref $lastRef")
+        }
 
-        val typeSpec = classCodegen.generate(lastRef, targetObject)
         refsTrace.forEach {
             context.generatedTypeSpecs[it] = TypeAndClass(type = typeSpec, className = config.classNameFor(it))
         }

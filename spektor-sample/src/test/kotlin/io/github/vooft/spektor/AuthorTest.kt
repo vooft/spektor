@@ -2,6 +2,7 @@ package io.github.vooft.spektor
 
 import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
+import io.github.vooft.spektor.test.models.AuthorCountryTestDto
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.kotest.matchers.shouldBe
 import kotlinx.datetime.LocalDate
@@ -21,6 +22,7 @@ class AuthorTest {
             AuthorRequestTestDto(
                 name = name,
                 dateOfBirth = dob,
+                country = AuthorCountryTestDto.DE,
                 dateOfDeath = dod
             )
         )
@@ -40,6 +42,7 @@ class AuthorTest {
         val response = api.create(
             AuthorRequestTestDto(
                 name = "test",
+                country = AuthorCountryTestDto.US,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         )

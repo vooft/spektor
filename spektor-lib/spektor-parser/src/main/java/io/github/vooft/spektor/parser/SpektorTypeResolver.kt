@@ -12,6 +12,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         schema.`$ref` != null -> resolveRef(schema.`$ref`)?.also { allRefs.add(it) }
         schema.type == "object" -> resolveObject(schema)
         schema.type == "array" -> resolveArray(schema)
+        schema.type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
         schema.type != null -> SpektorType.MicroType.from(schema.type, schema.format)
         else -> {
             logger.warn { "Schema in file $file is not a reference or primitive type: $schema" }
@@ -19,7 +20,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         }
     }
 
-    private fun resolveArray(schema: Schema<*>): SpektorType.List? {
+    private fun resolveArray(schema: Schema<*>): SpektorType.Array? {
         val itemsRef = schema.items ?: run {
             logger.warn { "Array schema has no items: $schema" }
             return null
@@ -30,7 +31,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
             return null
         }
 
-        return SpektorType.List(itemType)
+        return SpektorType.Array(itemType)
     }
 
     private fun resolveObject(schema: Schema<*>): SpektorType.Object? {

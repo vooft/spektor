@@ -9,6 +9,7 @@ import io.ktor.server.application.ApplicationCall
 import spektor.example.api.BookServerApi
 import spektor.example.models.BookDto
 import spektor.example.models.BookRequestDto
+import java.net.URI
 import java.time.Instant
 import java.util.UUID
 
@@ -21,6 +22,7 @@ class BookRestService(
             id = BookId(UUID.randomUUID()),
             title = request.title,
             nativeTitle = request.nativeTitle,
+            imageLink = URI.create("https://books.net/images/${UUID.randomUUID()}.jpg"),
             authorId = request.authorId,
             price = request.price,
             createdAt = Instant.now()

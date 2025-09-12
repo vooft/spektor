@@ -13,21 +13,23 @@ sealed interface SpektorType {
 
     data class Ref(val file: Path, val modelName: String) : SpektorType
 
-    data class Enum(val values: List<String>): SpektorType
+    data class Enum(val values: List<String>) : SpektorType
 
     data class RequiredWrapper<T : SpektorType>(val type: T, val required: Boolean)
 
     sealed interface MicroType : SpektorType {
-        data class StringMicroType(val format: StringFormat): MicroType {
-            override val isContextual get() = when (format) {
-                StringFormat.PLAIN -> false
-                StringFormat.UUID,
-                StringFormat.DATE_TIME,
-                StringFormat.DATE -> true
-            }
+        data class StringMicroType(val format: StringFormat) : MicroType {
+            override val isContextual
+                get() = when (format) {
+                    StringFormat.PLAIN -> false
+                    StringFormat.UUID,
+                    StringFormat.URI,
+                    StringFormat.DATE_TIME,
+                    StringFormat.DATE -> true
+                }
         }
 
-        data class IntegerMicroType(val format: String?): MicroType
+        data class IntegerMicroType(val format: String?) : MicroType
         data object BooleanMicroType : MicroType
         data class NumberMicroType(val format: NumberFormat) : MicroType
 
@@ -46,6 +48,7 @@ sealed interface SpektorType {
         enum class StringFormat(val formatName: String?) {
             PLAIN(null),
             UUID("uuid"),
+            URI("uri"),
             DATE_TIME("date-time"),
             DATE("date");
 
@@ -69,6 +72,6 @@ sealed interface SpektorType {
     }
 
     companion object {
-        private val logger = KotlinLogging.logger {  }
+        private val logger = KotlinLogging.logger { }
     }
 }

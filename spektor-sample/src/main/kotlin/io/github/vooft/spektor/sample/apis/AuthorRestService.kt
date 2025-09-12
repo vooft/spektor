@@ -25,6 +25,7 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
             name = request.name,
             dateOfBirth = request.dateOfBirth,
             dateOfDeath = request.dateOfDeath,
+            country = request.country.name,
             createdAt = Instant.now()
         )
 

@@ -98,7 +98,7 @@ class SpektorParserTest {
                 ) to SpektorType.Object(
                     properties = mapOf(
                         "books" to SpektorType.RequiredWrapper(
-                            type = SpektorType.List(
+                            type = SpektorType.Array(
                                 itemType = SpektorType.Ref(
                                     file = bookModelFile.toAbsolutePath().normalize(),
                                     modelName = "Book"

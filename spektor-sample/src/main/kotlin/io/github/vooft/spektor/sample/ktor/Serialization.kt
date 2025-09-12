@@ -6,11 +6,13 @@ import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -42,6 +44,14 @@ fun Application.configureSerialization() {
                             override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
                             override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
                             override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+                        }
+                    )
+                    contextual(
+                        kClass = URI::class,
+                        serializer = object : KSerializer<URI> {
+                            override val descriptor = PrimitiveSerialDescriptor("URI", STRING)
+                            override fun deserialize(decoder: Decoder): URI = URI(decoder.decodeString())
+                            override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString(value.toString())
                         }
                     )
                 }

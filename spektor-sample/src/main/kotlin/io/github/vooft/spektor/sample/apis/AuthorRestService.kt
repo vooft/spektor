@@ -15,16 +15,17 @@ import java.time.Instant
 import java.util.UUID
 
 class AuthorRestService(private val authors: AuthorRepository, private val books: BookRepository) : AuthorServerApi {
-    override fun list(call: ApplicationCall): AuthorsListDto = AuthorsListDto(
+    override suspend fun list(call: ApplicationCall): AuthorsListDto = AuthorsListDto(
         authors = authors.map { it.toDto() }
     )
 
-    override fun create(request: AuthorRequestDto, call: ApplicationCall): AuthorDto {
+    override suspend fun create(request: AuthorRequestDto, call: ApplicationCall): AuthorDto {
         val author = AuthorModel(
             id = AuthorId(UUID.randomUUID()),
             name = request.name,
             dateOfBirth = request.dateOfBirth,
             dateOfDeath = request.dateOfDeath,
+            country = request.country.name,
             createdAt = Instant.now()
         )
 
@@ -32,12 +33,12 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
         return author.toDto()
     }
 
-    override fun get(id: UUID, call: ApplicationCall): AuthorDto {
+    override suspend fun get(id: UUID, call: ApplicationCall): AuthorDto {
         val author = authors.single { it.id.value == id }
         return author.toDto()
     }
 
-    override fun searchBooks(id: UUID, filter: String, call: ApplicationCall): BooksListDto {
+    override suspend fun searchBooks(id: UUID, filter: String, call: ApplicationCall): BooksListDto {
         val books = books.filter { it.authorId.value == id }.filter { it.title.contains(filter, ignoreCase = true) }
         return BooksListDto(books = books.map { it.toDto(authors) })
     }

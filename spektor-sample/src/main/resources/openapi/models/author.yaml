@@ -5,6 +5,9 @@ info:
 paths: { }
 components:
   schemas:
+    AuthorCountry:
+      type: string
+      enum: [US, DE, JP]
     Author:
       type: object
       properties:
@@ -19,6 +22,8 @@ components:
         dateOfDeath:
           type: string
           format: date
+        country:
+          $ref: '#/components/schemas/AuthorCountry'
         createdAt:
           type: string
           format: date-time
@@ -26,6 +31,7 @@ components:
         - id
         - name
         - dateOfBirth
+        - country
         - createdAt
     AuthorsList:
       type: object
@@ -44,10 +50,13 @@ components:
         dateOfBirth:
           type: string
           format: date
+        country:
+          $ref: '#/components/schemas/AuthorCountry'
         dateOfDeath:
           type: string
           format: date
       required:
         - name
         - dateOfBirth
+        - country
 

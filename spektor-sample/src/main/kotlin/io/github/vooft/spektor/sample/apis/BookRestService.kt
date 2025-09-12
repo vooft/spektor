@@ -16,7 +16,7 @@ class BookRestService(
     private val authors: AuthorRepository,
     private val books: BookRepository
 ) : BookServerApi {
-    override fun create(request: BookRequestDto, call: ApplicationCall): BookDto {
+    override suspend fun create(request: BookRequestDto, call: ApplicationCall): BookDto {
         val book = BookModel(
             id = BookId(UUID.randomUUID()),
             title = request.title,

@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
@@ -12,7 +13,7 @@ import io.github.vooft.spektor.model.SpektorType
 
 class SpektorTypeDtoCodegen(
     private val config: SpektorCodegenConfig,
-    private val typeCodegen: SpektorTypeCodegen
+    private val typeCodegen: SpektorTypeCodegen,
 ) {
 
     fun generate(ref: SpektorType.Ref, objectType: SpektorType.Object): TypeSpec {
@@ -35,6 +36,32 @@ class SpektorTypeDtoCodegen(
                     .build()
             )
             .addProperties(fields)
+            .build()
+    }
+
+    fun generate(ref: SpektorType.Ref, enumType: SpektorType.Enum): TypeSpec {
+        return TypeSpec.enumBuilder(config.classNameFor(ref))
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("value", String::class)
+                    .build()
+            )
+            .addAnnotation(SERIALIZABLE_ANNOTATION)
+            .also {
+                for (value in enumType.values) {
+                    it.addEnumConstant(
+                        name = value.uppercase().replace(ENUM_NAME_REGEX, "_"),
+                        typeSpec = TypeSpec.anonymousClassBuilder()
+                            .addSuperclassConstructorParameter("%S", value)
+                            .addAnnotation(
+                                AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
+                                    .addMember("%S", value)
+                                    .build()
+                            )
+                            .build()
+                    )
+                }
+            }
             .build()
     }
 
@@ -70,6 +97,8 @@ class SpektorTypeDtoCodegen(
 
     companion object {
         private val SERIALIZABLE_ANNOTATION = ClassName("kotlinx.serialization", "Serializable")
+        private val SERIAL_NAME_ANNOTATION = ClassName("kotlinx.serialization", "SerialName")
+        private val ENUM_NAME_REGEX = Regex("[^A-Za-z0-9_]")
     }
 }
 

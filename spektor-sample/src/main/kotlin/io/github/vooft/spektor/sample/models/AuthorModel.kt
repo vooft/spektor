@@ -11,6 +11,7 @@ data class AuthorModel(
     val name: String,
     val dateOfBirth: LocalDate,
     val dateOfDeath: LocalDate?,
+    val country: String,
     val createdAt: Instant,
 )
 

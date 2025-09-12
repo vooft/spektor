@@ -39,7 +39,7 @@ class SpektorServerApiCodegen(
 
         return FunSpec.builder(operationId)
             .returns(returnType)
-            .addModifiers(KModifier.ABSTRACT)
+            .addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
             .apply {
                 if (requestType != null) {
                     addParameter("request", requestType)

@@ -6,9 +6,9 @@ import io.github.vooft.spektor.sample.models.BookModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.ApplicationCall
-import spektor.example.api.BookServerApi
-import spektor.example.models.BookDto
-import spektor.example.models.BookRequestDto
+import spektor.example.api.book.BookServerApi
+import spektor.example.models.book.BookDto
+import spektor.example.models.book.BookRequestDto
 import java.net.URI
 import java.time.Instant
 import java.util.UUID

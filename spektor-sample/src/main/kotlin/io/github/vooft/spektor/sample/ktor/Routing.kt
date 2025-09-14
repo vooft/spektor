@@ -4,8 +4,8 @@ import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.routing.routing
-import spektor.example.api.AuthorRoutes
-import spektor.example.api.BookRoutes
+import spektor.example.api.author.AuthorRoutes
+import spektor.example.api.book.BookRoutes
 
 fun Application.configureRouting() {
     val authorRoutes: AuthorRoutes by dependencies

@@ -6,11 +6,11 @@ import io.github.vooft.spektor.sample.models.AuthorModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.ApplicationCall
-import spektor.example.api.AuthorServerApi
-import spektor.example.models.AuthorDto
-import spektor.example.models.AuthorRequestDto
-import spektor.example.models.AuthorsListDto
-import spektor.example.models.BooksListDto
+import spektor.example.api.author.AuthorServerApi
+import spektor.example.models.author.AuthorDto
+import spektor.example.models.author.AuthorRequestDto
+import spektor.example.models.author.AuthorsListDto
+import spektor.example.models.book.BooksListDto
 import java.time.Instant
 import java.util.UUID
 

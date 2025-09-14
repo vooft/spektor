@@ -6,8 +6,8 @@ import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.dependencies
-import spektor.example.api.AuthorRoutes
-import spektor.example.api.BookRoutes
+import spektor.example.api.author.AuthorRoutes
+import spektor.example.api.book.BookRoutes
 
 fun Application.configureDependencyInjection() {
     dependencies {

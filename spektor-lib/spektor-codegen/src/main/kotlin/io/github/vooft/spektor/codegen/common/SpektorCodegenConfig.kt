@@ -35,6 +35,17 @@ data class SpektorPropertyRef(val ref: SpektorType.Ref, val propertyName: String
 fun Path.toPackageName(specRoot: Path): String {
     val specRootNormalized = specRoot.toAbsolutePath().normalize().toString()
     val thisNormalized = this.toAbsolutePath().normalize().toString()
-    val relativePath = thisNormalized.removePrefix(specRootNormalized).removePrefix("/").substringBeforeLast('/')
-    return relativePath.replace("/", ".")
+
+    val packageParts = thisNormalized.removePrefix(specRootNormalized)
+        .removePrefix("/")
+        .substringBeforeLast('/')
+        .split('/') + this.toFile().nameWithoutExtension.lowercase()
+
+    return packageParts.joinToString(".") { it.sanitizeKotlinIdentifier() }
+}
+
+private fun String.sanitizeKotlinIdentifier(): String {
+    return replace("[^A-Za-z0-9_]".toRegex(), "_").let {
+        if (it.firstOrNull()?.isDigit() == true) "_$it" else it
+    }
 }

@@ -1,6 +1,6 @@
 ![Build and test](https://github.com/vooft/spektor/actions/workflows/build.yml/badge.svg?branch=main)
 ![Releases](https://img.shields.io/github/v/release/vooft/spektor)
-![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/vooft/spektor/io.github.vooft.spektor/maven-metadata.xml.svg)
+![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/io.github.vooft.spektor)
 ![License](https://img.shields.io/github/license/vooft/spektor)
 
 ## Spektor - Ktor server code generation from OpenAPI specification

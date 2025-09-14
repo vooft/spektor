@@ -1,149 +1,68 @@
-### Usage
+![Build and test](https://github.com/vooft/spektor/actions/workflows/build.yml/badge.svg?branch=main)
+![Releases](https://img.shields.io/github/v/release/vooft/spektor)
+![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/io/github/vooft/spektor/io.github.vooft.spektor/maven-metadata.xml.svg)
+![License](https://img.shields.io/github/license/vooft/spektor)
 
-#### Implement the ServerApi interface
+## Spektor - Ktor server code generation from OpenAPI specification
+
+Spector is a Gradle plugin that generates Ktor server code from OpenAPI specification. 
+It generates a strongly typed API interface and routing code that can be used to implement the server logic.
+
+Both Ktor 2 and Ktor 3 are supported.
+
+## Usage
+
+### Gradle plugin
+
+Add the spektor plugin to your build file:
 ```kotlin
-class EntityRestService(
-    private val entityRepo: EntityRepository,
-) : EntityServerApi {
-
-    override suspend fun createEntity(request: Requests.CreateEntityRequest): ResponseEntity<Responses.EntityResponse> {
-        val entity = entityRepo.create(request.name)
-        return ResponseEntity.ok(entity.toApi())
-    }
-
-    override suspend fun updateEntity(id: UUID, request: Requests.UpdateEntityRequest): ResponseEntity<Responses.EntityResponse> {
-        val entity = entityRepo.update(id, request.name)
-        return ResponseEntity.ok(entity.toApi())
-    }
-
-    override suspend fun listEntity(): ResponseEntity<Responses.ListEntityResponse> {
-        val entities = entityRepo.findAll()
-        return ok(Responses.ListEntityResponse(entities.toApi()))
-    }
+plugins {
+    id("io.github.vooft.spektor") version "<version>"
 }
 ```
 
-#### Create routing and use the generated Routes class
-```kotlin
-// configure Routes instance
-val entityRepo = EntityRepository(...)
-val entityRestService = EntityRestService(entityRepo)
-val entityRoutes = EntityRoutes(entityRestService)
+Latest version could be found on [Gradle plugins portal](https://plugins.gradle.org/plugin/io.github.vooft.spektor).
 
-// create a resource and use it in routing
-class EntityResource(private val routes: EntityRoutes) {
-    fun Route.routes() {
-        routing {
-            authentication("admin") {
-                routes.createEntity()
-                routes.updateEntity()
-            }
-            
-            authentication("user") {
-                routes.listEntities()
-            }
-        }
-    }
+### Generator configuration
+
+```kotlin
+spektor {
+    // this is the only required parameter, all *.yaml files with paths will be processed
+    specRoot = file("src/main/resources/openapi")
+
+    // base api for all generated classes, rest of the package will be generated from the spec file path
+    // default is "spektor.example"
+    basePackage = "com.example.api"
+
+    // suffix for generated DTO classes
+    // optional default is "Dto"
+    dtoSuffix = "Dto"
+
+    // suffix for generated API interface and Routes class
+    // optional default is "ServerApi"
+    serverApiSuffix = "ServerApi"
+
+    // suffix for generated Routes class
+    // optional default is "Routes"
+    routesSuffix = "Routes"
 }
 ```
 
-### Static code
+### Generated code structure
 
-#### Base interface for the generated API
-```kotlin
-// interface marker
-interface OpenApiServerApi
+Since Ktor is not a declarative framework, `spektor` adds a layer of abstraction to make it easier to implement the server logic.
 
-// accessor for the ktor principal
-suspend fun <P: Principal> OpenApiServerApi.principal(klass: KClass<P>): P? {
-    val value = requireNotNull(currentCoroutineContext()[ApplicationCallElement]) {
-        "${ApplicationCallElement::class} element was not found in the context element, is the service called from the correct place?"
-    }
+For every OpenAPI tag, it will generate at least 2 classes (using Author example):
 
-    return value.applicationCall.authentication.principal(null, klass)
-}
+* `AuthorServerApi` - an interface with methods for every operation in the tag. 
+  The method parameters and return types are strongly typed using generated DTO classes.
+  This interface should be implemented to provide the server logic.
+* `AuthorRoutes` - a class with methods to create Ktor routes for every operation in the tag.
+  This class takes an instance of `AuthorServerApi` in the constructor and uses it to handle the requests.
+  The methods in this class should be used in the Ktor routing DSL.
 
-suspend inline fun <reified P: Principal> OpenApiServerApi.principal(): P? = principal(P::class)
+Routes class is generated to be able to configure custom interceptors, authentication, etc when configuring the Ktor routes.
 
-// coroutine context element for storing the application call
-class ApplicationCallElement(
-    val applicationCall: ApplicationCall
-) : CoroutineContext.Element {
-
-    companion object Key : CoroutineContext.Key<ApplicationCallElement>
-    override val key: CoroutineContext.Key<ApplicationCallElement> = ApplicationCallElement
-}
-
-data class ResponseEntity<T>(val status: HttpStatusCode, val body: T, val typeInfo: TypeInfo) {
-    companion object {
-        inline fun <reified T> ok(body: T) = ResponseEntity(HttpStatusCode.OK, body, typeInfo<T>())
-    }
-}
-```
-
-
-### Generated code
-
-#### Generated API interface
-```kotlin
-interface EntityServerApi : OpenApiServerApi {
-    suspend fun createEntity(request: Requests.CreateEntityRequest): ResponseEntity<Responses.EntityResponse>
-    suspend fun updateEntity(id: UUID, request: Requests.UpdateEntityRequest): ResponseEntity<Responses.EntityResponse>
-    suspend fun listEntities(): ResponseEntity<Responses.ListEntityResponse>
-    
-    object Requests {
-        @Serializable
-        data class CreateEntityRequest(val name: String)
-        @Serializable
-        data class UpdateEntityRequest(val name: String)
-    }
-    
-    object Responses {
-        @Serializable
-        data class EntityResponse(val name: String, val createdAt: @Contextual Instant)
-        @Serializable
-        data class ListEntityResponse(val entities: List<EntityResponse>)
-    }
-}
-```
-
-#### Generated routes
-```kotlin
-class EntityRoutes(
-    private val apiService: EntityServerApi
-) {
-
-    context(route: Route)
-    fun createEntity() {
-        route.post("/entities") {
-            val request = call.receive<Requests.CreateEntityRequest>()
-            val response = withApplicationCall { apiService.createEntity(request) }
-            call.respond(response.status, response.body, response.typeInfo)
-        }
-    }
-
-    context(route: Route)
-    fun updateEntity() {
-        route.put("/entities/{id}") {
-            val request = call.receive<Requests.UpdateEntityRequest>()
-            val id = UUID.fromString(call.param<String>(paramName))
-            val response = withApplicationCall { apiService.updateEntity(id, request) }
-            call.respond(response.status, response.body, response.typeInfo)
-        }
-    }
-
-    context(route: Route)
-    fun listEntities() {
-        route.get("/entities") {
-            val response = withApplicationCall { apiService.listEntities() }
-            call.respond(response.status, response.body, response.typeInfo)
-        }
-    }
-
-    private suspend fun <T> PipelineContext<Unit, ApplicationCall>.withApplicationCall(block: suspend () -> T): T {
-        return withContext(ApplicationCallElement(call)) {
-            block()
-        }
-    }
-}
-```
+Please see full example in [spektor-sample](./spektor-sample):
+* Implementation of the ServerApi interface: [AuthorRestService.kt](./spektor-sample/src/main/kotlin/io/github/vooft/spektor/sample/apis/AuthorRestService.kt) -- implements a generated class for the Author rest API, generated from [author.yaml](./spektor-sample/src/main/resources/openapi/api/author.yaml)
+* Using the generated Routes class in Ktor routing: [Routing.kt](./spektor-sample/src/main/kotlin/io/github/vooft/spektor/sample/ktor/Routing.kt) -- uses the generated `AuthorRoutes` class to create Ktor routes.

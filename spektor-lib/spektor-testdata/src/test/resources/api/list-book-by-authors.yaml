@@ -1,0 +1,26 @@
+openapi: 3.0.1
+info:
+  title: Book API
+  version: 1.0.0
+paths:
+  /book/byAuthors:
+    get:
+      tags:
+        - BookListByAuthors
+      operationId: listByAuthors
+      parameters:
+        - name: authorIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        200:
+          description: List is returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/book.yaml#/components/schemas/BooksList'

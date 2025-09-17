@@ -17,7 +17,7 @@ fun Application.configureRouting() {
             bookRoutes.create()
         }
 
-        authenticate("user") {
+        authenticate("admin", "user") {
             authorRoutes.list()
             authorRoutes.get()
             authorRoutes.searchBooks()

@@ -45,13 +45,13 @@ class SpektorServerApiCodegen(
                     addParameter("request", requestType)
                 }
             }
-            .addParameters(pathVariables)
-            .addParameters(queryVariables)
+            .addPathParameters(pathVariables)
+            .addQueryParameters(queryPathVariables)
             .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
             .build()
     }
 
-    private fun FunSpec.Builder.addParameters(vars: List<SpektorPath.Variable>): FunSpec.Builder {
+    private fun FunSpec.Builder.addPathParameters(vars: List<SpektorPath.PathVariable>): FunSpec.Builder {
         for (v in vars) {
             val typeName = typeCodegen.generate(v.type)
             addParameter(v.name, typeName.copy(nullable = !v.required))
@@ -59,6 +59,15 @@ class SpektorServerApiCodegen(
 
         return this
     }
+
+    private fun FunSpec.Builder.addQueryParameters(vars: List<SpektorPath.QueryVariable>): FunSpec.Builder {
+        for (v in vars) {
+            val typeName = typeCodegen.generate(v.type)
+            addParameter(v.name, typeName.copy(nullable = !v.required))
+        }
+        return this
+    }
+
 
     companion object {
         private val UNIT_TYPENAME = Unit::class.asClassName()

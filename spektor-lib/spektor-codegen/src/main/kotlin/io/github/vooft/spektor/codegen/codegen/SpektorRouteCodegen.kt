@@ -63,12 +63,12 @@ class SpektorRouteCodegen(
 
                     // reading path variables
                     for (variable in path.pathVariables) {
-                        addVariable(variable, "call.parameters", "Path")
+                        addPathVariable(variable)
                     }
 
                     // reading query variables
-                    for (variable in path.queryVariables) {
-                        addVariable(variable, "call.request.queryParameters", "Query")
+                    for (variable in path.queryPathVariables) {
+                        addQueryVariable(variable)
                     }
 
                     // reading request body
@@ -88,7 +88,7 @@ class SpektorRouteCodegen(
                         add("      ${variable.name} = ${variable.name},\n")
                     }
 
-                    for (variable in path.queryVariables) {
+                    for (variable in path.queryPathVariables) {
                         add("      ${variable.name} = ${variable.name},\n")
                     }
 
@@ -105,26 +105,74 @@ class SpektorRouteCodegen(
         )
         .build()
 
-    private fun CodeBlock.Builder.addVariable(variable: SpektorPath.Variable, accessor: String, errorText: String) {
+    private fun CodeBlock.Builder.addPathVariable(pathVariable: SpektorPath.PathVariable) {
         add(
             "  val %L = %L[%S]?.let { v -> ",
-            variable.name,
-            accessor,
-            variable.name,
+            pathVariable.name,
+            "call.parameters",
+            pathVariable.name,
         )
 
-        addParseFromString(variable.type, "v")
+        addParseFromString(
+            type = pathVariable.type,
+            varName = "v",
+        )
 
         add(" }")
 
-        if (variable.required) {
-            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "$errorText variable '${variable.name}' is required")
+        if (pathVariable.required) {
+            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "Path variable '${pathVariable.name}' is required")
         } else {
             add("\n")
         }
     }
 
-    private fun CodeBlock.Builder.addParseFromString(type: SpektorType.MicroType, varName: String) {
+    private fun CodeBlock.Builder.addQueryVariable(pathVariable: SpektorPath.QueryVariable) {
+        when (val type = pathVariable.type) {
+            is SpektorType.Array -> {
+                add(
+                    "  val %L = %L.getAll(%S)?.map { v -> ",
+                    pathVariable.name,
+                    "call.request.queryParameters",
+                    pathVariable.name,
+                )
+
+
+                addParseFromString(
+                    type = type.itemType,
+                    varName = "v",
+                )
+
+                add(" }")
+
+            }
+
+            is SpektorType.MicroType -> {
+                add(
+                    "  val %L = %L[%S]?.let { v -> ",
+                    pathVariable.name,
+                    "call.request.queryParameters",
+                    pathVariable.name,
+                )
+
+                addParseFromString(pathVariable.type, "v")
+
+                add(" }")
+            }
+        }
+
+        if (pathVariable.required) {
+            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "Query variable '${pathVariable.name}' is required")
+        } else {
+            add("\n")
+        }
+    }
+
+    private fun CodeBlock.Builder.addParseFromString(
+        type: SpektorType,
+        varName: String,
+        parentRef: SpektorType.Ref? = null,
+    ) {
         when (type) {
             is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
             is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
@@ -140,6 +188,36 @@ class SpektorRouteCodegen(
                 SpektorType.MicroType.StringFormat.DATE_TIME -> add("%T.parse($varName)", Instant::class)
                 SpektorType.MicroType.StringFormat.DATE -> add("%T.parse($varName)", LocalDate::class)
             }
+
+            is SpektorType.Ref -> {
+                when (val spektorType = context.refs[type]) {
+                    is SpektorType.Enum,
+                    is SpektorType.MicroType -> addParseFromString(
+                        type = spektorType,
+                        varName = varName,
+                        parentRef = type,
+                    )
+
+                    is SpektorType.Object,
+                    is SpektorType.Array,
+                    is SpektorType.Ref,
+                    null -> error("Parsing from string is not supported for $type which refers to $spektorType")
+                }
+
+            }
+
+            is SpektorType.Enum -> {
+                if (parentRef == null) {
+                    error("Parsing from string is not supported for non-referenced enums")
+                }
+                val generatedTypeSpec = context.generatedTypeSpecs[parentRef]
+                    ?: error("Unresolved type for ${parentRef.modelName}")
+
+                add("%T.valueOf($varName)", generatedTypeSpec.className)
+            }
+
+            is SpektorType.Object,
+            is SpektorType.Array -> error("Parsing from string is not supported for $type")
         }
     }
 

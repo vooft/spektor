@@ -2,6 +2,7 @@ package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorPath
+import io.github.vooft.spektor.model.SpektorPath.*
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
 import io.swagger.v3.oas.models.Operation
@@ -25,8 +26,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         responseBody = operation.responses?.find2xxSpektorType()?.let {
             SpektorType.RequiredWrapper(it, true)
         }, // TODO: can response body be optional?
-        pathVariables = operation.parameters?.extractParameters(ParameterLocation.PATH) ?: listOf(),
-        queryVariables = operation.parameters?.extractParameters(ParameterLocation.QUERY) ?: listOf(),
+        pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
+        queryPathVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
         method = method
     )
 
@@ -42,24 +43,55 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         }
     }
 
-    private fun Collection<Parameter>.extractParameters(location: ParameterLocation): List<SpektorPath.Variable> {
+    private fun Collection<Parameter>.extractPathParameters(location: ParameterLocation): List<PathVariable> {
         return filter { it.`in` == location.value }
             .mapNotNull { parameter ->
                 val type = parameter.findSpektorType() ?: run {
-                    logger.warn { "Parameter ${parameter.name} has no valid type, skipping" }
+                    logger.warn { "Path parameter ${parameter.name} has no valid type, skipping" }
                     return@mapNotNull null
                 }
 
-                val microType = type as? SpektorType.MicroType ?: run {
-                    logger.warn { "Only micro types are supported for params, but got: $type for parameter ${parameter.name}, skipping" }
+                return@mapNotNull when (type) {
+                    is SpektorType.MicroType -> PathVariable(
+                        name = parameter.name,
+                        type = type,
+                        required = parameter.required ?: false
+                    )
+
+                    is SpektorType.Enum,
+                    is SpektorType.Array,
+                    is SpektorType.Object,
+                    is SpektorType.Ref -> {
+                        logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
+                        null
+                    }
+                }
+            }
+    }
+
+    private fun Collection<Parameter>.extractQueryParameters(location: ParameterLocation): List<QueryVariable> {
+        return filter { it.`in` == location.value }
+            .mapNotNull { parameter ->
+                val type = parameter.findSpektorType() ?: run {
+                    logger.warn { "Query parameter ${parameter.name} has no valid type, skipping" }
                     return@mapNotNull null
                 }
 
-                SpektorPath.Variable(
-                    name = parameter.name,
-                    type = microType,
-                    required = parameter.required ?: false
-                )
+                return@mapNotNull when (type) {
+                    is SpektorType.MicroType,
+                    is SpektorType.Array -> QueryVariable(
+                        name = parameter.name,
+                        type = type,
+                        required = parameter.required ?: false
+                    )
+
+                    is SpektorType.Enum,
+                    is SpektorType.Object,
+                    is SpektorType.Ref -> {
+                        logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
+                        null
+                    }
+                }
             }
     }
 

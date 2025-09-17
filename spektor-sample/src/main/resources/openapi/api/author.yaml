@@ -8,6 +8,14 @@ paths:
       tags:
         - Author
       operationId: list
+      parameters:
+        - name: countries
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '../models/author.yaml#/components/schemas/AuthorCountry'
       responses:
         200:
           description: List is returned

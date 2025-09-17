@@ -38,7 +38,7 @@ class SpektorParserTest {
                             required = true
                         ),
                         pathVariables = emptyList(),
-                        queryVariables = emptyList(),
+                        queryPathVariables = emptyList(),
                         method = SpektorPath.Method.GET
                     )
                 ),
@@ -56,13 +56,13 @@ class SpektorParserTest {
                             required = true
                         ),
                         pathVariables = listOf(
-                            SpektorPath.Variable(
+                            SpektorPath.PathVariable(
                                 name = "id",
                                 type = StringMicroType(format = StringFormat.UUID),
                                 required = true
                             )
                         ),
-                        queryVariables = emptyList(),
+                        queryPathVariables = emptyList(),
                         method = SpektorPath.Method.GET
                     )
                 ),
@@ -86,7 +86,7 @@ class SpektorParserTest {
                             required = true
                         ),
                         pathVariables = emptyList(),
-                        queryVariables = emptyList(),
+                        queryPathVariables = emptyList(),
                         method = SpektorPath.Method.POST
                     )
                 )

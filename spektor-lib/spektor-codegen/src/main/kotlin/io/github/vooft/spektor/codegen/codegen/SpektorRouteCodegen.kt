@@ -13,6 +13,7 @@ import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
+import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -135,6 +136,7 @@ class SpektorRouteCodegen(
             is SpektorType.MicroType.StringMicroType -> when (type.format) {
                 SpektorType.MicroType.StringFormat.PLAIN -> add(varName)
                 SpektorType.MicroType.StringFormat.UUID -> add("%T.fromString($varName)", UUID::class)
+                SpektorType.MicroType.StringFormat.URI -> add("%T.create($varName)", URI::class)
                 SpektorType.MicroType.StringFormat.DATE_TIME -> add("%T.parse($varName)", Instant::class)
                 SpektorType.MicroType.StringFormat.DATE -> add("%T.parse($varName)", LocalDate::class)
             }

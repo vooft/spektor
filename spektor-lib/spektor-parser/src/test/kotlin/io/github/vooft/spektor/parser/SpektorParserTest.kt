@@ -178,6 +178,10 @@ class SpektorParserTest {
                             type = StringMicroType(format = StringFormat.PLAIN),
                             required = false
                         ),
+                        "imageLink" to SpektorType.RequiredWrapper(
+                            type = StringMicroType(format = StringFormat.URI),
+                            required = true
+                        ),
                         "author" to SpektorType.RequiredWrapper(
                             type = SpektorType.Ref(
                                 file = authorModelFile.toAbsolutePath().normalize(),

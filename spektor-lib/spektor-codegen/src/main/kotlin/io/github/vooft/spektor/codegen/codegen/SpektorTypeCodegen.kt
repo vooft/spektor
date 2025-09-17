@@ -13,6 +13,7 @@ import io.github.vooft.spektor.codegen.SpektorCodegenContext
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorType
+import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -76,6 +77,7 @@ class SpektorTypeCodegen(
         is SpektorType.MicroType.StringMicroType -> when (format) {
             SpektorType.MicroType.StringFormat.PLAIN -> STRING
             SpektorType.MicroType.StringFormat.UUID -> UUID::class.asClassName()
+            SpektorType.MicroType.StringFormat.URI -> URI::class.asClassName()
             SpektorType.MicroType.StringFormat.DATE_TIME -> Instant::class.asClassName()
             SpektorType.MicroType.StringFormat.DATE -> LocalDate::class.asClassName()
         }

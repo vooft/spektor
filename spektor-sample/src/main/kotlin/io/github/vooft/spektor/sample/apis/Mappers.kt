@@ -3,9 +3,9 @@ package io.github.vooft.spektor.sample.apis
 import io.github.vooft.spektor.sample.models.AuthorModel
 import io.github.vooft.spektor.sample.models.BookModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
-import spektor.example.models.AuthorCountryDto
-import spektor.example.models.AuthorDto
-import spektor.example.models.BookDto
+import spektor.example.models.author.AuthorCountryDto
+import spektor.example.models.author.AuthorDto
+import spektor.example.models.book.BookDto
 
 object Mappers {
     fun AuthorModel.toDto() = AuthorDto(
@@ -21,6 +21,7 @@ object Mappers {
         id = id,
         title = title,
         nativeTitle = nativeTitle,
+        imageLink = imageLink,
         author = authors.single { it.id == authorId }.toDto(),
         price = price,
         createdAt = createdAt

@@ -137,7 +137,6 @@ class SpektorRouteCodegen(
                     pathVariable.name,
                 )
 
-
                 addParseFromString(
                     type = type.itemType,
                     varName = "v",
@@ -211,7 +210,7 @@ class SpektorRouteCodegen(
                     error("Parsing from string is not supported for non-referenced enums")
                 }
                 val generatedTypeSpec = context.generatedTypeSpecs[parentRef]
-                    ?: error("Unresolved type for ${parentRef.modelName}")
+                    ?: error("Missing generated type spec for ${parentRef.modelName}")
 
                 add("%T.valueOf($varName)", generatedTypeSpec.className)
             }

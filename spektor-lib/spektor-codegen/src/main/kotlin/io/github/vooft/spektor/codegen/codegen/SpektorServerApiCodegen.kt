@@ -68,7 +68,6 @@ class SpektorServerApiCodegen(
         return this
     }
 
-
     companion object {
         private val UNIT_TYPENAME = Unit::class.asClassName()
         private val KTOR_APPLICATION_CALL_TYPENAME = ClassName("io.ktor.server.application", "ApplicationCall")

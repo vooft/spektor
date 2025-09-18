@@ -67,7 +67,7 @@ class SpektorRouteCodegen(
                     }
 
                     // reading query variables
-                    for (variable in path.queryPathVariables) {
+                    for (variable in path.queryVariables) {
                         addQueryVariable(variable)
                     }
 
@@ -88,7 +88,7 @@ class SpektorRouteCodegen(
                         add("      ${variable.name} = ${variable.name},\n")
                     }
 
-                    for (variable in path.queryPathVariables) {
+                    for (variable in path.queryVariables) {
                         add("      ${variable.name} = ${variable.name},\n")
                     }
 
@@ -143,7 +143,6 @@ class SpektorRouteCodegen(
                 )
 
                 add(" }")
-
             }
 
             is SpektorType.MicroType -> {

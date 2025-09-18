@@ -7,7 +7,7 @@ data class SpektorPath(
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
     val responseBody: SpektorType.RequiredWrapper<SpektorType>?,
     val pathVariables: List<PathVariable>,
-    val queryPathVariables: List<QueryVariable>,
+    val queryVariables: List<QueryVariable>,
     val method: Method,
 ) {
     init {
@@ -17,7 +17,7 @@ data class SpektorPath(
             "Duplicate path variable names in $path: ${pathNameDuplicates.joinToString()}"
         }
 
-        val queryNames = queryPathVariables.map { it.name }.groupBy { it }
+        val queryNames = queryVariables.map { it.name }.groupBy { it }
         val queryNameDuplicates = queryNames.filter { it.value.size > 1 }.keys
         require(queryNameDuplicates.isEmpty()) {
             "Duplicate query variable names in $path: ${queryNameDuplicates.joinToString()}"

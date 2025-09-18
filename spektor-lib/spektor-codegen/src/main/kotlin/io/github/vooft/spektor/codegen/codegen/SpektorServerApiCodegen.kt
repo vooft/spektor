@@ -46,7 +46,7 @@ class SpektorServerApiCodegen(
                 }
             }
             .addPathParameters(pathVariables)
-            .addQueryParameters(queryPathVariables)
+            .addQueryParameters(queryVariables)
             .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
             .build()
     }

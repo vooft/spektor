@@ -27,7 +27,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
             SpektorType.RequiredWrapper(it, true)
         }, // TODO: can response body be optional?
         pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
-        queryPathVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
+        queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
         method = method
     )
 

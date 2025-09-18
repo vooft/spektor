@@ -127,14 +127,14 @@ class SpektorRouteCodegen(
         }
     }
 
-    private fun CodeBlock.Builder.addQueryVariable(pathVariable: SpektorPath.QueryVariable) {
-        when (val type = pathVariable.type) {
+    private fun CodeBlock.Builder.addQueryVariable(queryVariable: SpektorPath.QueryVariable) {
+        when (val type = queryVariable.type) {
             is SpektorType.Array -> {
                 add(
                     "  val %L = %L.getAll(%S)?.map { v -> ",
-                    pathVariable.name,
+                    queryVariable.name,
                     "call.request.queryParameters",
-                    pathVariable.name,
+                    queryVariable.name,
                 )
 
                 addParseFromString(
@@ -148,19 +148,19 @@ class SpektorRouteCodegen(
             is SpektorType.MicroType -> {
                 add(
                     "  val %L = %L[%S]?.let { v -> ",
-                    pathVariable.name,
+                    queryVariable.name,
                     "call.request.queryParameters",
-                    pathVariable.name,
+                    queryVariable.name,
                 )
 
-                addParseFromString(pathVariable.type, "v")
+                addParseFromString(queryVariable.type, "v")
 
                 add(" }")
             }
         }
 
-        if (pathVariable.required) {
-            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "Query variable '${pathVariable.name}' is required")
+        if (queryVariable.required) {
+            add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "Query variable '${queryVariable.name}' is required")
         } else {
             add("\n")
         }

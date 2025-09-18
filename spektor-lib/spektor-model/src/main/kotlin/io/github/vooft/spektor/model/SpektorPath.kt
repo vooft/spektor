@@ -6,8 +6,8 @@ data class SpektorPath(
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
     val responseBody: SpektorType.RequiredWrapper<SpektorType>?,
-    val pathVariables: List<Variable>,
-    val queryVariables: List<Variable>,
+    val pathVariables: List<PathVariable>,
+    val queryVariables: List<QueryVariable>,
     val method: Method,
 ) {
     init {
@@ -29,9 +29,15 @@ data class SpektorPath(
         }
     }
 
-    data class Variable(
+    data class PathVariable(
         val name: String,
-        val type: SpektorType.MicroType,
+        val type: SpektorType.PathVariableType,
+        val required: Boolean
+    )
+
+    data class QueryVariable(
+        val name: String,
+        val type: SpektorType.QueryVariableType,
         val required: Boolean
     )
 

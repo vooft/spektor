@@ -4,6 +4,7 @@ import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.AuthorCountryTestDto
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.datetime.LocalDate
 import org.junit.jupiter.api.Test
@@ -48,5 +49,43 @@ class AuthorTest {
         )
 
         response.status shouldBe 401
+    }
+
+    @Test
+    fun `should list authors for countries`() = testClient("admin") { client ->
+        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        api.create(
+            AuthorRequestTestDto(
+                name = UUID.randomUUID().toString(),
+                dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+                country = AuthorCountryTestDto.DE,
+                dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+            )
+        )
+
+        api.create(
+            AuthorRequestTestDto(
+                name = UUID.randomUUID().toString(),
+                dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+                country = AuthorCountryTestDto.US,
+                dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+            )
+        )
+
+        api.create(
+            AuthorRequestTestDto(
+                name = UUID.randomUUID().toString(),
+                dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+                country = AuthorCountryTestDto.JP,
+                dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
+            )
+        )
+
+        val response = api.list(countries = listOf(AuthorCountryTestDto.US, AuthorCountryTestDto.JP))
+
+        response.status shouldBe 200
+
+        response.body().authors.map { it.country } shouldContainExactlyInAnyOrder listOf(AuthorCountryTestDto.US, AuthorCountryTestDto.JP)
     }
 }

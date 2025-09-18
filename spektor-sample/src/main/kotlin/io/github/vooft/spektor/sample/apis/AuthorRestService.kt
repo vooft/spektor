@@ -7,6 +7,7 @@ import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.ApplicationCall
 import spektor.example.api.author.AuthorServerApi
+import spektor.example.models.author.AuthorCountryDto
 import spektor.example.models.author.AuthorDto
 import spektor.example.models.author.AuthorRequestDto
 import spektor.example.models.author.AuthorsListDto
@@ -15,9 +16,17 @@ import java.time.Instant
 import java.util.UUID
 
 class AuthorRestService(private val authors: AuthorRepository, private val books: BookRepository) : AuthorServerApi {
-    override suspend fun list(call: ApplicationCall): AuthorsListDto = AuthorsListDto(
-        authors = authors.map { it.toDto() }
-    )
+    override suspend fun list(countries: List<AuthorCountryDto>?, call: ApplicationCall): AuthorsListDto {
+        val countryNames = countries?.map { it.name } ?: emptyList()
+        val filteredAuthors = if (countryNames.isNotEmpty()) {
+            authors.filter { it.country in countryNames }
+        } else {
+            authors
+        }
+        return AuthorsListDto(
+            authors = filteredAuthors.map { it.toDto() }
+        )
+    }
 
     override suspend fun create(request: AuthorRequestDto, call: ApplicationCall): AuthorDto {
         val author = AuthorModel(

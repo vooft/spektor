@@ -25,12 +25,12 @@ internal class SubstitutionDslImpl : SubstitutionDsl {
         return refsSubstitutions to microtypesSubstitutions
     }
 
-    override fun ref(block: RefSubstitutionDsl.() -> Unit): WithSubstitutionDsl {
+    override fun ref(block: RefSubstitutionDsl.() -> Unit): SubstituteWithDsl {
         val dsl = RefSubstitutionDslImpl().also(block)
         val modelRef = ModelRef(file = dsl.file, modelName = dsl.model)
         startedRefs.add(dsl)
 
-        return object : WithSubstitutionDsl {
+        return object : SubstituteWithDsl {
             override fun with(type: String) {
                 startedRefs.remove(dsl)
                 refsSubstitutions[modelRef] = type
@@ -38,12 +38,12 @@ internal class SubstitutionDslImpl : SubstitutionDsl {
         }
     }
 
-    override fun microtype(block: MicrotypeSubstitutionDsl.() -> Unit): WithSubstitutionDsl {
+    override fun microtype(block: MicrotypeSubstitutionDsl.() -> Unit): SubstituteWithDsl {
         val dsl = MicrotypeSubstitutionDslImpl().also(block)
         val propertyRef = PropertyRef(ref = ModelRef(file = dsl.file, modelName = dsl.model), propertyName = dsl.property)
         startedMicrotypes.add(dsl)
 
-        return object : WithSubstitutionDsl {
+        return object : SubstituteWithDsl {
             override fun with(type: String) {
                 startedMicrotypes.remove(dsl)
                 microtypesSubstitutions[propertyRef] = type

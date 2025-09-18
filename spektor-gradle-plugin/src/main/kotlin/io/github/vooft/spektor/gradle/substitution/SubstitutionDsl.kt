@@ -3,8 +3,8 @@ package io.github.vooft.spektor.gradle.substitution
 import java.io.File
 
 interface SubstitutionDsl {
-    fun ref(block: RefSubstitutionDsl.() -> Unit): WithSubstitutionDsl
-    fun microtype(block: MicrotypeSubstitutionDsl.() -> Unit): WithSubstitutionDsl
+    fun ref(block: RefSubstitutionDsl.() -> Unit): SubstituteWithDsl
+    fun microtype(block: MicrotypeSubstitutionDsl.() -> Unit): SubstituteWithDsl
 }
 
 interface RefSubstitutionDsl {
@@ -18,7 +18,7 @@ interface MicrotypeSubstitutionDsl {
     var property: String
 }
 
-interface WithSubstitutionDsl {
+interface SubstituteWithDsl {
     infix fun with(type: String)
 }
 

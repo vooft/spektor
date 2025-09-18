@@ -107,15 +107,16 @@ class SpektorRouteCodegen(
 
     private fun CodeBlock.Builder.addPathVariable(pathVariable: SpektorPath.PathVariable) {
         add(
-            "  val %L = %L[%S]?.let { v -> ",
+            "  val %L = %L[%S]?.let { %L -> ",
             pathVariable.name,
             "call.parameters",
             pathVariable.name,
+            DEFAULT_VAR_NAME,
         )
 
         addParseFromString(
             type = pathVariable.type,
-            varName = "v",
+            varName = DEFAULT_VAR_NAME,
         )
 
         add(" }")
@@ -131,15 +132,16 @@ class SpektorRouteCodegen(
         when (val type = queryVariable.type) {
             is SpektorType.Array -> {
                 add(
-                    "  val %L = %L.getAll(%S)?.map { v -> ",
+                    "  val %L = %L.getAll(%S)?.map { %L -> ",
                     queryVariable.name,
                     "call.request.queryParameters",
                     queryVariable.name,
+                    DEFAULT_VAR_NAME,
                 )
 
                 addParseFromString(
                     type = type.itemType,
-                    varName = "v",
+                    varName = DEFAULT_VAR_NAME,
                 )
 
                 add(" }")
@@ -147,13 +149,17 @@ class SpektorRouteCodegen(
 
             is SpektorType.MicroType -> {
                 add(
-                    "  val %L = %L[%S]?.let { v -> ",
+                    "  val %L = %L[%S]?.let { %L -> ",
                     queryVariable.name,
                     "call.request.queryParameters",
                     queryVariable.name,
+                    DEFAULT_VAR_NAME,
                 )
 
-                addParseFromString(queryVariable.type, "v")
+                addParseFromString(
+                    type = queryVariable.type,
+                    varName = DEFAULT_VAR_NAME,
+                )
 
                 add(" }")
             }
@@ -243,5 +249,7 @@ class SpektorRouteCodegen(
             add(KTOR_RESPOND_METHOD_IMPORT)
             add(KTOR_CALL_EXTENSION_IMPORT)
         }
+
+        private val DEFAULT_VAR_NAME = "v"
     }
 }

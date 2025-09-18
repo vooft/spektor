@@ -45,6 +45,22 @@ spektor {
     // suffix for generated Routes class
     // optional default is "Routes"
     routesSuffix = "Routes"
+    
+    // optional class names substitutions
+    substitutions {
+        // replace a class for a whole DTO, provided class will be used everywhere the model is referenced
+        ref {
+            file = file("src/main/resources/openapi/models/money.yaml")
+            model = "Money"
+        } with "io.github.vooft.spektor.sample.models.Money"
+
+        // replace a class for a specific property of a model, provided class will be used only for that property
+        microtype {
+            file = file("src/main/resources/openapi/models/book.yaml")
+            model = "Book"
+            property = "id"
+        } with "io.github.vooft.spektor.sample.models.BookId"
+    }
 }
 ```
 

@@ -14,7 +14,6 @@ data class AuthorModel(
     val dateOfDeath: LocalDate?,
     val country: String,
     val createdAt: Instant,
-    val additionalDetails: JsonObject? = null,
 )
 
 @Serializable

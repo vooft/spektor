@@ -27,7 +27,6 @@ fun Application.configureSerialization() {
         json(
             Json {
                 serializersModule = SerializersModule {
-                    contextual(kClass = Any::class, serializer = AnyKompendiumSerializer())
                     contextual(
                         kClass = Instant::class,
                         serializer = object : KSerializer<Instant> {
@@ -63,23 +62,5 @@ fun Application.configureSerialization() {
                 }
             }
         )
-    }
-}
-
-class AnyKompendiumSerializer<T : Any> : KSerializer<T> {
-    override fun serialize(encoder: Encoder, value: T) {
-        @Suppress("UNCHECKED_CAST")
-        serialize(encoder, value, value::class as KClass<T>)
-    }
-
-    override fun deserialize(decoder: Decoder): T {
-        error("Abandon all hope ye who enter 💀")
-    }
-
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("KompendiumAny", STRING)
-
-    @OptIn(InternalSerializationApi::class)
-    fun serialize(encoder: Encoder, obj: T, clazz: KClass<T>) {
-        clazz.serializer().serialize(encoder, obj)
     }
 }

@@ -56,7 +56,7 @@ class SpektorParserTest {
                             required = true
                         ),
                         pathVariables = listOf(
-                            SpektorPath.Variable(
+                            SpektorPath.PathVariable(
                                 name = "id",
                                 type = StringMicroType(format = StringFormat.UUID),
                                 required = true

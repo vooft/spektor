@@ -5,9 +5,12 @@ import java.nio.file.Path
 
 sealed interface SpektorType {
 
+    sealed interface QueryVariableType : SpektorType
+    sealed interface PathVariableType : SpektorType
+
     val isContextual: Boolean get() = false
 
-    data class Array(val itemType: SpektorType) : SpektorType
+    data class Array(val itemType: SpektorType) : QueryVariableType
 
     data class Object(val properties: Map<String, RequiredWrapper<SpektorType>>) : SpektorType
 
@@ -17,7 +20,7 @@ sealed interface SpektorType {
 
     data class RequiredWrapper<T : SpektorType>(val type: T, val required: Boolean)
 
-    sealed interface MicroType : SpektorType {
+    sealed interface MicroType : QueryVariableType, PathVariableType {
         data class StringMicroType(val format: StringFormat) : MicroType {
             override val isContextual
                 get() = when (format) {

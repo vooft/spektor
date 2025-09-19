@@ -3,6 +3,7 @@ package io.github.vooft.spektor.codegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.parser.SpektorParser
 import io.github.vooft.spektor.test.TestFiles
+import io.github.vooft.spektor.test.TestFiles.listBookByFiltersFile
 import io.github.vooft.spektor.test.TestFiles.listFile
 import io.github.vooft.spektor.test.TestFiles.pathVarFile
 import io.github.vooft.spektor.test.TestFiles.requestBodyFile
@@ -13,7 +14,7 @@ class SpektorCodegenTest {
     @Test
     fun test() {
         val parser = SpektorParser()
-        val schema = parser.parse(listOf(listFile, pathVarFile, requestBodyFile))
+        val schema = parser.parse(listOf(listFile, listBookByFiltersFile, pathVarFile, requestBodyFile))
 
         val config = SpektorCodegenConfig(
             basePackage = "io.github.vooft.spektor.example",

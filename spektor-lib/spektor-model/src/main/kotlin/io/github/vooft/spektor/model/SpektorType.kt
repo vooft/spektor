@@ -12,7 +12,10 @@ sealed interface SpektorType {
 
     data class Array(val itemType: SpektorType) : QueryVariableType
 
-    data class Object(val properties: Map<String, RequiredWrapper<SpektorType>>) : SpektorType
+    sealed interface Object : SpektorType {
+        data class WithProperties(val properties: Map<String, RequiredWrapper<SpektorType>>) : Object
+        object FreeForm : Object
+    }
 
     data class Ref(val file: Path, val modelName: String) : SpektorType
 

@@ -37,8 +37,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
     private fun resolveObject(schema: Schema<*>): SpektorType.Object? {
         val required = schema.required?.toSet() ?: emptySet()
         val properties = schema.properties ?: run {
-            logger.warn { "Object schema has no properties: $schema" }
-            return null
+            return SpektorType.Object.FreeForm
         }
 
         val props = properties.mapValues { (propName, propSchema) ->
@@ -50,7 +49,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
             SpektorType.RequiredWrapper(propertyModel, required.contains(propName))
         }
 
-        return SpektorType.Object(props)
+        return SpektorType.Object.WithProperties(props)
     }
 
     private fun resolveRef(rawRef: String): SpektorType.Ref? {

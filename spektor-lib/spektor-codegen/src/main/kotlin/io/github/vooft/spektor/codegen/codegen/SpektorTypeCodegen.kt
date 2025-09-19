@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.codegen.codegen
 
 import com.squareup.kotlinpoet.BOOLEAN
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
@@ -34,7 +35,8 @@ class SpektorTypeCodegen(
         return when (type) {
             is SpektorType.Array -> LIST.plusParameter(generate(type.itemType))
             is SpektorType.MicroType -> type.toTypeName()
-            is SpektorType.Object -> error("Generating object directly is not supported $type")
+            is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
+            is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
             is SpektorType.Ref -> generateRef(type)
         }.also { context.resolvedTypes[type] = it }
@@ -52,12 +54,13 @@ class SpektorTypeCodegen(
         val refsTrace = ref.traceRefs()
         val lastRef = refsTrace.last()
 
-        val typeSpec =  when (val target = context.refs.getValue(lastRef)) {
-            is SpektorType.Object -> classCodegen.generate(lastRef, target)
+        val typeSpec = when (val target = context.refs.getValue(lastRef)) {
+            is SpektorType.Object.WithProperties -> classCodegen.generate(lastRef, target)
             is SpektorType.Enum -> classCodegen.generate(lastRef, target)
             is SpektorType.Array,
             is SpektorType.MicroType,
-            is SpektorType.Ref -> error("Only object and enum references are supported, but got $target for ref $lastRef")
+            is SpektorType.Object.FreeForm,
+            is SpektorType.Ref -> error("Only object with properties and enum references are supported, but got $target for ref $lastRef")
         }
 
         refsTrace.forEach {
@@ -74,6 +77,7 @@ class SpektorTypeCodegen(
             SpektorType.MicroType.NumberFormat.FLOAT -> FLOAT
             SpektorType.MicroType.NumberFormat.DOUBLE -> DOUBLE
         }
+
         is SpektorType.MicroType.StringMicroType -> when (format) {
             SpektorType.MicroType.StringFormat.PLAIN -> STRING
             SpektorType.MicroType.StringFormat.UUID -> UUID::class.asClassName()
@@ -81,5 +85,9 @@ class SpektorTypeCodegen(
             SpektorType.MicroType.StringFormat.DATE_TIME -> Instant::class.asClassName()
             SpektorType.MicroType.StringFormat.DATE -> LocalDate::class.asClassName()
         }
+    }
+
+    companion object {
+        private val JSON_OBJECT_CLASS = ClassName("kotlinx.serialization.json", "JsonObject")
     }
 }

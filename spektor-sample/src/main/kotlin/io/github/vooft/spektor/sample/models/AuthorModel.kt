@@ -2,7 +2,6 @@ package io.github.vooft.spektor.sample.models
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID

@@ -95,7 +95,7 @@ class SpektorParserTest {
                 SpektorType.Ref(
                     file = bookModelFile.toAbsolutePath().normalize(),
                     modelName = "BooksList"
-                ) to SpektorType.Object(
+                ) to SpektorType.Object.WithProperties(
                     properties = mapOf(
                         "books" to SpektorType.RequiredWrapper(
                             type = SpektorType.Array(
@@ -111,7 +111,7 @@ class SpektorParserTest {
                 SpektorType.Ref(
                     file = authorModelFile.toAbsolutePath().normalize(),
                     modelName = "Author"
-                ) to SpektorType.Object(
+                ) to SpektorType.Object.WithProperties(
                     properties = mapOf(
                         "id" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.UUID),
@@ -120,6 +120,13 @@ class SpektorParserTest {
                         "name" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.PLAIN),
                             required = true
+                        ),
+                        "country" to SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = authorModelFile.toAbsolutePath().normalize(),
+                                modelName = "AuthorCountry"
+                            ),
+                            required = false
                         ),
                         "dateOfBirth" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.DATE),
@@ -138,7 +145,7 @@ class SpektorParserTest {
                 SpektorType.Ref(
                     file = bookModelFile.toAbsolutePath().normalize(),
                     modelName = "BookRequest"
-                ) to SpektorType.Object(
+                ) to SpektorType.Object.WithProperties(
                     properties = mapOf(
                         "title" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.PLAIN),
@@ -164,7 +171,7 @@ class SpektorParserTest {
                 SpektorType.Ref(
                     file = bookModelFile.toAbsolutePath().normalize(),
                     modelName = "Book"
-                ) to SpektorType.Object(
+                ) to SpektorType.Object.WithProperties(
                     properties = mapOf(
                         "id" to SpektorType.RequiredWrapper(
                             type = StringMicroType(format = StringFormat.UUID),
@@ -199,9 +206,13 @@ class SpektorParserTest {
                     ),
                 ),
                 SpektorType.Ref(
+                    file = authorModelFile.toAbsolutePath().normalize(),
+                    modelName = "AuthorCountry"
+                ) to SpektorType.Enum(values = listOf("US", "DE", "JP")),
+                SpektorType.Ref(
                     file = moneyModelFile.toAbsolutePath().normalize(),
                     modelName = "Money"
-                ) to SpektorType.Object(
+                ) to SpektorType.Object.WithProperties(
                     properties = mapOf(
                         "minorUnits" to SpektorType.RequiredWrapper(
                             type = SpektorType.MicroType.IntegerMicroType(null),

@@ -19,7 +19,7 @@ components:
         country:
           $ref: '#/components/schemas/AuthorCountry'
         additionalDetails:
-          type: number
+          type: object
         dateOfBirth:
           type: string
           format: date

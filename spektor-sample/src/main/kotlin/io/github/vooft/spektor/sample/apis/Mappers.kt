@@ -3,6 +3,8 @@ package io.github.vooft.spektor.sample.apis
 import io.github.vooft.spektor.sample.models.AuthorModel
 import io.github.vooft.spektor.sample.models.BookModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import spektor.example.models.author.AuthorCountryDto
 import spektor.example.models.author.AuthorDto
 import spektor.example.models.book.BookDto
@@ -15,6 +17,7 @@ object Mappers {
         dateOfDeath = dateOfDeath,
         country = AuthorCountryDto.valueOf(country),
         createdAt = createdAt,
+        additionalDetails = additionalDetails,
     )
 
     fun BookModel.toDto(authors: AuthorRepository) = BookDto(

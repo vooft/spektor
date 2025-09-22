@@ -1,10 +1,10 @@
 package io.github.vooft.spektor
 
+import io.github.vooft.spektor.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.apis.BookTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.AuthorCountryTestDto
-import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.models.BookRequestTestDto
 import io.github.vooft.spektor.test.models.MoneyTestDto
 import io.kotest.matchers.shouldBe

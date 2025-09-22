@@ -16,7 +16,7 @@ class SpektorTypeDtoCodegen(
     private val typeCodegen: SpektorTypeCodegen,
 ) {
 
-    fun generate(ref: SpektorType.Ref, objectType: SpektorType.Object): TypeSpec {
+    fun generate(ref: SpektorType.Ref, objectType: SpektorType.Object.WithProperties): TypeSpec {
         val fields = objectType.properties.map { (name, wrapper) ->
             val substituted = config.microtypeSubstitutions[SpektorPropertyRef(ref, name)]?.let { ClassName.bestGuess(it) }
 

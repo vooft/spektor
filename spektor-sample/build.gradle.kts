@@ -1,4 +1,3 @@
-
 import io.github.vooft.spektor.gradle.SpektorGenerateTask
 import io.github.vooft.spektor.gradle.substitutions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -92,6 +91,11 @@ listOf("src/main/resources/openapi/api/author.yaml", "src/main/resources/openapi
             mapOf(
                 "dateLibrary" to "kotlinx-datetime",
             )
+        )
+
+        importMappings = mapOf(
+            "AuthorRequestTestDto" to "io.github.vooft.spektor.models.AuthorRequestTestDto",
+            "AuthorTestDto" to "io.github.vooft.spektor.models.AuthorTestDto",
         )
 
         configOptions.set(

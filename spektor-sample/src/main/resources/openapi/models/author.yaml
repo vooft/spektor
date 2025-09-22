@@ -7,7 +7,7 @@ components:
   schemas:
     AuthorCountry:
       type: string
-      enum: [US, DE, JP]
+      enum: [ US, DE, JP ]
     Author:
       type: object
       properties:
@@ -16,6 +16,8 @@ components:
           format: uuid
         name:
           type: string
+        additionalDetails:
+          type: object
         dateOfBirth:
           type: string
           format: date
@@ -55,6 +57,8 @@ components:
         dateOfDeath:
           type: string
           format: date
+        additionalDetails:
+          type: object
       required:
         - name
         - dateOfBirth

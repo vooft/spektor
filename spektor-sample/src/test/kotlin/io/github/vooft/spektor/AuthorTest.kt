@@ -1,12 +1,14 @@
 package io.github.vooft.spektor
 
+import io.github.vooft.spektor.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.AuthorCountryTestDto
-import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
@@ -24,7 +26,10 @@ class AuthorTest {
                 name = name,
                 dateOfBirth = dob,
                 country = AuthorCountryTestDto.DE,
-                dateOfDeath = dod
+                dateOfDeath = dod,
+                additionalDetails = buildJsonObject {
+                    put("ref", "some-ref")
+                }
             )
         )
 
@@ -34,6 +39,7 @@ class AuthorTest {
         dto.name shouldBe name
         dto.dateOfBirth shouldBe dob
         dto.dateOfDeath shouldBe dod
+        dto.additionalDetails.toString() shouldBe """{"ref":"some-ref"}"""
     }
 
     @Test

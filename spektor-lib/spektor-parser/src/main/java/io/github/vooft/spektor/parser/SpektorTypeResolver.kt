@@ -15,7 +15,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         schema.type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
         schema.type != null -> SpektorType.MicroType.from(schema.type, schema.format)
         else -> {
-            logger.warn { "Schema in file $file is not a reference or primitive type: $schema" }
+            logger.warn { "Schema in file $file is of invalid type ${schema.type}: $schema" }
             null
         }
     }

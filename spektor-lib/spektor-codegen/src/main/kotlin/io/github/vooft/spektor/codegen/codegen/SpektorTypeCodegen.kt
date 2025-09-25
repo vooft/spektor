@@ -46,7 +46,7 @@ class SpektorTypeCodegen(
         var current: SpektorType = this@traceRefs
         while (current is SpektorType.Ref) {
             add(current)
-            current = context.refs.getValue(current)
+            current = context.refs[current] ?: error("Unable to resolve ref $current")
         }
     }
 

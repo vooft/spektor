@@ -15,11 +15,13 @@ internal class SubstitutionDslImpl : SubstitutionDsl {
     fun collectSubstitutions(): Pair<Map<ModelRef, String>, Map<PropertyRef, String>> {
         if (startedRefs.isNotEmpty()) {
             val dsl = startedRefs.first()
-            throw IllegalStateException("Ref substitution is not completed. Missing 'with' for ref ${dsl.model} in file ${dsl.file}")
+            error("Ref substitution is not completed. Missing 'with' for ref ${dsl.model} in file ${dsl.file}")
         }
         if (startedMicrotypes.isNotEmpty()) {
             val dsl = startedMicrotypes.first()
-            throw IllegalStateException("Microtype substitution is not completed. Missing 'with' for property ${dsl.property} of model ${dsl.model} in file ${dsl.file}")
+            error(
+                "Microtype substitution is not completed. Missing 'with' for property ${dsl.property} of model ${dsl.model} in file ${dsl.file}"
+            )
         }
 
         return refsSubstitutions to microtypesSubstitutions
@@ -57,11 +59,15 @@ internal class SubstitutionDslImpl : SubstitutionDsl {
 
         override var file: File
             get() = requireNotNull(fileField) { "File is not set" }
-            set(value) { fileField = value }
+            set(value) {
+                fileField = value
+            }
 
         override var model: String
             get() = requireNotNull(modelField) { "Model is not set" }
-            set(value) { modelField = value }
+            set(value) {
+                modelField = value
+            }
     }
 
     class MicrotypeSubstitutionDslImpl : MicrotypeSubstitutionDsl {
@@ -71,14 +77,20 @@ internal class SubstitutionDslImpl : SubstitutionDsl {
 
         override var file: File
             get() = requireNotNull(fileField) { "File is not set" }
-            set(value) { fileField = value }
+            set(value) {
+                fileField = value
+            }
 
         override var model: String
             get() = requireNotNull(modelField) { "Model is not set" }
-            set(value) { modelField = value }
+            set(value) {
+                modelField = value
+            }
 
         override var property: String
             get() = requireNotNull(propertyField) { "Property is not set" }
-            set(value) { propertyField = value }
+            set(value) {
+                propertyField = value
+            }
     }
 }

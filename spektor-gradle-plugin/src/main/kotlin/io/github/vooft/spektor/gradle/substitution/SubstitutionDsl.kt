@@ -21,4 +21,3 @@ interface MicrotypeSubstitutionDsl {
 interface SubstituteWithDsl {
     infix fun with(type: String)
 }
-

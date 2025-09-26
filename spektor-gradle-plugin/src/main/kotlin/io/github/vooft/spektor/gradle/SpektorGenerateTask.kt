@@ -77,4 +77,3 @@ abstract class SpektorGenerateTask : DefaultTask() {
         codegen.write(context, outputPath.asFile.get().toPath())
     }
 }
-

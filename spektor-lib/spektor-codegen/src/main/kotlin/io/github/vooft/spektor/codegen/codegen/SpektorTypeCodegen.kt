@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
@@ -72,7 +73,11 @@ class SpektorTypeCodegen(
 
     private fun SpektorType.MicroType.toTypeName(): TypeName = when (this) {
         is SpektorType.MicroType.BooleanMicroType -> BOOLEAN
-        is SpektorType.MicroType.IntegerMicroType -> INT
+        is SpektorType.MicroType.IntegerMicroType -> when (format) {
+            null, "int32", "int" -> INT
+            "int64", "long" -> LONG
+            else -> error("Unsupported integer format: $format")
+        }
         is SpektorType.MicroType.NumberMicroType -> when (format) {
             SpektorType.MicroType.NumberFormat.FLOAT -> FLOAT
             SpektorType.MicroType.NumberFormat.DOUBLE -> DOUBLE

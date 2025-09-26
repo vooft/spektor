@@ -17,6 +17,16 @@ allprojects {
     }
 }
 
+tasks.getByName("test") {
+    dependsOn(subprojects.mapNotNull { it.tasks.findByName("test") })
+    dependsOn(gradle.includedBuilds.map { it.task(":test") })
+}
+
+tasks.getByName("check") {
+    dependsOn(subprojects.mapNotNull { it.tasks.findByName("check") })
+    dependsOn(gradle.includedBuilds.map { it.task(":check") })
+}
+
 tasks.register("spektorPublishToMavenCentral") {
     dependsOn(
         subprojects.mapNotNull { it.tasks.findByName("publishAndReleaseToMavenCentral") } +

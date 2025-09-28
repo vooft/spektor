@@ -44,8 +44,6 @@ fun Path.toPackageName(specRoot: Path): String {
     return packageParts.joinToString(".") { it.sanitizeKotlinIdentifier() }
 }
 
-private fun String.sanitizeKotlinIdentifier(): String {
-    return replace("[^A-Za-z0-9_]".toRegex(), "_").let {
-        if (it.firstOrNull()?.isDigit() == true) "_$it" else it
-    }
+private fun String.sanitizeKotlinIdentifier(): String = replace("[^A-Za-z0-9_]".toRegex(), "_").let {
+    if (it.firstOrNull()?.isDigit() == true) "_$it" else it
 }

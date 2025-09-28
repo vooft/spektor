@@ -44,3 +44,31 @@ private fun DependencyHandler.addPlatform(project: Project, platform: Dependency
         add(configuration, platform)
     }
 }
+
+// not sure why, but this must be a separate task, otherwise it can't find the check tasks in subprojects
+val checkAll = tasks.register("checkAll") {
+    dependsOn(subprojects.map { it.tasks.getByName("check") }) // must be without a semicolon
+    dependsOn(gradle.includedBuilds.map { it.task(":check") }) // must be with a semicolon
+}
+
+tasks.named("check") {
+    dependsOn(checkAll)
+}
+
+val testAll = tasks.register("testAll") {
+    dependsOn(subprojects.map { it.tasks.getByName("test") })
+    dependsOn(gradle.includedBuilds.map { it.task(":test") })
+}
+
+tasks.named("test") {
+    dependsOn(testAll)
+}
+//
+//val cleanAll = tasks.register("cleanAll") {
+//    dependsOn(subprojects.map { it.tasks.getByName("clean") })
+//    dependsOn(gradle.includedBuilds.map { it.task(":clean") })
+//}
+//
+//tasks.named("clean") {
+//    dependsOn(cleanAll)
+//}

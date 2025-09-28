@@ -2,7 +2,8 @@ package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorPath
-import io.github.vooft.spektor.model.SpektorPath.*
+import io.github.vooft.spektor.model.SpektorPath.PathVariable
+import io.github.vooft.spektor.model.SpektorPath.QueryVariable
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
 import io.swagger.v3.oas.models.Operation

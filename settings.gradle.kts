@@ -9,3 +9,5 @@ includeBuild("spektor-gradle-plugin") {
         substitute(module("io.github.vooft:spektor-gradle-plugin")).using(project(":"))
     }
 }
+
+includeBuild("spektor-lib")

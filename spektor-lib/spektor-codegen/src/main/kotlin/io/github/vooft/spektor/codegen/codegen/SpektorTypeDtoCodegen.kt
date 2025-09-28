@@ -41,31 +41,29 @@ class SpektorTypeDtoCodegen(
             .build()
     }
 
-    fun generate(ref: SpektorType.Ref, enumType: SpektorType.Enum): TypeSpec {
-        return TypeSpec.enumBuilder(config.classNameFor(ref))
-            .primaryConstructor(
-                FunSpec.constructorBuilder()
-                    .addParameter("value", String::class)
-                    .build()
-            )
-            .addAnnotation(SERIALIZABLE_ANNOTATION)
-            .also {
-                for (value in enumType.values) {
-                    it.addEnumConstant(
-                        name = value.uppercase().replace(ENUM_NAME_REGEX, "_"),
-                        typeSpec = TypeSpec.anonymousClassBuilder()
-                            .addSuperclassConstructorParameter("%S", value)
-                            .addAnnotation(
-                                AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
-                                    .addMember("%S", value)
-                                    .build()
-                            )
-                            .build()
-                    )
-                }
+    fun generate(ref: SpektorType.Ref, enumType: SpektorType.Enum): TypeSpec = TypeSpec.enumBuilder(config.classNameFor(ref))
+        .primaryConstructor(
+            FunSpec.constructorBuilder()
+                .addParameter("value", String::class)
+                .build()
+        )
+        .addAnnotation(SERIALIZABLE_ANNOTATION)
+        .also {
+            for (value in enumType.values) {
+                it.addEnumConstant(
+                    name = value.uppercase().replace(ENUM_NAME_REGEX, "_"),
+                    typeSpec = TypeSpec.anonymousClassBuilder()
+                        .addSuperclassConstructorParameter("%S", value)
+                        .addAnnotation(
+                            AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
+                                .addMember("%S", value)
+                                .build()
+                        )
+                        .build()
+                )
             }
-            .build()
-    }
+        }
+        .build()
 
     private fun FunSpec.Builder.addParameters(fields: List<FieldInfo>): FunSpec.Builder {
         for (field in fields) {

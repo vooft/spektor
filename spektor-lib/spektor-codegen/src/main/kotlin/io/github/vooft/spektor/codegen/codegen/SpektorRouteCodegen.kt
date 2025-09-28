@@ -172,11 +172,7 @@ class SpektorRouteCodegen(
         }
     }
 
-    private fun CodeBlock.Builder.addParseFromString(
-        type: SpektorType,
-        varName: String,
-        parentRef: SpektorType.Ref? = null,
-    ) {
+    private fun CodeBlock.Builder.addParseFromString(type: SpektorType, varName: String, parentRef: SpektorType.Ref? = null,) {
         when (type) {
             is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
             is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
@@ -207,7 +203,6 @@ class SpektorRouteCodegen(
                     is SpektorType.Ref,
                     null -> error("Parsing from string is not supported for $type which refers to $spektorType")
                 }
-
             }
 
             is SpektorType.Enum -> {
@@ -250,6 +245,6 @@ class SpektorRouteCodegen(
             add(KTOR_CALL_EXTENSION_IMPORT)
         }
 
-        private val DEFAULT_VAR_NAME = "v"
+        private const val DEFAULT_VAR_NAME = "v"
     }
 }

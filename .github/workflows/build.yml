@@ -28,11 +28,11 @@ jobs:
           distribution: 'temurin'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Generate and submit dependency graph
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@v5
 
       - name: Build for ${{ github.ref }}
         run: ./gradlew build --parallel

@@ -22,6 +22,8 @@ components:
           $ref: "./author.yaml#/components/schemas/Author"
         price:
           $ref: "./money.yaml#/components/schemas/Money"
+        weight:
+          type: number
       required:
         - id
         - title

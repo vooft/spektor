@@ -15,6 +15,7 @@ import io.github.vooft.spektor.codegen.SpektorCodegenContext
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
 import io.github.vooft.spektor.model.SpektorType
+import java.math.BigDecimal
 import java.net.URI
 import java.time.Instant
 import java.time.LocalDate
@@ -81,6 +82,7 @@ class SpektorTypeCodegen(
         is SpektorType.MicroType.NumberMicroType -> when (format) {
             SpektorType.MicroType.NumberFormat.FLOAT -> FLOAT
             SpektorType.MicroType.NumberFormat.DOUBLE -> DOUBLE
+            SpektorType.MicroType.NumberFormat.BIG_DECIMAL -> BigDecimal::class.asClassName()
         }
 
         is SpektorType.MicroType.StringMicroType -> when (format) {

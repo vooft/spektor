@@ -3,6 +3,8 @@ package io.github.vooft.spektor.parser
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorSchema
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType.NumberFormat
+import io.github.vooft.spektor.model.SpektorType.MicroType.NumberMicroType
 import io.github.vooft.spektor.model.SpektorType.MicroType.StringFormat
 import io.github.vooft.spektor.model.SpektorType.MicroType.StringMicroType
 import io.github.vooft.spektor.model.TagAndFile
@@ -217,6 +219,10 @@ private val expected = SpektorSchema(
                         file = moneyModelFile.toAbsolutePath().normalize(),
                         modelName = "Money"
                     ),
+                    required = false
+                ),
+                "weight" to SpektorType.RequiredWrapper(
+                    type = NumberMicroType(format = NumberFormat.BIG_DECIMAL),
                     required = false
                 )
             ),

@@ -179,6 +179,7 @@ class SpektorRouteCodegen(
             is SpektorType.MicroType.NumberMicroType -> when (type.format) {
                 SpektorType.MicroType.NumberFormat.FLOAT -> add("$varName.toFloat()")
                 SpektorType.MicroType.NumberFormat.DOUBLE -> add("$varName.toDouble()")
+                SpektorType.MicroType.NumberFormat.BIG_DECIMAL -> add("%T($varName)", java.math.BigDecimal::class)
             }
 
             is SpektorType.MicroType.StringMicroType -> when (type.format) {

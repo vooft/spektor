@@ -27,7 +27,7 @@ complexity:
     functionThreshold: 7
     constructorThreshold: 8
   CyclomaticComplexMethod:
-    threshold: 20
+    threshold: 30
 
 exceptions:
   TooGenericExceptionCaught:

@@ -37,16 +37,19 @@ sealed interface SpektorType {
 
         data class IntegerMicroType(val format: String?) : MicroType
         data object BooleanMicroType : MicroType
-        data class NumberMicroType(val format: NumberFormat) : MicroType
+        data class NumberMicroType(val format: NumberFormat) : MicroType {
+            override val isContextual get() = format.isContextual
+        }
 
-        enum class NumberFormat(val formatName: String) {
-            FLOAT("float"),
-            DOUBLE("double");
+        enum class NumberFormat(val formatName: String, val isContextual: Boolean) {
+            BIG_DECIMAL("decimal", true),
+            FLOAT("float", false),
+            DOUBLE("double", false);
 
             companion object {
                 fun from(formatName: String?): NumberFormat = entries.find { it.formatName == formatName } ?: run {
-                    logger.warn { "Unsupported NUMBER type format $formatName, falling back to double" }
-                    DOUBLE
+                    logger.warn { "Unsupported NUMBER type format $formatName, falling back to ${BIG_DECIMAL.formatName}" }
+                    BIG_DECIMAL
                 }
             }
         }

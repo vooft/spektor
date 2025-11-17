@@ -25,6 +25,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        weight:
+          type: number
       required:
         - id
         - title

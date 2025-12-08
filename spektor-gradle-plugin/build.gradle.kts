@@ -3,6 +3,7 @@ plugins {
     `spektor-publish`
     alias(libs.plugins.buildconfig)
     alias(libs.plugins.plugin.publish)
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 gradlePlugin {
@@ -31,6 +32,11 @@ dependencies {
     implementation("io.github.vooft:spektor-codegen:${project.version}")
     implementation("io.github.vooft:spektor-model:${project.version}")
     implementation("io.github.vooft:spektor-parser:${project.version}")
+    implementation("io.github.vooft:spektor-merger:${project.version}")
+
+    implementation(platform(libs.jackson.bom))
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.yaml)
 
     implementation(libs.kotlin.gradle.plugin.api)
 }
@@ -57,4 +63,13 @@ tasks.register("spektorPublishPlugins") {
             gradle.includedBuilds.map { it.task(":spektorPublishPlugins") } +
             listOfNotNull(tasks.findByName("publishPlugins"))
     )
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+
+        relocate("com.fasterxml.jackson", "io.github.vooft.spektor.shadow.jackson")
+        relocate("org.yaml.snakeyaml", "io.github.vooft.spektor.shadow.snakeyaml")
+    }
 }

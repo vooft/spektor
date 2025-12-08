@@ -5,6 +5,7 @@ include(
     ":spektor-testdata",
     ":spektor-parser",
     ":spektor-codegen",
+    ":spektor-merger",
 )
 
 dependencyResolutionManagement {

@@ -2,6 +2,7 @@
 kotlin = "2.2.21"
 kotest = "6.0.7"
 ktor = "3.3.3"
+jackson = "2.19.2"
 
 [libraries]
 
@@ -14,6 +15,9 @@ gradle-plugin-maven-central-publish = { module = "com.vanniktech:gradle-maven-pu
 kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version = "2.1.36" }
+jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version = "2.2.0" }
 
 kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }

@@ -25,7 +25,7 @@ class SpektorGradlePlugin : Plugin<Project> {
             it.unifiedSpecName.set(extension.unifiedSpecName)
             it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
             it.unifiedSpecDescription.set(extension.unifiedSpecDescription)
-            it.failOnUnifiedSpecError.set(extension.failOnUnifiedSpecError)
+            it.failOnMergeError.set(extension.failOnMergeError)
         }
         val spektorGenerate = target.tasks.register("spektorGenerate", SpektorGenerateTask::class.java) {
             it.outputPath.set(outputDirectory)

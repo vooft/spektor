@@ -23,7 +23,7 @@ abstract class SpektorMergeTask : DefaultTask() {
     abstract val unifiedSpecDescription: Property<String>
 
     @get:Input
-    abstract val failOnUnifiedSpecError: Property<Boolean>
+    abstract val failOnMergeError: Property<Boolean>
 
     @TaskAction
     fun merge() {
@@ -34,7 +34,7 @@ abstract class SpektorMergeTask : DefaultTask() {
             specRoot = specRoot.asFile.get().toPath()
         ).merge()
 
-        if (failOnUnifiedSpecError.get()) {
+        if (failOnMergeError.get()) {
             mergeResult.getOrThrow()
         } else {
             mergeResult.getOrDefault(Unit)

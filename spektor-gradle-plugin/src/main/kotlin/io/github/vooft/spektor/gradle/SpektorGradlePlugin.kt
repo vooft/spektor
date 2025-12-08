@@ -20,6 +20,13 @@ class SpektorGradlePlugin : Plugin<Project> {
         target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").kotlin.srcDir(outputDirectory)
 
         // Run custom code after project is evaluated
+        val spektorMerge = target.tasks.register("spektorMerge", SpektorMergeTask::class.java) {
+            it.specRoot.set(extension.requireSpecRoot())
+            it.unifiedSpecName.set(extension.unifiedSpecName)
+            it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
+            it.unifiedSpecDescription.set(extension.unifiedSpecDescription)
+            it.failOnUnifiedSpecError.set(extension.failOnUnifiedSpecError)
+        }
         val spektorGenerate = target.tasks.register("spektorGenerate", SpektorGenerateTask::class.java) {
             it.outputPath.set(outputDirectory)
             it.basePackage.set(extension.basePackage)
@@ -33,18 +40,10 @@ class SpektorGradlePlugin : Plugin<Project> {
             it.microtypeSubstitutions.set(extension.microtypeSubstitutions)
 
             it.substitutionFingerprint.set(extension.dtoSubstitutions.toString() + extension.microtypeSubstitutions.toString())
-        }
-        val spektorMerge = target.tasks.register("spektorMerge", SpektorMergeTask::class.java) {
-            it.specRoot.set(extension.requireSpecRoot())
-            it.unifiedSpecName.set(extension.unifiedSpecName)
-            it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
-            it.unifiedSpecDescription.set(extension.unifiedSpecDescription)
-            it.failOnUnifiedSpecError.set(extension.failOnUnifiedSpecError)
-        }
 
-        target.tasks.withType(KotlinCompilationTask::class.java) {
             it.finalizedBy(spektorMerge)
         }
+
         target.tasks.withType(KotlinCompilationTask::class.java) {
             it.dependsOn(spektorGenerate)
         }

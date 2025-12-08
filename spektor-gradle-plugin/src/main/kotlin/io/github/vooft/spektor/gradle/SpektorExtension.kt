@@ -10,7 +10,7 @@ open class SpektorExtension {
     var unifiedSpecName: String = "openapi.yaml"
     var unifiedSpecTitle: String = "Unified API"
     var unifiedSpecDescription: String = "Unified API"
-    var failOnUnifiedSpecError: Boolean = false
+    var failOnUnifiedSpecError: Boolean = true
 
     var basePackage: String = "spektor.example"
     var enabled: Boolean = true

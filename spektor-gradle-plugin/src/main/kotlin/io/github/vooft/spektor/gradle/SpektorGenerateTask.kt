@@ -3,7 +3,6 @@ package io.github.vooft.spektor.gradle
 import io.github.vooft.spektor.codegen.SpektorCodegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.SpektorPropertyRef
-import io.github.vooft.spektor.merger.SpektorMerger
 import io.github.vooft.spektor.merger.SpektorMerger.Companion.isNotExcluded
 import io.github.vooft.spektor.merger.SpektorMerger.Companion.isYaml
 import io.github.vooft.spektor.model.SpektorType
@@ -28,15 +27,6 @@ abstract class SpektorGenerateTask : DefaultTask() {
 
     @get:Input
     abstract val unifiedSpecName: Property<String>
-
-    @get:Input
-    abstract val unifiedSpecTitle: Property<String>
-
-    @get:Input
-    abstract val unifiedSpecDescription: Property<String>
-
-    @get:Input
-    abstract val failOnUnifiedSpecError: Property<Boolean>
 
     @get:Input
     abstract val basePackage: Property<String>
@@ -90,18 +80,5 @@ abstract class SpektorGenerateTask : DefaultTask() {
         val context = codegen.generate(schema)
 
         codegen.write(context, outputPath.asFile.get().toPath())
-
-        val mergeResult = SpektorMerger(
-            unifiedSpecName = unifiedSpecName.get(),
-            unifiedSpecTitle = unifiedSpecTitle.get(),
-            unifiedSpecDescription = unifiedSpecDescription.get(),
-            specRoot = specRoot.asFile.get().toPath()
-        ).merge()
-
-        if (failOnUnifiedSpecError.get()) {
-            mergeResult.getOrThrow()
-        } else {
-            mergeResult.getOrDefault(Unit)
-        }
     }
 }

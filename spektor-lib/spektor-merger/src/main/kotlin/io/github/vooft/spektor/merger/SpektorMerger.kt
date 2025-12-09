@@ -11,7 +11,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
@@ -30,20 +29,15 @@ class SpektorMerger(
     init {
         require(specRoot.isDirectory()) { "Spec root must be a directory" }
         logger.debug { "YAML mapper version: ${yamlMapper.version()}" }
-        logger.debug { "JSON mapper version: ${jsonMapper.version()}" }
     }
 
     companion object {
         private val logger = logger { }
         private val yamlMapper = ObjectMapper(
-            YAMLFactory()
-//                .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+            YAMLFactory().apply {
+                disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+            }
         ).apply {
-            findAndRegisterModules()
-            setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        }
-        private val jsonMapper = ObjectMapper().apply {
             findAndRegisterModules()
             setSerializationInclusion(JsonInclude.Include.NON_NULL)
         }
@@ -77,13 +71,9 @@ class SpektorMerger(
         val resolvedOpenApi = resolveWithSwagger(syntheticYaml)
 
         val yamlOut = specRoot.resolve("$unifiedSpecName.yaml")
-//        val jsonOut = specRoot.resolve("$unifiedSpecName.json")
 
         logger.debug { "Writing unified OpenAPI spec to $yamlOut" }
         yamlOut.writeText(yamlMapper.writeValueAsString(resolvedOpenApi))
-
-//        logger.debug { "Writing unified OpenAPI spec to $jsonOut" }
-//        jsonOut.writeText(jsonMapper.writeValueAsString(resolvedOpenApi))
 
         logger.debug { "Deleting synthetic OpenAPI root $syntheticYaml" }
         syntheticYaml.deleteIfExists()
@@ -100,16 +90,6 @@ class SpektorMerger(
             null,
             options
         )
-//        val result = OpenAPIV3Parser().readContents(
-//            /* swaggerAsString = */
-//            syntheticYaml.absolutePathString(),
-//            /* auth = */
-//            null,
-//            /* options = */
-//            options,
-////            /* location = */
-////            specRoot.toUri().toString()
-//        )
 
         return result ?: error("Failed to parse/resolve synthetic OpenAPI root")
     }

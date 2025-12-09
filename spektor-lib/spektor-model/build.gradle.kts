@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.swagger.parser)
     implementation(libs.kotlin.logging)
 
     testImplementation(libs.kotest.assertions)

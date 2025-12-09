@@ -17,6 +17,6 @@ dependencies {
     implementation(libs.gradle.plugin.ktlint)
 
     // publishing
-    implementation(libs.gradle.plugin.dokka)
+//    implementation(libs.gradle.plugin.dokka)
     implementation(libs.gradle.plugin.maven.central.publish)
 }

@@ -9,15 +9,12 @@ jackson = "2.19.2"
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version = "1.23.8" }
 gradle-plugin-ktlint = { module = "org.jmailen.kotlinter:org.jmailen.kotlinter.gradle.plugin", version = "5.0.0" }
-gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version = "2.1.0" }
+#gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version = "2.1.0" }
 gradle-plugin-maven-central-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.35.0" }
 
 kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version = "2.1.36" }
-jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version = "2.2.0" }
 
 kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }

@@ -22,6 +22,7 @@ class SpektorGradlePlugin : Plugin<Project> {
         // Run custom code after project is evaluated
         val spektorMerge = target.tasks.register("spektorMerge", SpektorMergeTask::class.java) {
             it.specRoot.set(extension.requireSpecRoot())
+            it.outputPath.set(outputDirectory.map { it.dir("openapi") })
             it.unifiedSpecName.set(extension.unifiedSpecName)
             it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
             it.unifiedSpecDescription.set(extension.unifiedSpecDescription)

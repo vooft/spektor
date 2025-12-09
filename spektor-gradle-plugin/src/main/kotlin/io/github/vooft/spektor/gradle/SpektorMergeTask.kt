@@ -6,12 +6,21 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.copyToRecursively
+import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteRecursively
+import kotlin.io.path.exists
 
 abstract class SpektorMergeTask : DefaultTask() {
 
     @get:InputDirectory
     abstract val specRoot: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val outputPath: DirectoryProperty
 
     @get:Input
     abstract val unifiedSpecName: Property<String>
@@ -25,13 +34,28 @@ abstract class SpektorMergeTask : DefaultTask() {
     @get:Input
     abstract val failOnMergeError: Property<Boolean>
 
+    @OptIn(ExperimentalPathApi::class)
     @TaskAction
     fun merge() {
+        val specRoot = specRoot.asFile.get().toPath()
+        val outputPath = outputPath.asFile.get().toPath()
+
+        if (outputPath.exists()) {
+            outputPath.deleteRecursively()
+        }
+        outputPath.createDirectories()
+
+        specRoot.copyToRecursively(
+            target = outputPath,
+            overwrite = true,
+            followLinks = true
+        )
+
         val mergeResult = SpektorMerger(
             unifiedSpecName = unifiedSpecName.get(),
             unifiedSpecTitle = unifiedSpecTitle.get(),
             unifiedSpecDescription = unifiedSpecDescription.get(),
-            specRoot = specRoot.asFile.get().toPath()
+            specRoot = outputPath,
         ).merge()
 
         if (failOnMergeError.get()) {

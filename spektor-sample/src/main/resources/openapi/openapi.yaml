@@ -1,0 +1,16 @@
+openapi: "3.0.1"
+info:
+  title: "Unified API"
+  description: "Unified API"
+  version: "1.0.0"
+servers:
+- url: "/"
+paths:
+  /book:
+    $ref: "./api/book.yaml#/paths/~1book"
+  /author:
+    $ref: "./api/author.yaml#/paths/~1author"
+  /author/{id}:
+    $ref: "./api/author.yaml#/paths/~1author~1{id}"
+  /author/{id}/books:
+    $ref: "./api/author.yaml#/paths/~1author~1{id}~1books"

@@ -7,7 +7,7 @@ import java.io.File
 open class SpektorExtension {
     var specRoot: File? = null
 
-    var unifiedSpecName: String = "openapi.yaml"
+    var unifiedSpecName: String = "openapi"
     var unifiedSpecTitle: String = "Unified API"
     var unifiedSpecDescription: String = "Unified API"
     var failOnMergeError: Boolean = true

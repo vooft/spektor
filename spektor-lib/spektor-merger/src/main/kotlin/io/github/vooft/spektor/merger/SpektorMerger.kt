@@ -1,14 +1,18 @@
 package io.github.vooft.spektor.merger
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.isDirectory
@@ -31,8 +35,18 @@ class SpektorMerger(
 
     companion object {
         private val logger = logger { }
-        private val yamlMapper = ObjectMapper(YAMLFactory()).findAndRegisterModules()
-        private val jsonMapper = ObjectMapper().findAndRegisterModules()
+        private val yamlMapper = ObjectMapper(
+            YAMLFactory()
+//                .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+        ).apply {
+            findAndRegisterModules()
+            setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        }
+        private val jsonMapper = ObjectMapper().apply {
+            findAndRegisterModules()
+            setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        }
 
         private val HTTP_METHODS = setOf(
             "get",
@@ -52,7 +66,8 @@ class SpektorMerger(
             listOf(
                 "$it.yaml",
                 "$it.yml",
-                "$it.json"
+                "$it.json",
+                "synthetic_$it.yaml"
             )
         }
     }
@@ -62,39 +77,47 @@ class SpektorMerger(
         val resolvedOpenApi = resolveWithSwagger(syntheticYaml)
 
         val yamlOut = specRoot.resolve("$unifiedSpecName.yaml")
-        val jsonOut = specRoot.resolve("$unifiedSpecName.json")
+//        val jsonOut = specRoot.resolve("$unifiedSpecName.json")
 
         logger.debug { "Writing unified OpenAPI spec to $yamlOut" }
         yamlOut.writeText(yamlMapper.writeValueAsString(resolvedOpenApi))
 
-        logger.debug { "Writing unified OpenAPI spec to $jsonOut" }
-        jsonOut.writeText(jsonMapper.writeValueAsString(resolvedOpenApi))
+//        logger.debug { "Writing unified OpenAPI spec to $jsonOut" }
+//        jsonOut.writeText(jsonMapper.writeValueAsString(resolvedOpenApi))
+
+        logger.debug { "Deleting synthetic OpenAPI root $syntheticYaml" }
+        syntheticYaml.deleteIfExists()
     }.onFailure { logger.error(it) { "Failed to merge OpenAPI specs" } }
 
-    private fun resolveWithSwagger(syntheticYaml: String,): OpenAPI {
+    private fun resolveWithSwagger(syntheticYaml: Path): OpenAPI {
         logger.debug { "Resolving synthetic OpenAPI root" }
         val options = ParseOptions().apply {
-            isResolve = true
+//            isResolve = true
         }
 
-        val result = OpenAPIV3Parser().readContents(
-            /* swaggerAsString = */
-            syntheticYaml,
-            /* auth = */
+        val result = OpenAPIV3Parser().read(
+            syntheticYaml.toAbsolutePath().toUri().toString(),
             null,
-            /* options = */
-            options,
-            /* location = */
-            specRoot.toUri().toString()
+            options
         )
+//        val result = OpenAPIV3Parser().readContents(
+//            /* swaggerAsString = */
+//            syntheticYaml.absolutePathString(),
+//            /* auth = */
+//            null,
+//            /* options = */
+//            options,
+////            /* location = */
+////            specRoot.toUri().toString()
+//        )
 
-        return result.openAPI ?: error("Failed to parse/resolve synthetic OpenAPI root")
+        return result ?: error("Failed to parse/resolve synthetic OpenAPI root")
     }
 
     private fun escapeJsonPointerSegment(segment: String): String = segment.replace("~", "~0")
         .replace("/", "~1")
 
-    private fun buildSyntheticRootYaml(): String {
+    private fun buildSyntheticRootYaml(): Path {
         logger.debug { "Building synthetic root OpenAPI spec YAML" }
         val root: ObjectNode = yamlMapper.createObjectNode().apply {
             put("openapi", "3.0.1")
@@ -160,7 +183,10 @@ class SpektorMerger(
             }
         }
 
-        return yamlMapper.writeValueAsString(root)
+        return specRoot.resolve("synthetic_$unifiedSpecName.yaml").also {
+            logger.debug { "Writing synthetic OpenAPI root to $it" }
+            it.writeText(yamlMapper.writeValueAsString(root))
+        }
     }
 
     private fun rewriteRefsInPlace(node: JsonNode, sourceFile: Path,) {

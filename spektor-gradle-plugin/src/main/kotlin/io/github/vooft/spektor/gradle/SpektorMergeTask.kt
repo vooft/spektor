@@ -10,7 +10,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
@@ -49,18 +48,13 @@ abstract class SpektorMergeTask : DefaultTask() {
         }
         outputPath.createDirectories()
 
-        specRoot.copyToRecursively(
-            target = outputPath,
-            overwrite = true,
-            followLinks = true
-        )
-
         val mergeResult = SpektorMerger(
             unifiedSpecName = unifiedSpecName.get(),
             unifiedSpecTitle = unifiedSpecTitle.get(),
             unifiedSpecDescription = unifiedSpecDescription.get(),
-            specRoot = outputPath,
-            servers = unifiedSpecServers.get()
+            servers = unifiedSpecServers.get(),
+            specRoot = specRoot,
+            outputPath = outputPath,
         ).merge()
 
         if (failOnMergeError.get()) {

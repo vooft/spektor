@@ -23,7 +23,8 @@ class SpektorMerger(
     val unifiedSpecTitle: String,
     val unifiedSpecDescription: String?,
     val servers: List<String>,
-    val specRoot: Path
+    val specRoot: Path,
+    val outputPath: Path,
 ) {
 
     init {
@@ -56,7 +57,7 @@ class SpektorMerger(
     fun merge() = runCatching {
         val unifiedSpec = buildUnifiedSpec()
 
-        val yamlOut = specRoot.resolve("$unifiedSpecName.yaml")
+        val yamlOut = outputPath.resolve("$unifiedSpecName.yaml")
 
         logger.debug { "Writing unified OpenAPI spec to $yamlOut" }
         yamlOut.writeText(yamlMapper.writeValueAsString(unifiedSpec))

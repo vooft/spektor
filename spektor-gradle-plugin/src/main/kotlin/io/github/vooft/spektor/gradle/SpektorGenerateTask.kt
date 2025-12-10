@@ -3,7 +3,6 @@ package io.github.vooft.spektor.gradle
 import io.github.vooft.spektor.codegen.SpektorCodegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.SpektorPropertyRef
-import io.github.vooft.spektor.merger.SpektorMerger.Companion.isNotExcluded
 import io.github.vooft.spektor.merger.SpektorMerger.Companion.isYaml
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.parser.SpektorParser

@@ -64,5 +64,4 @@ abstract class SpektorMergeTask : DefaultTask() {
             mergeResult.getOrDefault(Unit)
         }
     }
-
 }

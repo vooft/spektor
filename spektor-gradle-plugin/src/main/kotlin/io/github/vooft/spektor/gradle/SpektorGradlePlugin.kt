@@ -36,7 +36,6 @@ class SpektorGradlePlugin : Plugin<Project> {
             it.serverApiSuffix.set(extension.serverApiSuffix)
             it.routesSuffix.set(extension.routesSuffix)
             it.specRoot.set(extension.requireSpecRoot())
-            it.unifiedSpecName.set(extension.unifiedSpecName)
 
             it.dtoSubstitutions.set(extension.dtoSubstitutions)
             it.microtypeSubstitutions.set(extension.microtypeSubstitutions)

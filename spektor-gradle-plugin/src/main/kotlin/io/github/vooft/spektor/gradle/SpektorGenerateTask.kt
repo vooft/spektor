@@ -26,9 +26,6 @@ abstract class SpektorGenerateTask : DefaultTask() {
     abstract val specRoot: DirectoryProperty
 
     @get:Input
-    abstract val unifiedSpecName: Property<String>
-
-    @get:Input
     abstract val basePackage: Property<String>
 
     @get:Input
@@ -53,7 +50,7 @@ abstract class SpektorGenerateTask : DefaultTask() {
     fun generate() {
         val files = specRoot.asFile.get().walk()
             .map { it.toPath().toAbsolutePath().normalize() }
-            .filter { it.isYaml() && it.isNotExcluded(listOf(unifiedSpecName.get())) }
+            .filter { it.isYaml() }
             .toList()
 
         val parser = SpektorParser()

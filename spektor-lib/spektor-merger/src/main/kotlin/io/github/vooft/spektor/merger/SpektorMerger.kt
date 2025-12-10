@@ -95,6 +95,7 @@ class SpektorMerger(
                 val duplicates = it.filter { (_, entries) -> entries.size > 1 }
                 require(duplicates.isEmpty()) { "Duplicate paths in api files: $duplicates" }
             }.mapValues { (_, entries) -> entries.single() }
+            .toSortedMap()
 
         logger.debug { "Merging paths" }
         pathFiles.forEach { (pathKey, file) ->

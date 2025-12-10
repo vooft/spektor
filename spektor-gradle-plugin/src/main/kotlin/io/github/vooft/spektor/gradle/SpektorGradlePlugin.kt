@@ -17,12 +17,13 @@ class SpektorGradlePlugin : Plugin<Project> {
 
         val spektorOutputDirectory = target.layout.buildDirectory.dir("spektor-generated")
         val generatedSourcesDirectory = spektorOutputDirectory.map { it.dir("kotlin") }
-        val unifiedSpecResourcesDirectory = spektorOutputDirectory.map { it.dir("resources").dir("openapi") }
+        val generatedResourcesDirectory = spektorOutputDirectory.map { it.dir("resources") }
+        val unifiedSpecResourcesDirectory = generatedResourcesDirectory.map { it.dir("openapi") }
 
         // add generated classes to the source set
         target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").apply {
             kotlin.srcDir(generatedSourcesDirectory)
-            resources.srcDir(unifiedSpecResourcesDirectory)
+            resources.srcDir(generatedResourcesDirectory)
         }
 
         // Run custom code after project is evaluated

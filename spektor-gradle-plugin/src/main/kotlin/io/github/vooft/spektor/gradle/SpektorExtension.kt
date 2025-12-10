@@ -9,7 +9,8 @@ open class SpektorExtension {
 
     var unifiedSpecName: String = "openapi"
     var unifiedSpecTitle: String = "Unified API"
-    var unifiedSpecDescription: String = "Unified API"
+    var unifiedSpecDescription: String? = "Unified API"
+    var unifiedSpecServers: List<String> = emptyList()
     var failOnMergeError: Boolean = true
 
     var basePackage: String = "spektor.example"

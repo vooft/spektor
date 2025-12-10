@@ -3,6 +3,7 @@ package io.github.vooft.spektor.gradle
 import io.github.vooft.spektor.merger.SpektorMerger
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -32,6 +33,9 @@ abstract class SpektorMergeTask : DefaultTask() {
     abstract val unifiedSpecDescription: Property<String>
 
     @get:Input
+    abstract val unifiedSpecServers: ListProperty<String>
+
+    @get:Input
     abstract val failOnMergeError: Property<Boolean>
 
     @OptIn(ExperimentalPathApi::class)
@@ -56,6 +60,7 @@ abstract class SpektorMergeTask : DefaultTask() {
             unifiedSpecTitle = unifiedSpecTitle.get(),
             unifiedSpecDescription = unifiedSpecDescription.get(),
             specRoot = outputPath,
+            servers = unifiedSpecServers.get()
         ).merge()
 
         if (failOnMergeError.get()) {

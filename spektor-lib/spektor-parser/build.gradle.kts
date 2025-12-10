@@ -4,10 +4,10 @@ plugins {
 }
 
 dependencies {
-    api(project(":spektor-model"))
+    implementation(project(":spektor-model"))
 
-    api(libs.swagger.parser)
-    api(libs.kotlin.logging)
+    implementation(libs.swagger.parser)
+    implementation(libs.kotlin.logging)
 
     testImplementation(project(":spektor-testdata"))
     testImplementation(libs.kotest.assertions)

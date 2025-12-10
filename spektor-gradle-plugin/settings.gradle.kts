@@ -8,7 +8,13 @@ dependencyResolutionManagement {
 
 includeBuild("../spektor-lib") {
     dependencySubstitution {
-        listOf("spektor-codegen", "spektor-model", "spektor-parser", "spektor-testdata").forEach {
+        listOf(
+            "spektor-codegen",
+            "spektor-model",
+            "spektor-parser",
+            "spektor-testdata",
+            "spektor-merger",
+        ).forEach {
             substitute(module("io.github.vooft:$it")).using(project(":$it"))
         }
     }

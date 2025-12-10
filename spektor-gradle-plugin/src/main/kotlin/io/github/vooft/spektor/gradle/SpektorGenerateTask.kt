@@ -3,6 +3,7 @@ package io.github.vooft.spektor.gradle
 import io.github.vooft.spektor.codegen.SpektorCodegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.SpektorPropertyRef
+import io.github.vooft.spektor.merger.SpektorMerger.Companion.isYaml
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.parser.SpektorParser
 import org.gradle.api.DefaultTask
@@ -47,8 +48,8 @@ abstract class SpektorGenerateTask : DefaultTask() {
     @TaskAction
     fun generate() {
         val files = specRoot.asFile.get().walk()
-            .filter { it.extension == "yaml" }
             .map { it.toPath().toAbsolutePath().normalize() }
+            .filter { it.isYaml() }
             .toList()
 
         val parser = SpektorParser()

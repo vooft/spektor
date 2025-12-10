@@ -7,6 +7,12 @@ import java.io.File
 open class SpektorExtension {
     var specRoot: File? = null
 
+    var unifiedSpecName: String = "openapi"
+    var unifiedSpecTitle: String = "Unified API"
+    var unifiedSpecDescription: String? = "Unified API"
+    var unifiedSpecServers: List<String> = emptyList()
+    var failOnMergeError: Boolean = true
+
     var basePackage: String = "spektor.example"
     var enabled: Boolean = true
     var dtoSuffix: String = "Dto"

@@ -63,7 +63,7 @@ spektor {
     
     // server urls used for unified spec
     // optional default is empty list
-    unifiedSpecServers = emptyList("https://example.com")
+    unifiedSpecServers = listOf("https://example.com")
     
     // fail gradle :spektorMerge task if there was an error during spec unification
     // if disabled, error will still be logged

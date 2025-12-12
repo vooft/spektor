@@ -13,6 +13,7 @@ import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.pathString
 
 abstract class SpektorMergeTask : DefaultTask() {
 
@@ -20,7 +21,7 @@ abstract class SpektorMergeTask : DefaultTask() {
     abstract val specRoot: DirectoryProperty
 
     @get:OutputDirectory
-    abstract val outputPath: DirectoryProperty
+    abstract val generatedResourcesPath: DirectoryProperty
 
     @get:Input
     abstract val unifiedSpecName: Property<String>
@@ -40,8 +41,16 @@ abstract class SpektorMergeTask : DefaultTask() {
     @OptIn(ExperimentalPathApi::class)
     @TaskAction
     fun merge() {
-        val specRoot = specRoot.asFile.get().toPath()
-        val outputPath = outputPath.asFile.get().toPath()
+        val specRoot = specRoot.asFile.get().toPath().toAbsolutePath()
+        val outputPath = generatedResourcesPath.asFile.get().toPath().toAbsolutePath().let { path ->
+            specRoot.pathString
+                .substringAfterLast("resources")
+                .split("/")
+                .filterNot { it.isBlank() }
+                .let { dirs ->
+                    dirs.fold(path) { acc, name -> acc.resolve(name) }
+                }
+        }
 
         if (outputPath.exists()) {
             outputPath.deleteRecursively()

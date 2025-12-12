@@ -9,6 +9,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.nio.file.FileSystems
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
@@ -45,7 +46,7 @@ abstract class SpektorMergeTask : DefaultTask() {
         val outputPath = generatedResourcesPath.asFile.get().toPath().toAbsolutePath().let { path ->
             specRoot.pathString
                 .substringAfterLast("resources")
-                .split("/")
+                .split(FileSystems.getDefault().separator)
                 .filterNot { it.isBlank() }
                 .let { dirs ->
                     dirs.fold(path) { acc, name -> acc.resolve(name) }

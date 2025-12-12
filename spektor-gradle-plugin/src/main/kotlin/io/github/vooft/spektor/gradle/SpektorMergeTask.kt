@@ -9,10 +9,13 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.nio.file.FileSystems
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 abstract class SpektorMergeTask : DefaultTask() {
 
@@ -20,7 +23,7 @@ abstract class SpektorMergeTask : DefaultTask() {
     abstract val specRoot: DirectoryProperty
 
     @get:OutputDirectory
-    abstract val outputPath: DirectoryProperty
+    abstract val generatedResourcesPath: DirectoryProperty
 
     @get:Input
     abstract val unifiedSpecName: Property<String>
@@ -40,8 +43,17 @@ abstract class SpektorMergeTask : DefaultTask() {
     @OptIn(ExperimentalPathApi::class)
     @TaskAction
     fun merge() {
-        val specRoot = specRoot.asFile.get().toPath()
-        val outputPath = outputPath.asFile.get().toPath()
+        val specRoot = specRoot.asFile.get().toPath().toAbsolutePath()
+        require(specRoot.any { it.name == RESOURCES }) {
+            "Spec root must contain `$RESOURCES` directory"
+        }
+        val outputPath = generatedResourcesPath.asFile.get().toPath().toAbsolutePath().let { path ->
+            specRoot.pathString
+                .substringAfterLast(RESOURCES)
+                .split(FileSystems.getDefault().separator)
+                .filterNot { it.isBlank() }
+                .fold(path) { acc, name -> acc.resolve(name)}
+        }
 
         if (outputPath.exists()) {
             outputPath.deleteRecursively()
@@ -62,5 +74,9 @@ abstract class SpektorMergeTask : DefaultTask() {
         } else {
             mergeResult.getOrDefault(Unit)
         }
+    }
+
+    companion object {
+        const val RESOURCES = "resources"
     }
 }

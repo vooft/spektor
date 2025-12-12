@@ -18,8 +18,6 @@ class SpektorGradlePlugin : Plugin<Project> {
         val spektorOutputDirectory = target.layout.buildDirectory.dir("spektor-generated")
         val generatedSourcesDirectory = spektorOutputDirectory.map { it.dir("kotlin") }
         val generatedResourcesDirectory = spektorOutputDirectory.map { it.dir("resources") }
-        val unifiedSpecResourcesDirectory = generatedResourcesDirectory.map { it.dir("openapi") }
-
         // add generated classes to the source set
         target.extensions.getByType(KotlinJvmExtension::class.java).sourceSets.getByName("main").apply {
             kotlin.srcDir(generatedSourcesDirectory)
@@ -29,7 +27,7 @@ class SpektorGradlePlugin : Plugin<Project> {
         // Run custom code after project is evaluated
         val spektorMerge = target.tasks.register("spektorMerge", SpektorMergeTask::class.java) {
             it.specRoot.set(extension.requireSpecRoot())
-            it.outputPath.set(unifiedSpecResourcesDirectory)
+            it.generatedResourcesPath.set(generatedResourcesDirectory)
             it.unifiedSpecName.set(extension.unifiedSpecName)
             it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
             it.unifiedSpecDescription.set(extension.unifiedSpecDescription)

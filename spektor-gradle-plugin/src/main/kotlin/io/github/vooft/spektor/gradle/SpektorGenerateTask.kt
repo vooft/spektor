@@ -43,7 +43,7 @@ abstract class SpektorGenerateTask : DefaultTask() {
     abstract val microtypeSubstitutions: MapProperty<PropertyRef, String>
 
     @get:Input
-    abstract val substitutionFingerprint: Property<String>
+    abstract val substitutionFingerprint: Property<String> // fingeprint to force task rerun on substitution changes
 
     @TaskAction
     fun generate() {

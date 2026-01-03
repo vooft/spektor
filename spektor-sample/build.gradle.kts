@@ -1,4 +1,6 @@
+
 import io.github.vooft.spektor.gradle.SpektorGenerateTask
+import io.github.vooft.spektor.gradle.createUnifiedSpec
 import io.github.vooft.spektor.gradle.substitutions
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
@@ -21,6 +23,8 @@ application {
 
 spektor {
     specRoot = file("src/main/resources/openapi")
+
+    createUnifiedSpec()
 
     substitutions {
         ref {

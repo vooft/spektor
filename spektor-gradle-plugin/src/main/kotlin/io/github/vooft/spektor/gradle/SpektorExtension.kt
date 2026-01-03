@@ -2,16 +2,14 @@ package io.github.vooft.spektor.gradle
 
 import io.github.vooft.spektor.gradle.substitution.SubstitutionDsl
 import io.github.vooft.spektor.gradle.substitution.SubstitutionDslImpl
+import io.github.vooft.spektor.gradle.unifiedspec.UnifiedSpecDsl
+import io.github.vooft.spektor.gradle.unifiedspec.UnifiedSpecDslImpl
 import java.io.File
 
 open class SpektorExtension {
     var specRoot: File? = null
 
-    var unifiedSpecName: String = "openapi"
-    var unifiedSpecTitle: String = "Unified API"
-    var unifiedSpecDescription: String? = "Unified API"
-    var unifiedSpecServers: List<String> = emptyList()
-    var failOnMergeError: Boolean = true
+    internal var unifiedSpec: UnifiedSpec? = null
 
     var basePackage: String = "spektor.example"
     var enabled: Boolean = true
@@ -32,6 +30,20 @@ fun SpektorExtension.substitutions(block: SubstitutionDsl.() -> Unit) {
     microtypeSubstitutions.putAll(microtypeSubs)
 }
 
+fun SpektorExtension.createUnifiedSpec(block: UnifiedSpecDsl.() -> Unit = {}) {
+    val dsl = UnifiedSpecDslImpl()
+    dsl.block()
+    unifiedSpec = dsl.build()
+}
+
 data class ModelRef(val file: File, val modelName: String)
 
 data class PropertyRef(val ref: ModelRef, val propertyName: String)
+
+data class UnifiedSpec(
+    val specName: String,
+    val specTitle: String,
+    val specDescription: String?,
+    val specServers: List<String>,
+    val failOnMergeError: Boolean,
+)

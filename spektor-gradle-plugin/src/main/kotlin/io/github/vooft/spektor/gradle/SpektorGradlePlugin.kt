@@ -26,13 +26,18 @@ class SpektorGradlePlugin : Plugin<Project> {
 
         // Run custom code after project is evaluated
         val spektorMerge = target.tasks.register("spektorMerge", SpektorMergeTask::class.java) {
-            it.specRoot.set(extension.requireSpecRoot())
-            it.generatedResourcesPath.set(generatedResourcesDirectory)
-            it.unifiedSpecName.set(extension.unifiedSpecName)
-            it.unifiedSpecTitle.set(extension.unifiedSpecTitle)
-            it.unifiedSpecDescription.set(extension.unifiedSpecDescription)
-            it.failOnMergeError.set(extension.failOnMergeError)
-            it.unifiedSpecServers.set(extension.unifiedSpecServers)
+            val enabled = extension.unifiedSpec != null
+            it.enabled = enabled
+
+            if (enabled) {
+                it.specRoot.set(extension.requireSpecRoot())
+                it.generatedResourcesPath.set(generatedResourcesDirectory)
+                it.unifiedSpecName.set(extension.unifiedSpec?.specName)
+                it.unifiedSpecTitle.set(extension.unifiedSpec?.specTitle)
+                it.unifiedSpecDescription.set(extension.unifiedSpec?.specDescription)
+                it.failOnMergeError.set(extension.unifiedSpec?.failOnMergeError)
+                it.unifiedSpecServers.set(extension.unifiedSpec?.specServers)
+            }
         }
         val spektorGenerate = target.tasks.register("spektorGenerate", SpektorGenerateTask::class.java) {
             it.outputPath.set(generatedSourcesDirectory)

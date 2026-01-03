@@ -52,7 +52,7 @@ abstract class SpektorMergeTask : DefaultTask() {
                 .substringAfterLast(RESOURCES)
                 .split(FileSystems.getDefault().separator)
                 .filterNot { it.isBlank() }
-                .fold(path) { acc, name -> acc.resolve(name)}
+                .fold(path) { acc, name -> acc.resolve(name) }
         }
 
         if (outputPath.exists()) {

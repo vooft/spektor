@@ -49,26 +49,29 @@ spektor {
     // optional default is "Routes"
     routesSuffix = "Routes"
 
-    // name for unified .yaml spec file
-    // optional default is "openapi"
-    unifiedSpecName = "openapi"
-    
-    // title used for unified spec
-    // optional default is "Unified API"
-    unifiedSpecTitle = "Unified API"
-    
-    // description used for unified spec
-    // optional default is "Unified API"
-    unifiedSpecDescription = "Unified API"
-    
-    // server urls used for unified spec
-    // optional default is empty list
-    unifiedSpecServers = listOf("https://example.com")
-    
-    // fail gradle :spektorMerge task if there was an error during spec unification
-    // if disabled, error will still be logged
-    // optional default is "true"
-    failOnMergeError = true
+    // create unified spec from all provided specs, could be used without arguments, i.e. createUnifiedSpec()
+    createUnifiedSpec {
+        // name for unified .yaml spec file
+        // optional default is "openapi"
+        specName = "openapi"
+
+        // title used for unified spec
+        // optional default is "Unified API"
+        specTitle = "Unified API"
+
+        // description used for unified spec
+        // optional default is "Unified API"
+        specDescription = "Unified API"
+
+        // server urls used for unified spec
+        // optional default is empty list
+        specServers.add("https://example.com")
+
+        // fail gradle :spektorMerge task if there was an error during spec unification
+        // if disabled, error will still be logged
+        // optional default is "true"
+        failOnMergeError = true
+    }
 
     // optional class names substitutions
     substitutions {

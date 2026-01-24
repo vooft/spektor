@@ -18,7 +18,7 @@ detekt {
 
 tasks.withType<Detekt> {
     tasks.findByName("check")?.dependsOn(this)
-    exclude { it.file.path.contains("generated/") }
+    exclude { it.file.absolutePath.contains("generated/") }
 }
 
 tasks.withType<JavaCompile> {

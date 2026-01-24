@@ -22,7 +22,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         operationId = operation.operationId ?: "operationPlaceholder-${operationIdCounter.getAndIncrement()}",
         path = path,
         requestBody = operation.requestBody?.let { rq ->
-            rq.content?.findSpektorType()?.let { SpektorType.RequiredWrapper(it, rq.required) }
+            rq.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, rq.required) }
         },
         responseBody = operation.responses?.find2xxSpektorType()?.let {
             SpektorType.RequiredWrapper(it, true)
@@ -47,7 +47,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private fun Collection<Parameter>.extractPathParameters(location: ParameterLocation): List<PathVariable> {
         return filter { it.`in` == location.value }
             .mapNotNull { parameter ->
-                val type = parameter.findSpektorType() ?: run {
+                val type = parameter.findParameterSpektorType() ?: run {
                     logger.warn { "Path parameter ${parameter.name} has no valid type, skipping" }
                     return@mapNotNull null
                 }
@@ -73,7 +73,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private fun Collection<Parameter>.extractQueryParameters(location: ParameterLocation): List<QueryVariable> {
         return filter { it.`in` == location.value }
             .mapNotNull { parameter ->
-                val type = parameter.findSpektorType() ?: run {
+                val type = parameter.findParameterSpektorType() ?: run {
                     logger.warn { "Query parameter ${parameter.name} has no valid type, skipping" }
                     return@mapNotNull null
                 }
@@ -96,13 +96,13 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
             }
     }
 
-    private fun Parameter.findSpektorType(): SpektorType? {
+    private fun Parameter.findParameterSpektorType(): SpektorType? {
         val schemaVal = schema
         val contentVal = content
 
         return when {
             schemaVal != null -> typeResolver.resolve(schemaVal)
-            contentVal != null -> contentVal.findSpektorType()
+            contentVal != null -> contentVal.findContentSpektorType()
             else -> {
                 logger.warn { "Parameter has neither schema nor content: $this" }
                 null
@@ -119,13 +119,13 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
             return null
         }
 
-        return responses2xx.firstNotNullOfOrNull { it.content?.findSpektorType() } ?: run {
+        return responses2xx.firstNotNullOfOrNull { it.content?.findContentSpektorType() } ?: run {
             logger.warn { "No valid response types found in 2xx responses: $responses2xx" }
             null
         }
     }
 
-    private fun Content.findSpektorType(): SpektorType? {
+    private fun Content.findContentSpektorType(): SpektorType? {
         if (isEmpty()) return null
 
         val schema = get(APPLICATION_JSON)?.schema ?: run {

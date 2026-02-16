@@ -43,7 +43,7 @@ plugin-publish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "6.0.7" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-openapi = { id = "org.openapi.generator", version = "7.19.0" }
+openapi = { id = "org.openapi.generator", version = "7.20.0" }
 
 [bundles]
 ktor = ["ktor-server-content-negotiation", "ktor-server-core", "ktor-serialization-kotlinx-json", "ktor-server-auth", "ktor-server-cio", "ktor-server-config-yaml", "ktor-server-di"]

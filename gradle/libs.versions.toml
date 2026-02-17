@@ -13,7 +13,7 @@ gradle-plugin-maven-central-publish = { module = "com.vanniktech:gradle-maven-pu
 
 kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
-swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version = "2.1.37" }
+swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version = "2.1.38" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version = "2.2.0" }
 
 kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }

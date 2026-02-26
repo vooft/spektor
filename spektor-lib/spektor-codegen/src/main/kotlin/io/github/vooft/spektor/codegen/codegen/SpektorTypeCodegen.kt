@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
@@ -37,7 +38,18 @@ class SpektorTypeCodegen(
 
         return when (type) {
             is SpektorType.Array -> LIST.plusParameter(generate(type.itemType))
-            is SpektorType.MicroType -> type.toTypeName()
+            is SpektorType.MicroType -> {
+                type.toTypeName().let {
+                    if (type.isContextual) {
+                        it.copy(
+                            annotations = it.annotations + AnnotationSpec.builder(CONTEXTUAL_ANNOTATION).build()
+                        )
+                    } else {
+                        it
+                    }
+                }
+            }
+
             is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
             is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
@@ -80,6 +92,7 @@ class SpektorTypeCodegen(
             "int64", "long" -> LONG
             else -> error("Unsupported integer format: $format")
         }
+
         is SpektorType.MicroType.NumberMicroType -> when (format) {
             SpektorType.MicroType.NumberFormat.FLOAT -> FLOAT
             SpektorType.MicroType.NumberFormat.DOUBLE -> DOUBLE
@@ -98,5 +111,6 @@ class SpektorTypeCodegen(
 
     companion object {
         private val JSON_OBJECT_CLASS = ClassName("kotlinx.serialization.json", "JsonObject")
+        private val CONTEXTUAL_ANNOTATION = ClassName("kotlinx.serialization", "Contextual")
     }
 }

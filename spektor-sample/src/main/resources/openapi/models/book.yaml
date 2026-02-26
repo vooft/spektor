@@ -30,6 +30,11 @@ components:
           format: year-month
         weight:
           type: number
+        referenceLinks:
+          type: array
+          items:
+            type: string
+            format: uri
       required:
         - id
         - title
@@ -37,6 +42,7 @@ components:
         - author
         - createdAt
         - yearMonth
+        - referenceLinks
     BooksList:
       type: object
       properties:

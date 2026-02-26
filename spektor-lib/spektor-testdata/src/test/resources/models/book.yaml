@@ -21,6 +21,11 @@ components:
         yearMonth:
           type: string
           format: year-month
+        referenceLinks:
+          type: array
+          items:
+            type: string
+            format: uri
         author:
           $ref: "./author.yaml#/components/schemas/Author"
         price:
@@ -33,6 +38,7 @@ components:
         - imageLink
         - author
         - yearMonth
+        - referenceLinks
     BooksList:
       type: object
       properties:

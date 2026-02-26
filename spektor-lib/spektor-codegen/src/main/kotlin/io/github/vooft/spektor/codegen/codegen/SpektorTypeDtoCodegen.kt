@@ -83,11 +83,6 @@ class SpektorTypeDtoCodegen(
             addProperty(
                 PropertySpec.builder(field.name, field.typeName.copy(nullable = !field.required))
                     .initializer(field.name)
-                    .apply {
-                        if (field.contextual) {
-                            addAnnotation(ClassName("kotlinx.serialization", "Contextual"))
-                        }
-                    }
                     .build()
             )
         }

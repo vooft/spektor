@@ -16,6 +16,7 @@ data class BookModel(
     val price: Money?,
     val createdAt: Instant,
     val yearMonth: YearMonth,
+    val referenceLinks: List<URI>,
 )
 
 @Serializable

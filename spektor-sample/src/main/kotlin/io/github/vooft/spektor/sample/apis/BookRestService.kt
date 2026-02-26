@@ -28,6 +28,7 @@ class BookRestService(
             price = request.price,
             createdAt = Instant.now(),
             yearMonth = YearMonth.now(),
+            referenceLinks = listOf(URI.create("https://books.net/books/${UUID.randomUUID()}")),
         )
 
         books.addBook(book)

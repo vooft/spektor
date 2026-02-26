@@ -27,5 +27,6 @@ object Mappers {
         price = price,
         createdAt = createdAt,
         yearMonth = yearMonth,
+        referenceLinks = referenceLinks,
     )
 }

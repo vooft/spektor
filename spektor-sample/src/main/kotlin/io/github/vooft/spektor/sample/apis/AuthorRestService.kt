@@ -26,7 +26,7 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
         } else {
             authors
         }
-        return ListResponse.Ok(
+        return ListResponse.ok(
             AuthorsListDto(authors = filteredAuthors.map { it.toDto() })
         )
     }
@@ -43,16 +43,16 @@ class AuthorRestService(private val authors: AuthorRepository, private val books
         )
 
         authors.addAuthor(author)
-        return CreateResponse.Ok(author.toDto())
+        return CreateResponse.ok(author.toDto())
     }
 
     override suspend fun get(id: UUID, call: ApplicationCall): GetResponse {
         val author = authors.single { it.id.value == id }
-        return GetResponse.Ok(author.toDto())
+        return GetResponse.ok(author.toDto())
     }
 
     override suspend fun searchBooks(id: UUID, filter: String, call: ApplicationCall): SearchBooksResponse {
         val books = books.filter { it.authorId.value == id }.filter { it.title.contains(filter, ignoreCase = true) }
-        return SearchBooksResponse.Ok(BooksListDto(books = books.map { it.toDto(authors) }))
+        return SearchBooksResponse.ok(BooksListDto(books = books.map { it.toDto(authors) }))
     }
 }

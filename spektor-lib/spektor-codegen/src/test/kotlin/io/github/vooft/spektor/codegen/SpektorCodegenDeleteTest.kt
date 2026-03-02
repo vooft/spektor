@@ -48,6 +48,7 @@ class SpektorCodegenDeleteTest {
         val noContent = deleteResponse.typeSpecs.find { it.name == "NoContent" }
         noContent.shouldNotBeNull()
         noContent.kind shouldBe TypeSpec.Kind.OBJECT
+        noContent.modifiers shouldContain KModifier.PRIVATE
     }
 
     @Test
@@ -69,5 +70,23 @@ class SpektorCodegenDeleteTest {
 
         val statusCodeProp = noContent.propertySpecs.single { it.name == "statusCode" }
         statusCodeProp.initializer.toString() shouldBe "io.ktor.http.HttpStatusCode.fromValue(204)"
+    }
+
+    @Test
+    fun `should generate companion object with noContent factory method`() {
+        val schema = parser.parse(listOf(deleteBookFile))
+        val context = codegen.generate(schema)
+
+        val serverApiType = context.generatedPathSpecs.values
+            .single { it.className.simpleName == "BookServerApi" }
+            .type
+
+        val deleteResponse = serverApiType.typeSpecs.single { it.name == "DeleteResponse" }
+        val companion = deleteResponse.typeSpecs.find { it.kind == TypeSpec.Kind.OBJECT && it.name == null }
+        companion.shouldNotBeNull()
+
+        val factoryMethod = companion.funSpecs.find { it.name == "noContent" }
+        factoryMethod.shouldNotBeNull()
+        factoryMethod.parameters.isEmpty() shouldBe true
     }
 }

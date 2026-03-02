@@ -45,30 +45,56 @@ class SpektorServerApiCodegen(
         return interfaceBuilder.build()
     }
 
-    private fun generateResponseInterface(path: SpektorPath, className: ClassName): TypeSpec =
-        TypeSpec.interfaceBuilder(className.simpleName)
+    private fun generateResponseInterface(path: SpektorPath, className: ClassName): TypeSpec {
+        val companionBuilder = TypeSpec.companionObjectBuilder()
+
+        return TypeSpec.interfaceBuilder(className.simpleName)
             .addModifiers(KModifier.SEALED)
-            .addProperty(
-                PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME).build()
-            )
-            .addProperty(
-                PropertySpec.builder("body", ANY.copy(nullable = true)).build()
-            )
+            .addProperty(PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME).build())
+            .addProperty(PropertySpec.builder("body", ANY.copy(nullable = true)).build())
             .apply {
                 for (response in path.responses) {
-                    addType(generateResponseClass(response, className))
+                    val bodyTypeName = response.body?.let {
+                        typeCodegen.generate(it.type).copy(nullable = !it.required)
+                    }
+
+                    val typeSpec = generateResponseClass(
+                        response = response,
+                        parentInterfaceClass = className,
+                        bodyTypeName = bodyTypeName,
+                    )
+                    addType(typeSpec)
+
+                    val responseClassName = typeSpec.name ?: error("Response class name is null")
+                    val factoryName = responseClassName.replaceFirstChar { it.lowercase() }
+                    val factoryFun = if (bodyTypeName != null) {
+                        FunSpec.builder(factoryName)
+                            .addParameter("body", bodyTypeName)
+                            .returns(className)
+                            .addStatement("return %L(body)", responseClassName)
+                            .build()
+                    } else {
+                        FunSpec.builder(factoryName)
+                            .returns(className)
+                            .addStatement("return %L", responseClassName)
+                            .build()
+                    }
+                    companionBuilder.addFunction(factoryFun)
                 }
             }
+            .addType(companionBuilder.build())
             .build()
+    }
 
-    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName): TypeSpec {
+    private fun generateResponseClass(
+        response: SpektorPath.Response,
+        parentInterfaceClass: ClassName,
+        bodyTypeName: TypeName?,
+    ): TypeSpec {
         val nestedClassName = response.statusCode.toResponseClassName()
-        val bodyTypeName = response.body?.let {
-            typeCodegen.generate(it.type).copy(nullable = !it.required)
-        }
-
         return if (bodyTypeName != null) {
             TypeSpec.classBuilder(nestedClassName)
+                .addModifiers(KModifier.PRIVATE)
                 .addSuperinterface(parentInterfaceClass)
                 .primaryConstructor(
                     FunSpec.constructorBuilder()
@@ -88,6 +114,7 @@ class SpektorServerApiCodegen(
                 .build()
         } else {
             TypeSpec.objectBuilder(nestedClassName)
+                .addModifiers(KModifier.PRIVATE)
                 .addSuperinterface(parentInterfaceClass)
                 .addProperty(
                     PropertySpec.builder("body", ANY.copy(nullable = true), KModifier.OVERRIDE)

@@ -34,11 +34,11 @@ class BookRestService(
         )
 
         books.addBook(book)
-        return CreateResponse.Ok(book.toDto(authors))
+        return CreateResponse.ok(book.toDto(authors))
     }
 
     override suspend fun delete(id: UUID, call: ApplicationCall): DeleteResponse {
         books.removeBook(BookId(id))
-        return DeleteResponse.NoContent
+        return DeleteResponse.noContent()
     }
 }

@@ -108,13 +108,11 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         }
     }
 
-    private fun ApiResponses.responses(): List<SpektorPath.Response> {
-        return map { (code, response) ->
-            SpektorPath.Response(
-                statusCode = code.toInt(),
-                body = response.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, true) }
-            )
-        }
+    private fun ApiResponses.responses(): List<SpektorPath.Response> = map { (code, response) ->
+        SpektorPath.Response(
+            statusCode = code.toInt(),
+            body = response.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, true) }
+        )
     }
 
     private fun Content.findContentSpektorType(): SpektorType? {

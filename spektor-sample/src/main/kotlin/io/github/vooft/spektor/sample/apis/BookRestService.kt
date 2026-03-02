@@ -41,5 +41,4 @@ class BookRestService(
         books.removeBook(BookId(id))
         return DeleteResponse.NoContent
     }
-
 }

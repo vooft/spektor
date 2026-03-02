@@ -21,7 +21,6 @@ class SpektorCodegenDeleteTest {
 
     private val codegen = SpektorCodegen(config)
 
-
     @Test
     fun `should generate sealed interface for 204 response`() {
         val schema = parser.parse(listOf(deleteBookFile))

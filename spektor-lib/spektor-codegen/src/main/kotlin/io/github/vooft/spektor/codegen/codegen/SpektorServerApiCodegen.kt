@@ -144,61 +144,62 @@ class SpektorServerApiCodegen(
         private val KTOR_APPLICATION_CALL_TYPENAME = ClassName("io.ktor.server.application", "ApplicationCall")
         private val HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
 
-        private fun Int.toResponseClassName(): String = when (this) {
-            100 -> "Continue"
-            101 -> "SwitchingProtocols"
-            102 -> "Processing"
-            200 -> "Ok"
-            201 -> "Created"
-            202 -> "Accepted"
-            203 -> "NonAuthoritativeInformation"
-            204 -> "NoContent"
-            205 -> "ResetContent"
-            206 -> "PartialContent"
-            207 -> "MultiStatus"
-            300 -> "MultipleChoices"
-            301 -> "MovedPermanently"
-            302 -> "Found"
-            303 -> "SeeOther"
-            304 -> "NotModified"
-            305 -> "UseProxy"
-            306 -> "SwitchProxy"
-            307 -> "TemporaryRedirect"
-            308 -> "PermanentRedirect"
-            400 -> "BadRequest"
-            401 -> "Unauthorized"
-            402 -> "PaymentRequired"
-            403 -> "Forbidden"
-            404 -> "NotFound"
-            405 -> "MethodNotAllowed"
-            406 -> "NotAcceptable"
-            407 -> "ProxyAuthenticationRequired"
-            408 -> "RequestTimeout"
-            409 -> "Conflict"
-            410 -> "Gone"
-            411 -> "LengthRequired"
-            412 -> "PreconditionFailed"
-            413 -> "PayloadTooLarge"
-            414 -> "RequestUriTooLong"
-            415 -> "UnsupportedMediaType"
-            416 -> "RequestedRangeNotSatisfiable"
-            417 -> "ExpectationFailed"
-            422 -> "UnprocessableEntity"
-            423 -> "Locked"
-            424 -> "FailedDependency"
-            425 -> "TooEarly"
-            426 -> "UpgradeRequired"
-            429 -> "TooManyRequests"
-            431 -> "RequestHeaderFieldTooLarge"
-            500 -> "InternalServerError"
-            501 -> "NotImplemented"
-            502 -> "BadGateway"
-            503 -> "ServiceUnavailable"
-            504 -> "GatewayTimeout"
-            505 -> "VersionNotSupported"
-            506 -> "VariantAlsoNegotiates"
-            507 -> "InsufficientStorage"
-            else -> "Status$this"
-        }
+        private val STATUS_CLASS_NAMES = mapOf(
+            100 to "Continue",
+            101 to "SwitchingProtocols",
+            102 to "Processing",
+            200 to "Ok",
+            201 to "Created",
+            202 to "Accepted",
+            203 to "NonAuthoritativeInformation",
+            204 to "NoContent",
+            205 to "ResetContent",
+            206 to "PartialContent",
+            207 to "MultiStatus",
+            300 to "MultipleChoices",
+            301 to "MovedPermanently",
+            302 to "Found",
+            303 to "SeeOther",
+            304 to "NotModified",
+            305 to "UseProxy",
+            306 to "SwitchProxy",
+            307 to "TemporaryRedirect",
+            308 to "PermanentRedirect",
+            400 to "BadRequest",
+            401 to "Unauthorized",
+            402 to "PaymentRequired",
+            403 to "Forbidden",
+            404 to "NotFound",
+            405 to "MethodNotAllowed",
+            406 to "NotAcceptable",
+            407 to "ProxyAuthenticationRequired",
+            408 to "RequestTimeout",
+            409 to "Conflict",
+            410 to "Gone",
+            411 to "LengthRequired",
+            412 to "PreconditionFailed",
+            413 to "PayloadTooLarge",
+            414 to "RequestUriTooLong",
+            415 to "UnsupportedMediaType",
+            416 to "RequestedRangeNotSatisfiable",
+            417 to "ExpectationFailed",
+            422 to "UnprocessableEntity",
+            423 to "Locked",
+            424 to "FailedDependency",
+            425 to "TooEarly",
+            426 to "UpgradeRequired",
+            429 to "TooManyRequests",
+            431 to "RequestHeaderFieldTooLarge",
+            500 to "InternalServerError",
+            501 to "NotImplemented",
+            502 to "BadGateway",
+            503 to "ServiceUnavailable",
+            504 to "GatewayTimeout",
+            505 to "VersionNotSupported",
+            506 to "VariantAlsoNegotiates",
+            507 to "InsufficientStorage",
+        )
+
+        private fun Int.toResponseClassName(): String = STATUS_CLASS_NAMES[this] ?: "Status$this"
     }
 }

@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Author API
+  title: Book API
   version: 1.0.0
 paths:
   /book/{id}:

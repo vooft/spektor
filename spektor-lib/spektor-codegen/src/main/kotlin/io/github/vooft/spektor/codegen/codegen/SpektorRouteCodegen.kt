@@ -98,7 +98,11 @@ class SpektorRouteCodegen(
                     add("    )\n")
 
                     // add response
-                    add("  call.respond(response)\n")
+                    if (path.responses.isEmpty()) {
+                        add("  call.respond(%T.NoContent)\n", KTOR_HTTP_STATUS_CODE_TYPENAME)
+                    } else {
+                        add("  response.body?.let { body -> call.respond(response.statusCode, body) } ?: call.respond(response.statusCode)\n")
+                    }
 
                     add("}\n")
                 }
@@ -226,6 +230,7 @@ class SpektorRouteCodegen(
     companion object {
         private val KTOR_ROUTE_CLASS = ClassName("io.ktor.server.routing", "Route")
         private val KTOR_BAD_REQUEST_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "BadRequestException")
+        private val KTOR_HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
 
         private const val API_SERVICE_FIELD = "apiService"
 

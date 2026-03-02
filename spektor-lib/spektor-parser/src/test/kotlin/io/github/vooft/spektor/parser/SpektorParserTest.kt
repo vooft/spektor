@@ -44,12 +44,17 @@ private val expected = SpektorSchema(
                 operationId = "list",
                 path = "/book",
                 requestBody = null,
-                responseBody = SpektorType.RequiredWrapper(
-                    type = SpektorType.Ref(
-                        file = bookModelFile.toAbsolutePath().normalize(),
-                        modelName = "BooksList"
-                    ),
-                    required = true
+                responses = listOf(
+                    SpektorPath.Response(
+                        statusCode = 200,
+                        body = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = bookModelFile.toAbsolutePath().normalize(),
+                                modelName = "BooksList"
+                            ),
+                            required = true,
+                        )
+                    )
                 ),
                 pathVariables = emptyList(),
                 queryVariables = emptyList(),
@@ -62,12 +67,17 @@ private val expected = SpektorSchema(
                 operationId = "get",
                 path = "/author/{id}",
                 requestBody = null,
-                responseBody = SpektorType.RequiredWrapper(
-                    type = SpektorType.Ref(
-                        file = authorModelFile.toAbsolutePath().normalize(),
-                        modelName = "Author"
-                    ),
-                    required = true
+                responses = listOf(
+                    SpektorPath.Response(
+                        statusCode = 200,
+                        body = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = authorModelFile.toAbsolutePath().normalize(),
+                                modelName = "Author"
+                            ),
+                            required = true,
+                        )
+                    )
                 ),
                 pathVariables = listOf(
                     SpektorPath.PathVariable(
@@ -92,12 +102,17 @@ private val expected = SpektorSchema(
                     ),
                     required = true
                 ),
-                responseBody = SpektorType.RequiredWrapper(
-                    type = SpektorType.Ref(
-                        file = bookModelFile.toAbsolutePath().normalize(),
-                        modelName = "Book"
-                    ),
-                    required = true
+                responses = listOf(
+                    SpektorPath.Response(
+                        statusCode = 200,
+                        body = SpektorType.RequiredWrapper(
+                            type = SpektorType.Ref(
+                                file = bookModelFile.toAbsolutePath().normalize(),
+                                modelName = "Book"
+                            ),
+                            required = true,
+                        )
+                    )
                 ),
                 pathVariables = emptyList(),
                 queryVariables = emptyList(),

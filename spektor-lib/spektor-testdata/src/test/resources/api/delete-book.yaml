@@ -1,0 +1,20 @@
+openapi: 3.0.1
+info:
+  title: Author API
+  version: 1.0.0
+paths:
+  /book/{id}:
+    delete:
+      tags:
+        - Book
+      operationId: Delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Deleted book by id

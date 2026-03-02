@@ -7,7 +7,7 @@ import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.ApplicationCall
 import spektor.example.api.book.BookServerApi
-import spektor.example.models.book.BookDto
+import spektor.example.api.book.BookServerApi.CreateResponse
 import spektor.example.models.book.BookRequestDto
 import java.net.URI
 import java.time.Instant
@@ -18,7 +18,7 @@ class BookRestService(
     private val authors: AuthorRepository,
     private val books: BookRepository
 ) : BookServerApi {
-    override suspend fun create(request: BookRequestDto, call: ApplicationCall): BookDto {
+    override suspend fun create(request: BookRequestDto, call: ApplicationCall): CreateResponse {
         val book = BookModel(
             id = BookId(UUID.randomUUID()),
             title = request.title,
@@ -32,6 +32,6 @@ class BookRestService(
         )
 
         books.addBook(book)
-        return book.toDto(authors)
+        return CreateResponse.Ok(book.toDto(authors))
     }
 }

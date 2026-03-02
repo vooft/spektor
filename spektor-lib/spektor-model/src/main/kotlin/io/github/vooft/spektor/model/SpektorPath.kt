@@ -5,11 +5,16 @@ data class SpektorPath(
     val operationId: String,
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
-    val responseBody: SpektorType.RequiredWrapper<SpektorType>?,
+    val responses: List<Response>,
     val pathVariables: List<PathVariable>,
     val queryVariables: List<QueryVariable>,
     val method: Method,
 ) {
+    data class Response(
+        val statusCode: Int,
+        val body: SpektorType.RequiredWrapper<SpektorType>?,
+    )
+
     init {
         val pathNames = pathVariables.map { it.name }.groupBy { it }
         val pathNameDuplicates = pathNames.filter { it.value.size > 1 }.keys

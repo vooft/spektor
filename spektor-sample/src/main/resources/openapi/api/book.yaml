@@ -3,6 +3,21 @@ info:
   title: Book API
   version: 1.0.0
 paths:
+  /book/{id}:
+    delete:
+      tags:
+        - Book
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Book was deleted
   /book:
     post:
       tags:

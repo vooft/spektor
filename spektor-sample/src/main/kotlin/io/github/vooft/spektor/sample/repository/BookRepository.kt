@@ -1,5 +1,6 @@
 package io.github.vooft.spektor.sample.repository
 
+import io.github.vooft.spektor.sample.models.BookId
 import io.github.vooft.spektor.sample.models.BookModel
 
 class BookRepository(
@@ -8,5 +9,9 @@ class BookRepository(
 
     fun addBook(book: BookModel) {
         books.add(book)
+    }
+
+    fun removeBook(id: BookId) {
+        books.removeIf { it.id == id }
     }
 }

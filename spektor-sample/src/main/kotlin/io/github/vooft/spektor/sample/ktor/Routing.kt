@@ -15,6 +15,7 @@ fun Application.configureRouting() {
         authenticate("admin") {
             authorRoutes.create()
             bookRoutes.create()
+            bookRoutes.delete()
         }
 
         authenticate("admin", "user") {

@@ -13,6 +13,7 @@ class SpektorClassWriter(private val outputRoot: Path) {
                 }
             }
             .addType(typeAndClass.type)
+            .apply { typeAndClass.additionalTypes.forEach { addType(it) } }
             .build()
             .writeTo(outputRoot)
     }

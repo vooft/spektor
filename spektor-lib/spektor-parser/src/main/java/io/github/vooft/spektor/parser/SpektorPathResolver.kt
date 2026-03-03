@@ -19,14 +19,12 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
     fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
         tagAndFile = TagAndFile(operation.resolveTag(), file),
-        operationId = operation.operationId ?: "operationPlaceholder-${operationIdCounter.getAndIncrement()}",
+        operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
         path = path,
         requestBody = operation.requestBody?.let { rq ->
             rq.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, rq.required) }
         },
-        responseBody = operation.responses?.find2xxSpektorType()?.let {
-            SpektorType.RequiredWrapper(it, true)
-        }, // TODO: can response body be optional?
+        responses = operation.responses?.responses() ?: emptyList(),
         pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
         queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
         method = method
@@ -110,19 +108,11 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         }
     }
 
-    private fun ApiResponses.find2xxSpektorType(): SpektorType? {
-        if (isEmpty()) return null
-
-        val responses2xx = entries.filter { it.key.length == 3 && it.key.startsWith("2") }.map { it.value }
-        if (responses2xx.isEmpty()) {
-            logger.warn { "No 2xx responses found in API responses: $this" }
-            return null
-        }
-
-        return responses2xx.firstNotNullOfOrNull { it.content?.findContentSpektorType() } ?: run {
-            logger.warn { "No valid response types found in 2xx responses: $responses2xx" }
-            null
-        }
+    private fun ApiResponses.responses(): List<SpektorPath.Response> = map { (code, response) ->
+        SpektorPath.Response(
+            statusCode = code.toInt(),
+            body = response.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, true) }
+        )
     }
 
     private fun Content.findContentSpektorType(): SpektorType? {
@@ -147,5 +137,6 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         private val logger = KotlinLogging.logger { }
         private const val APPLICATION_JSON = "application/json"
         private const val TAG_PLACEHOLDER = "SpektorDefault"
+        private const val OPERATION_PLACEHOLDER = "DoOperation"
     }
 }

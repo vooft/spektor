@@ -50,6 +50,29 @@ class BookTest {
     }
 
     @Test
+    fun `should delete book`() = testClient("admin") { client ->
+        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+            AuthorRequestTestDto(
+                name = "test",
+                country = AuthorCountryTestDto.JP,
+                dateOfBirth = LocalDate.parse("1800-01-01"),
+            )
+        ).body().id
+
+        val bookId = api.create(
+            BookRequestTestDto(
+                title = UUID.randomUUID().toString(),
+                authorId = authorId,
+            )
+        ).body().id
+
+        val response = api.delete(bookId)
+        response.status shouldBe 204
+    }
+
+    @Test
     fun `should fail to create author with 401`() = testClient("not admin") { client ->
         val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
 

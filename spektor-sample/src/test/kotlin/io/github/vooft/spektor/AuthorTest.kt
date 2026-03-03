@@ -58,6 +58,15 @@ class AuthorTest {
     }
 
     @Test
+    fun `should fail to get author with invalid id`() = testClient("admin") { client ->
+        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        val response = api.get("not-a-valid-uuid")
+
+        response.status shouldBe 400
+    }
+
+    @Test
     fun `should list authors for countries`() = testClient("admin") { client ->
         val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
 

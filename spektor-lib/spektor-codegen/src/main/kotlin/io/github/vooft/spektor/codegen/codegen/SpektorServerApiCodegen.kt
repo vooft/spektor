@@ -86,11 +86,7 @@ class SpektorServerApiCodegen(
             .build()
     }
 
-    private fun generateResponseClass(
-        response: SpektorPath.Response,
-        parentInterfaceClass: ClassName,
-        bodyTypeName: TypeName?,
-    ): TypeSpec {
+    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName, bodyTypeName: TypeName?,): TypeSpec {
         val nestedClassName = response.statusCode.toResponseClassName()
         return if (bodyTypeName != null) {
             TypeSpec.classBuilder(nestedClassName)

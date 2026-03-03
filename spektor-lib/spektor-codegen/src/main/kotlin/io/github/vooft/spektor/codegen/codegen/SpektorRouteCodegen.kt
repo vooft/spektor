@@ -113,20 +113,39 @@ class SpektorRouteCodegen(
         .build()
 
     private fun CodeBlock.Builder.addPathVariable(pathVariable: SpektorPath.PathVariable) {
-        add(
-            "  val %L = %L[%S]?.let { %L -> ",
-            pathVariable.name,
-            "call.parameters",
-            pathVariable.name,
-            DEFAULT_VAR_NAME,
-        )
-
-        addParseFromString(
-            type = pathVariable.type,
-            varName = DEFAULT_VAR_NAME,
-        )
-
-        add(" }")
+        if (canConversionFail(pathVariable.type)) {
+            add(
+                "  val %L = %L[%S]?.let { %L ->\n    try {\n      ",
+                pathVariable.name,
+                "call.parameters",
+                pathVariable.name,
+                DEFAULT_VAR_NAME,
+            )
+            addParseFromString(
+                type = pathVariable.type,
+                varName = DEFAULT_VAR_NAME,
+            )
+            add(
+                "\n    } catch (e: %T) {\n      throw %T(parameterName = %S, type = %S, cause = e)\n    }\n  }",
+                Exception::class,
+                KTOR_PARAMETER_CONVERSION_EXCEPTION_CLASS,
+                pathVariable.name,
+                typeNameForConversion(pathVariable.type),
+            )
+        } else {
+            add(
+                "  val %L = %L[%S]?.let { %L -> ",
+                pathVariable.name,
+                "call.parameters",
+                pathVariable.name,
+                DEFAULT_VAR_NAME,
+            )
+            addParseFromString(
+                type = pathVariable.type,
+                varName = DEFAULT_VAR_NAME,
+            )
+            add(" }")
+        }
 
         if (pathVariable.required) {
             add(" ?: throw %T(%S)\n", KTOR_BAD_REQUEST_EXCEPTION_CLASS, "Path variable '${pathVariable.name}' is required")
@@ -138,37 +157,75 @@ class SpektorRouteCodegen(
     private fun CodeBlock.Builder.addQueryVariable(queryVariable: SpektorPath.QueryVariable) {
         when (val type = queryVariable.type) {
             is SpektorType.Array -> {
-                add(
-                    "  val %L = %L.getAll(%S)?.map { %L -> ",
-                    queryVariable.name,
-                    "call.request.queryParameters",
-                    queryVariable.name,
-                    DEFAULT_VAR_NAME,
-                )
-
-                addParseFromString(
-                    type = type.itemType,
-                    varName = DEFAULT_VAR_NAME,
-                )
-
-                add(" }")
+                if (canConversionFail(type.itemType)) {
+                    add(
+                        "  val %L = %L.getAll(%S)?.map { %L ->\n    try {\n      ",
+                        queryVariable.name,
+                        "call.request.queryParameters",
+                        queryVariable.name,
+                        DEFAULT_VAR_NAME,
+                    )
+                    addParseFromString(
+                        type = type.itemType,
+                        varName = DEFAULT_VAR_NAME,
+                    )
+                    add(
+                        "\n    } catch (e: %T) {\n      throw %T(parameterName = %S, type = %S, cause = e)\n    }\n  }",
+                        Exception::class,
+                        KTOR_PARAMETER_CONVERSION_EXCEPTION_CLASS,
+                        queryVariable.name,
+                        typeNameForConversion(type.itemType),
+                    )
+                } else {
+                    add(
+                        "  val %L = %L.getAll(%S)?.map { %L -> ",
+                        queryVariable.name,
+                        "call.request.queryParameters",
+                        queryVariable.name,
+                        DEFAULT_VAR_NAME,
+                    )
+                    addParseFromString(
+                        type = type.itemType,
+                        varName = DEFAULT_VAR_NAME,
+                    )
+                    add(" }")
+                }
             }
 
             is SpektorType.MicroType -> {
-                add(
-                    "  val %L = %L[%S]?.let { %L -> ",
-                    queryVariable.name,
-                    "call.request.queryParameters",
-                    queryVariable.name,
-                    DEFAULT_VAR_NAME,
-                )
-
-                addParseFromString(
-                    type = queryVariable.type,
-                    varName = DEFAULT_VAR_NAME,
-                )
-
-                add(" }")
+                if (canConversionFail(queryVariable.type)) {
+                    add(
+                        "  val %L = %L[%S]?.let { %L ->\n    try {\n      ",
+                        queryVariable.name,
+                        "call.request.queryParameters",
+                        queryVariable.name,
+                        DEFAULT_VAR_NAME,
+                    )
+                    addParseFromString(
+                        type = queryVariable.type,
+                        varName = DEFAULT_VAR_NAME,
+                    )
+                    add(
+                        "\n    } catch (e: %T) {\n      throw %T(parameterName = %S, type = %S, cause = e)\n    }\n  }",
+                        Exception::class,
+                        KTOR_PARAMETER_CONVERSION_EXCEPTION_CLASS,
+                        queryVariable.name,
+                        typeNameForConversion(queryVariable.type),
+                    )
+                } else {
+                    add(
+                        "  val %L = %L[%S]?.let { %L -> ",
+                        queryVariable.name,
+                        "call.request.queryParameters",
+                        queryVariable.name,
+                        DEFAULT_VAR_NAME,
+                    )
+                    addParseFromString(
+                        type = queryVariable.type,
+                        varName = DEFAULT_VAR_NAME,
+                    )
+                    add(" }")
+                }
             }
         }
 
@@ -179,7 +236,25 @@ class SpektorRouteCodegen(
         }
     }
 
-    private fun CodeBlock.Builder.addParseFromString(type: SpektorType, varName: String, parentRef: SpektorType.Ref? = null,) {
+    private fun canConversionFail(type: SpektorType): Boolean = when (type) {
+        is SpektorType.MicroType.BooleanMicroType -> false
+        is SpektorType.MicroType.StringMicroType -> type.format != SpektorType.MicroType.StringFormat.PLAIN
+        is SpektorType.Ref -> context.refs[type]?.let { canConversionFail(it) } ?: true
+        else -> true
+    }
+
+    private fun typeNameForConversion(type: SpektorType): String = when (type) {
+        is SpektorType.Enum -> "enum"
+        is SpektorType.MicroType.BooleanMicroType -> "boolean"
+        is SpektorType.MicroType.IntegerMicroType -> "integer"
+        is SpektorType.MicroType.NumberMicroType -> type.format.formatName
+        is SpektorType.MicroType.StringMicroType -> type.format.formatName ?: error("Unsupported type for conversion: $type")
+        is SpektorType.Ref -> context.refs[type]?.let { typeNameForConversion(it) } ?: type.modelName
+        is SpektorType.Object,
+        is SpektorType.Array -> error("Unsupported type for conversion: $type")
+    }
+
+    private fun CodeBlock.Builder.addParseFromString(type: SpektorType, varName: String, parentRef: SpektorType.Ref? = null) {
         when (type) {
             is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
             is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
@@ -232,6 +307,7 @@ class SpektorRouteCodegen(
     companion object {
         private val KTOR_ROUTE_CLASS = ClassName("io.ktor.server.routing", "Route")
         private val KTOR_BAD_REQUEST_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "BadRequestException")
+        private val KTOR_PARAMETER_CONVERSION_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "ParameterConversionException")
         private val KTOR_HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
 
         private const val API_SERVICE_FIELD = "apiService"

@@ -51,7 +51,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                 }
 
                 return@mapNotNull when (type) {
-                    is SpektorType.MicroType -> PathVariable(
+                    is SpektorType.MicroType,
+                    is SpektorType.Ref -> PathVariable(
                         name = parameter.name,
                         type = type,
                         required = parameter.required ?: false
@@ -59,8 +60,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
                     is SpektorType.Enum,
                     is SpektorType.Array,
-                    is SpektorType.Object,
-                    is SpektorType.Ref -> {
+                    is SpektorType.Object -> {
                         logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
                         null
                     }
@@ -78,15 +78,15 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
                 return@mapNotNull when (type) {
                     is SpektorType.MicroType,
-                    is SpektorType.Array -> QueryVariable(
+                    is SpektorType.Array,
+                    is SpektorType.Ref -> QueryVariable(
                         name = parameter.name,
                         type = type,
                         required = parameter.required ?: false
                     )
 
                     is SpektorType.Enum,
-                    is SpektorType.Object,
-                    is SpektorType.Ref -> {
+                    is SpektorType.Object -> {
                         logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
                         null
                     }

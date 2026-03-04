@@ -34,4 +34,11 @@ components:
         - name
         - dateOfBirth
         - createdAt
+    AuthorsList:
+      type: object
+      properties:
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
 

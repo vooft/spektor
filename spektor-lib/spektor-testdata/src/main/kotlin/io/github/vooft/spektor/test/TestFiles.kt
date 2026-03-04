@@ -14,6 +14,8 @@ object TestFiles {
     val pathVarFile: Path = rootPath.resolve("api/path-var-author.yaml")
     val requestBodyFile: Path = rootPath.resolve("api/request-body-book.yaml")
     val deleteBookFile: Path = rootPath.resolve("api/delete-book.yaml")
+    val pathParamRefFile: Path = rootPath.resolve("api/path-param-ref.yaml")
+    val queryParamRefFile: Path = rootPath.resolve("api/query-param-ref.yaml")
 
     /**
      * Models

@@ -17,7 +17,7 @@ sealed interface SpektorType {
         object FreeForm : Object
     }
 
-    data class Ref(val file: Path, val modelName: String) : SpektorType
+    data class Ref(val file: Path, val modelName: String) : QueryVariableType, PathVariableType
 
     data class Enum(val values: List<String>) : SpektorType
 

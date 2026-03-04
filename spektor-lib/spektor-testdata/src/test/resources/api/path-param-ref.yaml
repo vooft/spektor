@@ -1,0 +1,23 @@
+openapi: 3.0.1
+info:
+  title: Author API
+  version: 1.0.0
+paths:
+  /author/byCountry/{country}:
+    get:
+      tags:
+        - Author
+      operationId: listByCountry
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            $ref: '../models/author.yaml#/components/schemas/AuthorCountry'
+      responses:
+        200:
+          description: List is returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/author.yaml#/components/schemas/AuthorsList'

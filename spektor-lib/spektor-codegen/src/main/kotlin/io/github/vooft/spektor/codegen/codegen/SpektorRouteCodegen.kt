@@ -162,7 +162,8 @@ class SpektorRouteCodegen(
                 )
             }
 
-            is SpektorType.MicroType -> {
+            is SpektorType.MicroType,
+            is SpektorType.Ref -> {
                 add(
                     "  val %L = %L[%S]?.let { %L ->\n    try {\n      ",
                     queryVariable.name,

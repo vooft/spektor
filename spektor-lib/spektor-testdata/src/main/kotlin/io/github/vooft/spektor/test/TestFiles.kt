@@ -13,6 +13,7 @@ object TestFiles {
     val listBookByFiltersFile: Path = rootPath.resolve("api/list-book-by-filters.yaml")
     val pathVarFile: Path = rootPath.resolve("api/path-var-author.yaml")
     val requestBodyFile: Path = rootPath.resolve("api/request-body-book.yaml")
+    val optionalRequestBodyFile: Path = rootPath.resolve("api/optional-request-body-book.yaml")
     val deleteBookFile: Path = rootPath.resolve("api/delete-book.yaml")
     val pathParamRefFile: Path = rootPath.resolve("api/path-param-ref.yaml")
     val queryParamRefFile: Path = rootPath.resolve("api/query-param-ref.yaml")

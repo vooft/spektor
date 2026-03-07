@@ -5,6 +5,7 @@ import io.github.vooft.spektor.parser.SpektorParser
 import io.github.vooft.spektor.test.TestFiles
 import io.github.vooft.spektor.test.TestFiles.listBookByFiltersFile
 import io.github.vooft.spektor.test.TestFiles.listFile
+import io.github.vooft.spektor.test.TestFiles.optionalRequestBodyFile
 import io.github.vooft.spektor.test.TestFiles.pathVarFile
 import io.github.vooft.spektor.test.TestFiles.requestBodyFile
 import org.junit.jupiter.api.Test
@@ -14,7 +15,15 @@ class SpektorCodegenTest {
     @Test
     fun test() {
         val parser = SpektorParser()
-        val schema = parser.parse(listOf(listFile, listBookByFiltersFile, pathVarFile, requestBodyFile))
+        val schema = parser.parse(
+            listOf(
+                listFile,
+                listBookByFiltersFile,
+                pathVarFile,
+                requestBodyFile,
+                optionalRequestBodyFile,
+            )
+        )
 
         val config = SpektorCodegenConfig(
             basePackage = "io.github.vooft.spektor.example",

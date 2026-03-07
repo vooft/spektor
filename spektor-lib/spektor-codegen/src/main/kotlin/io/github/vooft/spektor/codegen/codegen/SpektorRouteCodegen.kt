@@ -75,7 +75,11 @@ class SpektorRouteCodegen(
                     // reading request body
                     val requestBody = path.requestBody
                     if (requestBody != null) {
-                        add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                        if (requestBody.required) {
+                            add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                        } else {
+                            add("  val request = call.receiveNullable<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                        }
                     }
 
                     // adding actual call
@@ -266,6 +270,7 @@ class SpektorRouteCodegen(
             .toSet()
 
         private val KTOR_RECEIVE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receive")
+        private val KTOR_RECEIVE_NULLABLE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveNullable")
         private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
 
         /**
@@ -276,6 +281,7 @@ class SpektorRouteCodegen(
         private val IMPORTS = buildSet {
             addAll(KTOR_METHOD_IMPORTS)
             add(KTOR_RECEIVE_METHOD_IMPORT)
+            add(KTOR_RECEIVE_NULLABLE_METHOD_IMPORT)
             add(KTOR_RESPOND_METHOD_IMPORT)
             add(KTOR_CALL_EXTENSION_IMPORT)
         }

@@ -1,0 +1,23 @@
+openapi: 3.0.1
+info:
+  title: Book API
+  version: 1.0.0
+paths:
+  /book/update:
+    patch:
+      tags:
+        - OptionalRequestBodyBook
+      operationId: update
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '../models/book.yaml#/components/schemas/BookRequest'
+      responses:
+        200:
+          description: Model was updated
+          content:
+            application/json:
+              schema:
+                $ref: '../models/book.yaml#/components/schemas/Book'

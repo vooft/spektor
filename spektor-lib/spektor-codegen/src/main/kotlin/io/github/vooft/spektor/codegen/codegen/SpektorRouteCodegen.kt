@@ -199,9 +199,9 @@ class SpektorRouteCodegen(
     private fun typeNameForConversion(type: SpektorType): String = when (type) {
         is SpektorType.Enum -> "enum"
         is SpektorType.MicroType.BooleanMicroType -> "boolean"
-        is SpektorType.MicroType.IntegerMicroType -> "integer"
+        is SpektorType.MicroType.IntegerMicroType -> type.format.formatName
         is SpektorType.MicroType.NumberMicroType -> type.format.formatName
-        is SpektorType.MicroType.StringMicroType -> type.format.formatName ?: "plain"
+        is SpektorType.MicroType.StringMicroType -> type.format.formatName
         is SpektorType.Ref -> context.refs[type]?.let { typeNameForConversion(it) } ?: type.modelName
         is SpektorType.Object,
         is SpektorType.Array -> error("Unsupported type for conversion: $type")

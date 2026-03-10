@@ -1,6 +1,5 @@
 package io.github.vooft.spektor.model
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Path
 
 sealed interface SpektorType {
@@ -47,7 +46,13 @@ sealed interface SpektorType {
             INT64("int64");
 
             companion object {
-                fun from(formatName: String?): IntegerFormat = IntegerFormat.entries.find { it.formatName == formatName } ?: INT32
+                fun from(formatName: String?): IntegerFormat {
+                    if (formatName == null) {
+                        return INT32
+                    }
+                    return IntegerFormat.entries.find { it.formatName == formatName }
+                        ?: error("Unsupported integer format: $formatName")
+                }
             }
         }
 
@@ -57,12 +62,18 @@ sealed interface SpektorType {
             DOUBLE("double", false);
 
             companion object {
-                fun from(formatName: String?): NumberFormat = entries.find { it.formatName == formatName } ?: BIG_DECIMAL
+                fun from(formatName: String?): NumberFormat {
+                    if (formatName == null) {
+                        return BIG_DECIMAL
+                    }
+                    return entries.find { it.formatName == formatName }
+                        ?: error("Unsupported number format: $formatName")
+                }
             }
         }
 
-        enum class StringFormat(val formatName: String?) {
-            PLAIN(null),
+        enum class StringFormat(val formatName: String) {
+            PLAIN("plain"),
             UUID("uuid"),
             URI("uri"),
             DATE_TIME("date-time"),
@@ -70,25 +81,24 @@ sealed interface SpektorType {
             DATE("date");
 
             companion object {
-                fun from(formatName: String?): StringFormat = entries.find { it.formatName == formatName } ?: run {
-                    logger.warn { "Unsupported STRING type format $formatName, falling back to plain string" }
-                    PLAIN
+                fun from(formatName: String?): StringFormat {
+                    if (formatName == null) {
+                        return PLAIN
+                    }
+                    return entries.find { it.formatName == formatName }
+                        ?: error("Unsupported string format: $formatName")
                 }
             }
         }
 
         companion object {
             fun from(typeName: String, format: String?): MicroType = when (typeName) {
+                "boolean" -> BooleanMicroType
                 "string" -> StringMicroType(StringFormat.from(format))
                 "integer" -> IntegerMicroType(IntegerFormat.from(format))
-                "boolean" -> BooleanMicroType
                 "number" -> NumberMicroType(NumberFormat.from(format))
                 else -> error("Unsupported OpenAPI micro type: $typeName")
             }
         }
-    }
-
-    companion object {
-        private val logger = KotlinLogging.logger { }
     }
 }

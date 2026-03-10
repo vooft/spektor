@@ -210,7 +210,11 @@ class SpektorRouteCodegen(
     private fun CodeBlock.Builder.addParseFromString(type: SpektorType, varName: String, parentRef: SpektorType.Ref? = null) {
         when (type) {
             is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
-            is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
+            is SpektorType.MicroType.IntegerMicroType -> when (type.format) {
+                SpektorType.MicroType.IntegerFormat.INT32 -> add("$varName.toInt()")
+                SpektorType.MicroType.IntegerFormat.INT64 -> add("$varName.toLong()")
+            }
+
             is SpektorType.MicroType.NumberMicroType -> when (type.format) {
                 SpektorType.MicroType.NumberFormat.FLOAT -> add("$varName.toFloat()")
                 SpektorType.MicroType.NumberFormat.DOUBLE -> add("$varName.toDouble()")

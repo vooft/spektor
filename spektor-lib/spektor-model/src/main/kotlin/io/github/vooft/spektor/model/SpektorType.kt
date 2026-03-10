@@ -36,10 +36,19 @@ sealed interface SpektorType {
                 }
         }
 
-        data class IntegerMicroType(val format: String?) : MicroType
+        data class IntegerMicroType(val format: IntegerFormat) : MicroType
         data object BooleanMicroType : MicroType
         data class NumberMicroType(val format: NumberFormat) : MicroType {
             override val isContextual get() = format.isContextual
+        }
+
+        enum class IntegerFormat(val formatName: String) {
+            INT32("int32"),
+            INT64("int64");
+
+            companion object {
+                fun from(formatName: String?): IntegerFormat = IntegerFormat.entries.find { it.formatName == formatName } ?: INT32
+            }
         }
 
         enum class NumberFormat(val formatName: String, val isContextual: Boolean) {
@@ -48,10 +57,7 @@ sealed interface SpektorType {
             DOUBLE("double", false);
 
             companion object {
-                fun from(formatName: String?): NumberFormat = entries.find { it.formatName == formatName } ?: run {
-                    logger.warn { "Unsupported NUMBER type format $formatName, falling back to ${BIG_DECIMAL.formatName}" }
-                    BIG_DECIMAL
-                }
+                fun from(formatName: String?): NumberFormat = entries.find { it.formatName == formatName } ?: BIG_DECIMAL
             }
         }
 
@@ -74,7 +80,7 @@ sealed interface SpektorType {
         companion object {
             fun from(typeName: String, format: String?): MicroType = when (typeName) {
                 "string" -> StringMicroType(StringFormat.from(format))
-                "integer" -> IntegerMicroType(format)
+                "integer" -> IntegerMicroType(IntegerFormat.from(format))
                 "boolean" -> BooleanMicroType
                 "number" -> NumberMicroType(NumberFormat.from(format))
                 else -> error("Unsupported OpenAPI micro type: $typeName")

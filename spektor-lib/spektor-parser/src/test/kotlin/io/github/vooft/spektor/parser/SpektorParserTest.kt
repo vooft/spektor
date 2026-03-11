@@ -3,6 +3,7 @@ package io.github.vooft.spektor.parser
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorSchema
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType.IntegerFormat
 import io.github.vooft.spektor.model.SpektorType.MicroType.NumberFormat
 import io.github.vooft.spektor.model.SpektorType.MicroType.NumberMicroType
 import io.github.vooft.spektor.model.SpektorType.MicroType.StringFormat
@@ -260,7 +261,7 @@ private val expected = SpektorSchema(
         ) to SpektorType.Object.WithProperties(
             properties = mapOf(
                 "minorUnits" to SpektorType.RequiredWrapper(
-                    type = SpektorType.MicroType.IntegerMicroType(null),
+                    type = SpektorType.MicroType.IntegerMicroType(format = IntegerFormat.INT32),
                     required = true
                 ),
                 "currency" to SpektorType.RequiredWrapper(

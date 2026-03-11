@@ -88,9 +88,8 @@ class SpektorTypeCodegen(
     private fun SpektorType.MicroType.toTypeName(): TypeName = when (this) {
         is SpektorType.MicroType.BooleanMicroType -> BOOLEAN
         is SpektorType.MicroType.IntegerMicroType -> when (format) {
-            null, "int32", "int" -> INT
-            "int64", "long" -> LONG
-            else -> error("Unsupported integer format: $format")
+            SpektorType.MicroType.IntegerFormat.INT32 -> INT
+            SpektorType.MicroType.IntegerFormat.INT64 -> LONG
         }
 
         is SpektorType.MicroType.NumberMicroType -> when (format) {

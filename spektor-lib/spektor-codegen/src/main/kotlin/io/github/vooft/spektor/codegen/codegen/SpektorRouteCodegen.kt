@@ -199,9 +199,9 @@ class SpektorRouteCodegen(
     private fun typeNameForConversion(type: SpektorType): String = when (type) {
         is SpektorType.Enum -> "enum"
         is SpektorType.MicroType.BooleanMicroType -> "boolean"
-        is SpektorType.MicroType.IntegerMicroType -> "integer"
+        is SpektorType.MicroType.IntegerMicroType -> type.format.formatName
         is SpektorType.MicroType.NumberMicroType -> type.format.formatName
-        is SpektorType.MicroType.StringMicroType -> type.format.formatName ?: "plain"
+        is SpektorType.MicroType.StringMicroType -> type.format.formatName
         is SpektorType.Ref -> context.refs[type]?.let { typeNameForConversion(it) } ?: type.modelName
         is SpektorType.Object,
         is SpektorType.Array -> error("Unsupported type for conversion: $type")
@@ -210,7 +210,11 @@ class SpektorRouteCodegen(
     private fun CodeBlock.Builder.addParseFromString(type: SpektorType, varName: String, parentRef: SpektorType.Ref? = null) {
         when (type) {
             is SpektorType.MicroType.BooleanMicroType -> add("$varName.toBoolean()")
-            is SpektorType.MicroType.IntegerMicroType -> add("$varName.toInt()")
+            is SpektorType.MicroType.IntegerMicroType -> when (type.format) {
+                SpektorType.MicroType.IntegerFormat.INT32 -> add("$varName.toInt()")
+                SpektorType.MicroType.IntegerFormat.INT64 -> add("$varName.toLong()")
+            }
+
             is SpektorType.MicroType.NumberMicroType -> when (type.format) {
                 SpektorType.MicroType.NumberFormat.FLOAT -> add("$varName.toFloat()")
                 SpektorType.MicroType.NumberFormat.DOUBLE -> add("$varName.toDouble()")

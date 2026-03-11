@@ -22,7 +22,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
         path = path,
         requestBody = operation.requestBody?.let { rq ->
-            rq.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, rq.required?: false) }
+            rq.content?.findContentSpektorType()?.let { SpektorType.RequiredWrapper(it, rq.required ?: false) }
         },
         responses = operation.responses?.responses() ?: emptyList(),
         pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),

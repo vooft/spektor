@@ -18,6 +18,27 @@ paths:
       responses:
         204:
           description: Book was deleted
+  /book/{id}/optional-update:
+    post:
+      tags:
+        - Book
+      operationId: optionalUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '../models/book.yaml#/components/schemas/BookUpdateRequest'
+      responses:
+        200:
+          description: Book was updated
   /book:
     post:
       tags:

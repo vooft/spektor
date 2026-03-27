@@ -8,6 +8,10 @@ import io.github.vooft.spektor.test.models.AuthorCountryTestDto
 import io.github.vooft.spektor.test.models.BookRequestTestDto
 import io.github.vooft.spektor.test.models.MoneyTestDto
 import io.kotest.matchers.shouldBe
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.datetime.LocalDate
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -70,6 +74,57 @@ class BookTest {
 
         val response = api.delete(bookId)
         response.status shouldBe 204
+    }
+
+    @Test
+    fun `should update book with body`() = testClient("admin") { client ->
+        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+            AuthorRequestTestDto(
+                name = "test",
+                country = AuthorCountryTestDto.JP,
+                dateOfBirth = LocalDate.parse("1800-01-01"),
+            )
+        ).body().id
+
+        val bookId = api.create(
+            BookRequestTestDto(
+                title = "original title",
+                authorId = authorId,
+            )
+        ).body().id
+
+        val response = client.post("/book/$bookId/optional-update") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"title":"updated title"}""")
+        }
+
+        response.status.value shouldBe 200
+    }
+
+    @Test
+    fun `should update book without body`() = testClient("admin") { client ->
+        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+
+        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+            AuthorRequestTestDto(
+                name = "test",
+                country = AuthorCountryTestDto.JP,
+                dateOfBirth = LocalDate.parse("1800-01-01"),
+            )
+        ).body().id
+
+        val bookId = api.create(
+            BookRequestTestDto(
+                title = "original title",
+                authorId = authorId,
+            )
+        ).body().id
+
+        val response = client.post("/book/$bookId/optional-update")
+
+        response.status.value shouldBe 200
     }
 
     @Test

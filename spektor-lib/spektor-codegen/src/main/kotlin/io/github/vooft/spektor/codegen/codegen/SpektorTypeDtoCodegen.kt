@@ -41,6 +41,65 @@ class SpektorTypeDtoCodegen(
             .build()
     }
 
+    fun generate(ref: SpektorType.Ref, oneOfType: SpektorType.OneOf, resolvedVariants: List<SpektorType.OneOf.ResolvedVariant>,): TypeSpec {
+        val sealedClassName = config.classNameFor(ref)
+
+        val builder = TypeSpec.interfaceBuilder(sealedClassName)
+            .addModifiers(KModifier.SEALED)
+            .addAnnotation(SERIALIZABLE_ANNOTATION)
+            .addAnnotation(
+                AnnotationSpec.builder(OPT_IN_ANNOTATION)
+                    .addMember("%T::class", EXPERIMENTAL_SERIALIZATION_API_ANNOTATION)
+                    .build()
+            )
+            .addAnnotation(
+                AnnotationSpec.builder(JSON_CLASS_DISCRIMINATOR_ANNOTATION)
+                    .addMember("%S", oneOfType.discriminatorPropertyName)
+                    .build()
+            )
+
+        for (variant in resolvedVariants) {
+            builder.addType(generateVariantDataClass(variant, sealedClassName, oneOfType.discriminatorPropertyName))
+        }
+
+        return builder.build()
+    }
+
+    private fun generateVariantDataClass(
+        variant: SpektorType.OneOf.ResolvedVariant,
+        sealedParent: ClassName,
+        discriminatorPropertyName: String,
+    ): TypeSpec {
+        val fields = variant.objectType.properties
+            .filter { (name, _) -> name != discriminatorPropertyName }
+            .map { (name, wrapper) ->
+                val substituted = config.microtypeSubstitutions[SpektorPropertyRef(variant.ref, name)]?.let { ClassName.bestGuess(it) }
+                FieldInfo(
+                    name = name,
+                    typeName = substituted ?: typeCodegen.generate(wrapper.type),
+                    required = wrapper.required,
+                    contextual = wrapper.type.isContextual,
+                )
+            }
+
+        return TypeSpec.classBuilder(config.classNameFor(variant.ref).simpleName)
+            .addModifiers(KModifier.DATA)
+            .addAnnotation(SERIALIZABLE_ANNOTATION)
+            .addAnnotation(
+                AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
+                    .addMember("%S", variant.discriminatorValue)
+                    .build()
+            )
+            .addSuperinterface(sealedParent)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameters(fields)
+                    .build()
+            )
+            .addProperties(fields)
+            .build()
+    }
+
     fun generate(ref: SpektorType.Ref, enumType: SpektorType.Enum): TypeSpec = TypeSpec.enumBuilder(config.classNameFor(ref))
         .primaryConstructor(
             FunSpec.constructorBuilder()
@@ -90,11 +149,19 @@ class SpektorTypeDtoCodegen(
         return this
     }
 
+    private data class FieldInfo(
+        val name: String,
+        val typeName: TypeName,
+        val required: Boolean,
+        val contextual: Boolean,
+    )
+
     companion object {
         private val SERIALIZABLE_ANNOTATION = ClassName("kotlinx.serialization", "Serializable")
         private val SERIAL_NAME_ANNOTATION = ClassName("kotlinx.serialization", "SerialName")
+        private val JSON_CLASS_DISCRIMINATOR_ANNOTATION = ClassName("kotlinx.serialization.json", "JsonClassDiscriminator")
+        private val OPT_IN_ANNOTATION = ClassName("kotlin", "OptIn")
+        private val EXPERIMENTAL_SERIALIZATION_API_ANNOTATION = ClassName("kotlinx.serialization", "ExperimentalSerializationApi")
         private val ENUM_NAME_REGEX = Regex("[^A-Za-z0-9_]")
     }
 }
-
-private data class FieldInfo(val name: String, val typeName: TypeName, val required: Boolean, val contextual: Boolean)

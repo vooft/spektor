@@ -1,4 +1,3 @@
-
 import io.github.vooft.spektor.gradle.SpektorGenerateTask
 import io.github.vooft.spektor.gradle.createUnifiedSpec
 import io.github.vooft.spektor.gradle.substitutions
@@ -77,7 +76,11 @@ tasks.withType<FormatTask> {
     dependsOn(tasks.withType<SpektorGenerateTask>())
 }
 
-listOf("src/main/resources/openapi/api/author.yaml", "src/main/resources/openapi/api/book.yaml").forEachIndexed { index, specPath ->
+listOf(
+    "src/main/resources/openapi/api/author.yaml",
+    "src/main/resources/openapi/api/book.yaml",
+    "src/main/resources/openapi/api/owner.yaml"
+).forEachIndexed { index, specPath ->
     val taskName = "generateTestClientOpenApi$index"
     tasks.register<GenerateTask>(taskName) {
         generatorName.set("kotlin")

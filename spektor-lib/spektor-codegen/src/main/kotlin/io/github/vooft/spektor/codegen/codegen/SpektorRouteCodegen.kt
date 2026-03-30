@@ -208,6 +208,7 @@ class SpektorRouteCodegen(
         is SpektorType.MicroType.StringMicroType -> type.format.formatName
         is SpektorType.Ref -> context.refs[type]?.let { typeNameForConversion(it) } ?: type.modelName
         is SpektorType.Object,
+        is SpektorType.OneOf,
         is SpektorType.Array -> error("Unsupported type for conversion: $type")
     }
 
@@ -244,6 +245,7 @@ class SpektorRouteCodegen(
                     )
 
                     is SpektorType.Object,
+                    is SpektorType.OneOf,
                     is SpektorType.Array,
                     is SpektorType.Ref,
                     null -> error("Parsing from string is not supported for $type which refers to $spektorType")
@@ -261,6 +263,7 @@ class SpektorRouteCodegen(
             }
 
             is SpektorType.Object,
+            is SpektorType.OneOf,
             is SpektorType.Array -> error("Parsing from string is not supported for $type")
         }
     }

@@ -2,6 +2,7 @@ package io.github.vooft.spektor.sample.models
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import java.net.URI
 import java.time.Instant
 import java.time.YearMonth
@@ -14,6 +15,8 @@ data class BookModel(
     val imageLink: URI,
     val authorId: AuthorId,
     val price: Money?,
+    val countryPrices: Map<String, Money>,
+    val metadata: JsonObject?,
     val createdAt: Instant,
     val yearMonth: YearMonth,
     val referenceLinks: List<URI>,

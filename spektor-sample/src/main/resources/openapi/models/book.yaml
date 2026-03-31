@@ -22,6 +22,10 @@ components:
           $ref: "./author.yaml#/components/schemas/Author"
         price:
           $ref: "./money.yaml#/components/schemas/Money"
+        countryPrices:
+          $ref: "./countryPrices.yaml#/components/schemas/CountryPrices"
+        metadata:
+          type: object
         createdAt:
           type: string
           format: date-time
@@ -43,6 +47,7 @@ components:
         - createdAt
         - yearMonth
         - referenceLinks
+        - countryPrices
     BooksList:
       type: object
       properties:
@@ -64,6 +69,10 @@ components:
           format: uuid
         price:
           $ref: "./money.yaml#/components/schemas/Money"
+        countryPrices:
+          $ref: "./countryPrices.yaml#/components/schemas/CountryPrices"
+        metadata:
+          type: object
       required:
         - title
         - authorId

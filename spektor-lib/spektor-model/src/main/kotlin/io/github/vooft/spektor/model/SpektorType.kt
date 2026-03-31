@@ -13,6 +13,7 @@ sealed interface SpektorType {
 
     sealed interface Object : SpektorType {
         data class WithProperties(val properties: Map<String, RequiredWrapper<SpektorType>>) : Object
+        data class AdditionalProperties(val valueType: SpektorType) : Object
         object FreeForm : Object
     }
 

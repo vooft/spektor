@@ -11,6 +11,7 @@ import io.github.vooft.spektor.model.SpektorType.MicroType.StringMicroType
 import io.github.vooft.spektor.model.TagAndFile
 import io.github.vooft.spektor.test.TestFiles.authorModelFile
 import io.github.vooft.spektor.test.TestFiles.bookModelFile
+import io.github.vooft.spektor.test.TestFiles.countryPricesModelFile
 import io.github.vooft.spektor.test.TestFiles.listFile
 import io.github.vooft.spektor.test.TestFiles.moneyModelFile
 import io.github.vooft.spektor.test.TestFiles.pathVarFile
@@ -199,7 +200,23 @@ private val expected = SpektorSchema(
                         modelName = "Money"
                     ),
                     required = false
+                ),
+                "countryPrices" to SpektorType.RequiredWrapper(
+                    type = SpektorType.Ref(
+                        file = countryPricesModelFile.toAbsolutePath().normalize(),
+                        modelName = "CountryPrices"
+                    ),
+                    required = false
                 )
+            )
+        ),
+        SpektorType.Ref(
+            file = countryPricesModelFile.toAbsolutePath().normalize(),
+            modelName = "CountryPrices"
+        ) to SpektorType.Object.AdditionalProperties(
+            valueType = SpektorType.Ref(
+                file = moneyModelFile.toAbsolutePath().normalize(),
+                modelName = "Money"
             )
         ),
         SpektorType.Ref(

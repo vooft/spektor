@@ -8,6 +8,7 @@ import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.LONG
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
@@ -51,6 +52,7 @@ class SpektorTypeCodegen(
             }
 
             is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
+            is SpektorType.Object.AdditionalProperties -> MAP.plusParameter(STRING).plusParameter(generate(type.valueType))
             is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
             is SpektorType.OneOf -> error("Generating oneOf directly is not supported $type")
@@ -70,7 +72,14 @@ class SpektorTypeCodegen(
         val refsTrace = ref.traceRefs()
         val lastRef = refsTrace.last()
 
-        val typeSpec = when (val target = context.refs.getValue(lastRef)) {
+        val target = context.refs.getValue(lastRef)
+        if (target is SpektorType.Object.AdditionalProperties) {
+            val mapType = MAP.plusParameter(STRING).plusParameter(generate(target.valueType))
+            refsTrace.forEach { context.resolvedTypes[it] = mapType }
+            return mapType
+        }
+
+        val typeSpec = when (target) {
             is SpektorType.Object.WithProperties -> classCodegen.generate(lastRef, target)
             is SpektorType.Enum -> classCodegen.generate(lastRef, target)
             is SpektorType.OneOf -> {
@@ -91,6 +100,7 @@ class SpektorTypeCodegen(
 
             is SpektorType.Array,
             is SpektorType.MicroType,
+            is SpektorType.Object.AdditionalProperties,
             is SpektorType.Object.FreeForm,
             is SpektorType.Ref -> error(
                 "Only object with properties, enum, and oneOf references are supported, but got $target for ref $lastRef"

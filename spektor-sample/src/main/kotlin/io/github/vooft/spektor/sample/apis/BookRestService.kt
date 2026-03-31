@@ -31,6 +31,8 @@ class BookRestService(
             imageLink = URI.create("https://books.net/images/${UUID.randomUUID()}.jpg"),
             authorId = request.authorId,
             price = request.price,
+            countryPrices = request.countryPrices ?: emptyMap(),
+            metadata = request.metadata,
             createdAt = Instant.now(),
             yearMonth = YearMonth.now(),
             referenceLinks = listOf(URI.create("https://books.net/books/${UUID.randomUUID()}")),

@@ -55,20 +55,17 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
 
     private fun resolveOneOf(schema: Schema<*>): SpektorType.OneOf? {
         val discriminator = schema.discriminator
-        val propertyName = discriminator.propertyName ?: run {
-            logger.warn { "oneOf schema in $file has no discriminator propertyName" }
-            return null
-        }
-        val mapping = discriminator.mapping ?: run {
-            logger.warn { "oneOf schema in $file has no discriminator mapping" }
-            return null
-        }
+
+        val propertyName = discriminator.propertyName
+            ?: error("oneOf schema in $file has no discriminator propertyName")
+
+        val mapping = discriminator.mapping
+            ?: error("oneOf schema in $file has no discriminator mapping")
 
         val variants = mapping.mapValues { (_, refString) ->
-            resolveRef(refString)?.also { allRefs.add(it) } ?: run {
-                logger.warn { "Cannot resolve ref $refString in oneOf discriminator mapping in $file" }
-                return null
-            }
+            resolveRef(refString)
+                ?.also { allRefs.add(it) }
+                ?: error("Cannot resolve ref $refString in oneOf discriminator mapping in $file")
         }
 
         return SpektorType.OneOf(

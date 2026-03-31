@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: Owner Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    OwnerType:
+      type: string
+      enum:
+        - BUSINESS
+        - INDIVIDUAL
+    Owner:
+      oneOf:
+        - $ref: '#/components/schemas/Individual'
+        - $ref: '#/components/schemas/Business'
+      discriminator:
+        propertyName: type
+        mapping:
+          INDIVIDUAL: '#/components/schemas/Individual'
+          BUSINESS: '#/components/schemas/Business'
+    Individual:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/OwnerType'
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required:
+        - type
+        - id
+        - firstName
+        - lastName
+    Business:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/OwnerType'
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+        - type
+        - id
+        - name
+    OwnersList:
+      type: object
+      properties:
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Owner'
+      required:
+        - owners

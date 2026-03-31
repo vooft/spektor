@@ -59,6 +59,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     )
 
                     is SpektorType.Enum,
+                    is SpektorType.OneOf,
                     is SpektorType.Array,
                     is SpektorType.Object -> {
                         logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
@@ -86,6 +87,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     )
 
                     is SpektorType.Enum,
+                    is SpektorType.OneOf,
                     is SpektorType.Object -> {
                         logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
                         null

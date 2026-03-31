@@ -14,6 +14,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         schema.type == "array" -> resolveArray(schema)
         schema.type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
         schema.type != null -> SpektorType.MicroType.from(schema.type, schema.format)
+        schema.oneOf != null && schema.discriminator != null -> resolveOneOf(schema)
         else -> {
             logger.warn { "Schema in file $file is of invalid type ${schema.type}: $schema" }
             null
@@ -50,6 +51,27 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         }
 
         return SpektorType.Object.WithProperties(props)
+    }
+
+    private fun resolveOneOf(schema: Schema<*>): SpektorType.OneOf? {
+        val discriminator = schema.discriminator
+
+        val propertyName = discriminator.propertyName
+            ?: error("oneOf schema in $file has no discriminator propertyName")
+
+        val mapping = discriminator.mapping
+            ?: error("oneOf schema in $file has no discriminator mapping")
+
+        val variants = mapping.mapValues { (_, refString) ->
+            resolveRef(refString)
+                ?.also { allRefs.add(it) }
+                ?: error("Cannot resolve ref $refString in oneOf discriminator mapping in $file")
+        }
+
+        return SpektorType.OneOf(
+            discriminatorPropertyName = propertyName,
+            variants = variants
+        )
     }
 
     private fun resolveRef(rawRef: String): SpektorType.Ref? {

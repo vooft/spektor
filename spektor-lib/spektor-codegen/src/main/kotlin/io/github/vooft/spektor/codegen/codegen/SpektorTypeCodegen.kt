@@ -53,6 +53,7 @@ class SpektorTypeCodegen(
             is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
             is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
+            is SpektorType.OneOf -> error("Generating oneOf directly is not supported $type")
             is SpektorType.Ref -> generateRef(type)
         }.also { context.resolvedTypes[type] = it }
     }
@@ -72,10 +73,28 @@ class SpektorTypeCodegen(
         val typeSpec = when (val target = context.refs.getValue(lastRef)) {
             is SpektorType.Object.WithProperties -> classCodegen.generate(lastRef, target)
             is SpektorType.Enum -> classCodegen.generate(lastRef, target)
+            is SpektorType.OneOf -> {
+                val resolvedVariants = target.variants.map { (discriminatorValue, variantRef) ->
+                    val variantTarget = context.refs[variantRef]
+                        ?: error("Cannot resolve variant ref $variantRef for oneOf $lastRef")
+                    require(variantTarget is SpektorType.Object.WithProperties) {
+                        "oneOf variant must be an object with properties, but got $variantTarget for $variantRef"
+                    }
+                    SpektorType.OneOf.ResolvedVariant(variantRef, variantTarget, discriminatorValue)
+                }
+                classCodegen.generate(
+                    ref = lastRef,
+                    oneOfType = target,
+                    resolvedVariants = resolvedVariants,
+                )
+            }
+
             is SpektorType.Array,
             is SpektorType.MicroType,
             is SpektorType.Object.FreeForm,
-            is SpektorType.Ref -> error("Only object with properties and enum references are supported, but got $target for ref $lastRef")
+            is SpektorType.Ref -> error(
+                "Only object with properties, enum, and oneOf references are supported, but got $target for ref $lastRef"
+            )
         }
 
         refsTrace.forEach {

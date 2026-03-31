@@ -20,6 +20,17 @@ sealed interface SpektorType {
 
     data class Enum(val values: List<String>) : SpektorType
 
+    data class OneOf(
+        val discriminatorPropertyName: String,
+        val variants: Map<String, Ref>,
+    ) : SpektorType {
+        data class ResolvedVariant(
+            val ref: Ref,
+            val objectType: Object.WithProperties,
+            val discriminatorValue: String,
+        )
+    }
+
     data class RequiredWrapper<T : SpektorType>(val type: T, val required: Boolean)
 
     sealed interface MicroType : QueryVariableType, PathVariableType {

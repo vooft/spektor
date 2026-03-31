@@ -17,6 +17,7 @@ object TestFiles {
     val deleteBookFile: Path = rootPath.resolve("api/delete-book.yaml")
     val pathParamRefFile: Path = rootPath.resolve("api/path-param-ref.yaml")
     val queryParamRefFile: Path = rootPath.resolve("api/query-param-ref.yaml")
+    val listOwnerFile: Path = rootPath.resolve("api/list-owner.yaml")
 
     /**
      * Models
@@ -24,4 +25,5 @@ object TestFiles {
     val bookModelFile: Path = rootPath.resolve("models/book.yaml")
     val authorModelFile: Path = rootPath.resolve("models/author.yaml")
     val moneyModelFile: Path = rootPath.resolve("models/money.yaml")
+    val ownerModelFile: Path = rootPath.resolve("models/owner.yaml")
 }

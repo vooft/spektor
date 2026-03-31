@@ -52,7 +52,7 @@ class SpektorCodegenDeleteTest {
     }
 
     @Test
-    fun `should generate NoContent with null body and 204 statusCode`() {
+    fun `should generate NoContent with 204 statusCode`() {
         val schema = parser.parse(listOf(deleteBookFile))
         val context = codegen.generate(schema)
 
@@ -64,9 +64,6 @@ class SpektorCodegenDeleteTest {
             .single { it.name == "DeleteResponse" }
             .typeSpecs
             .single { it.name == "NoContent" }
-
-        val bodyProp = noContent.propertySpecs.single { it.name == "body" }
-        bodyProp.initializer.toString() shouldBe "null"
 
         val statusCodeProp = noContent.propertySpecs.single { it.name == "statusCode" }
         statusCodeProp.initializer.toString() shouldBe "io.ktor.http.HttpStatusCode.fromValue(204)"

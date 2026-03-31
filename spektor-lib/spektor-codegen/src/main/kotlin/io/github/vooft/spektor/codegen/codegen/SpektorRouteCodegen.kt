@@ -109,9 +109,7 @@ class SpektorRouteCodegen(
                     if (path.responses.isEmpty()) {
                         add("  call.respond(%T.NoContent)\n", KTOR_HTTP_STATUS_CODE_TYPENAME)
                     } else {
-                        add(
-                            "  response.body?.let { body -> call.respond(response.statusCode, body) } ?: call.respond(response.statusCode)\n"
-                        )
+                        add("  response.respondTo(call)\n")
                     }
 
                     add("}\n")

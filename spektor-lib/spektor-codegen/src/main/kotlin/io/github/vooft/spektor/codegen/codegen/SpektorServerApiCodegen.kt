@@ -1,7 +1,7 @@
 package io.github.vooft.spektor.codegen.codegen
 
-import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
@@ -23,7 +23,9 @@ class SpektorServerApiCodegen(
         for ((tagAndFile, paths) in allPaths) {
             val className = config.classNameForServerApi(tagAndFile)
             val typeSpec = generateSingleTag(className, paths)
-            context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className)
+            val hasResponses = paths.any { it.responses.isNotEmpty() }
+            val imports = if (hasResponses) setOf(KTOR_RESPOND_METHOD_IMPORT) else emptySet()
+            context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className, imports = imports)
         }
     }
 
@@ -51,7 +53,12 @@ class SpektorServerApiCodegen(
         return TypeSpec.interfaceBuilder(className.simpleName)
             .addModifiers(KModifier.SEALED)
             .addProperty(PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME).build())
-            .addProperty(PropertySpec.builder("body", ANY.copy(nullable = true)).build())
+            .addFunction(
+                FunSpec.builder("respondTo")
+                    .addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
+                    .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
+                    .build()
+            )
             .apply {
                 for (response in path.responses) {
                     val bodyTypeName = response.body?.let {
@@ -86,7 +93,7 @@ class SpektorServerApiCodegen(
             .build()
     }
 
-    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName, bodyTypeName: TypeName?,): TypeSpec {
+    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName, bodyTypeName: TypeName?): TypeSpec {
         val nestedClassName = response.statusCode.toResponseClassName()
         return if (bodyTypeName != null) {
             TypeSpec.classBuilder(nestedClassName)
@@ -98,7 +105,7 @@ class SpektorServerApiCodegen(
                         .build()
                 )
                 .addProperty(
-                    PropertySpec.builder("body", bodyTypeName, KModifier.OVERRIDE)
+                    PropertySpec.builder("body", bodyTypeName, KModifier.PRIVATE)
                         .initializer("body")
                         .build()
                 )
@@ -107,19 +114,28 @@ class SpektorServerApiCodegen(
                         .initializer("%T.fromValue(%L)", HTTP_STATUS_CODE_TYPENAME, response.statusCode)
                         .build()
                 )
+                .addFunction(
+                    FunSpec.builder("respondTo")
+                        .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
+                        .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
+                        .addCode(CodeBlock.of("call.respond(statusCode, body)\n"))
+                        .build()
+                )
                 .build()
         } else {
             TypeSpec.objectBuilder(nestedClassName)
                 .addModifiers(KModifier.PRIVATE)
                 .addSuperinterface(parentInterfaceClass)
                 .addProperty(
-                    PropertySpec.builder("body", ANY.copy(nullable = true), KModifier.OVERRIDE)
-                        .initializer("null")
-                        .build()
-                )
-                .addProperty(
                     PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME, KModifier.OVERRIDE)
                         .initializer("%T.fromValue(%L)", HTTP_STATUS_CODE_TYPENAME, response.statusCode)
+                        .build()
+                )
+                .addFunction(
+                    FunSpec.builder("respondTo")
+                        .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
+                        .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
+                        .addCode(CodeBlock.of("call.respond(statusCode)\n"))
                         .build()
                 )
                 .build()
@@ -166,6 +182,7 @@ class SpektorServerApiCodegen(
         private val UNIT_TYPENAME = Unit::class.asClassName()
         private val KTOR_APPLICATION_CALL_TYPENAME = ClassName("io.ktor.server.application", "ApplicationCall")
         private val HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
+        private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
 
         private val STATUS_CLASS_NAMES = mapOf(
             100 to "Continue",

@@ -40,10 +40,8 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         val properties = schema.properties ?: run {
             val additionalProps = schema.additionalProperties
             if (additionalProps is Schema<*>) {
-                val valueType = resolve(additionalProps) ?: run {
-                    logger.warn { "Cannot resolve additionalProperties value type: $additionalProps" }
-                    return SpektorType.Object.FreeForm
-                }
+                val valueType = resolve(additionalProps)
+                    ?: error("Cannot resolve additionalProperties type: $additionalProps")
                 return SpektorType.Object.AdditionalProperties(valueType)
             }
             return SpektorType.Object.FreeForm

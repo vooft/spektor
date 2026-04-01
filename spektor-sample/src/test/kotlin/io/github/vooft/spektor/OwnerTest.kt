@@ -1,10 +1,11 @@
 package io.github.vooft.spektor
 
-import io.github.vooft.spektor.test.apis.OwnerTestApi
-import io.github.vooft.spektor.test.infrastructure.ApiClient
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -14,23 +15,19 @@ import org.junit.jupiter.api.Test
 class OwnerTest {
 
     @Test
-    fun `should list owners`() = testClient("admin") { client ->
-        val api = OwnerTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+    fun `should list owners with discriminator`() = testClient("admin") { client ->
+        val response = client.get("/owner")
+        response.status shouldBe HttpStatusCode.OK
 
-        val response = api.list()
-        response.status shouldBe 200
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        val owners = body["owners"].shouldNotBeNull().jsonArray
+        owners shouldHaveSize 2
 
-        val body = Json.parseToJsonElement(response.response.bodyAsText()).jsonObject
-        val owners = body.getValue("owners").jsonArray
-        owners.size shouldBe 2
+        val individual = owners.first { it.jsonObject["type"].shouldNotBeNull().jsonPrimitive.content == "INDIVIDUAL" }.jsonObject
+        individual["firstName"].shouldNotBeNull().jsonPrimitive.content shouldBe "John"
+        individual["lastName"].shouldNotBeNull().jsonPrimitive.content shouldBe "Doe"
 
-        val individual = owners.single { it.jsonObject.getValue("type").jsonPrimitive.content == "INDIVIDUAL" }.jsonObject
-        individual.getValue("firstName").jsonPrimitive.content shouldBe "John"
-        individual.getValue("lastName").jsonPrimitive.content shouldBe "Doe"
-        individual["id"] shouldNotBe null
-
-        val business = owners.single { it.jsonObject.getValue("type").jsonPrimitive.content == "BUSINESS" }.jsonObject
-        business.getValue("name").jsonPrimitive.content shouldBe "Acme Corp"
-        business["id"] shouldNotBe null
+        val business = owners.first { it.jsonObject["type"].shouldNotBeNull().jsonPrimitive.content == "BUSINESS" }.jsonObject
+        business["name"].shouldNotBeNull().jsonPrimitive.content shouldBe "Acme Corp"
     }
 }

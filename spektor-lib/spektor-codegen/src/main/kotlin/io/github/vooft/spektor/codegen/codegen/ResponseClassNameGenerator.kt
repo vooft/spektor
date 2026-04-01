@@ -1,6 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
-object ResponseNameGenerator {
+object ResponseClassNameGenerator {
 
     fun generate(operationId: String): String {
         require(operationId.isNotBlank()) { "operationId must not be blank" }

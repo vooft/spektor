@@ -7,6 +7,7 @@ import io.github.vooft.spektor.parser.SpektorParser
 import io.github.vooft.spektor.test.TestFiles.deleteBookFile
 import io.github.vooft.spektor.test.TestFiles.rootPath
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -48,11 +49,11 @@ class SpektorCodegenDeleteTest {
         val noContent = deleteResponse.typeSpecs.find { it.name == "NoContent" }
         noContent.shouldNotBeNull()
         noContent.kind shouldBe TypeSpec.Kind.OBJECT
-        noContent.modifiers shouldContain KModifier.PRIVATE
+        noContent.modifiers shouldNotContain KModifier.PRIVATE
     }
 
     @Test
-    fun `should generate NoContent with 204 statusCode`() {
+    fun `should generate NoContent with no body and 204 statusCode`() {
         val schema = parser.parse(listOf(deleteBookFile))
         val context = codegen.generate(schema)
 
@@ -64,6 +65,8 @@ class SpektorCodegenDeleteTest {
             .single { it.name == "DeleteResponse" }
             .typeSpecs
             .single { it.name == "NoContent" }
+
+        noContent.propertySpecs.none { it.name == "body" } shouldBe true
 
         val statusCodeProp = noContent.propertySpecs.single { it.name == "statusCode" }
         statusCodeProp.initializer.toString() shouldBe "io.ktor.http.HttpStatusCode.fromValue(204)"

@@ -1,7 +1,6 @@
 package io.github.vooft.spektor.codegen.codegen
 
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
@@ -23,9 +22,7 @@ class SpektorServerApiCodegen(
         for ((tagAndFile, paths) in allPaths) {
             val className = config.classNameForServerApi(tagAndFile)
             val typeSpec = generateSingleTag(className, paths)
-            val hasResponses = paths.any { it.responses.isNotEmpty() }
-            val imports = if (hasResponses) setOf(KTOR_RESPOND_METHOD_IMPORT) else emptySet()
-            context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className, imports = imports)
+            context.generatedPathSpecs[tagAndFile] = TypeAndClass(type = typeSpec, className = className)
         }
     }
 
@@ -37,7 +34,7 @@ class SpektorServerApiCodegen(
             if (path.responses.isEmpty()) {
                 returnType = UNIT_TYPENAME
             } else {
-                val responseClassName = className.nestedClass(ResponseNameGenerator.generate(path.operationId))
+                val responseClassName = className.nestedClass(ResponseClassNameGenerator.generate(path.operationId))
                 returnType = responseClassName
                 interfaceBuilder.addType(generateResponseInterface(path, responseClassName))
             }
@@ -53,12 +50,6 @@ class SpektorServerApiCodegen(
         return TypeSpec.interfaceBuilder(className.simpleName)
             .addModifiers(KModifier.SEALED)
             .addProperty(PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME).build())
-            .addFunction(
-                FunSpec.builder("respondTo")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.SUSPEND)
-                    .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
-                    .build()
-            )
             .apply {
                 for (response in path.responses) {
                     val bodyTypeName = response.body?.let {
@@ -93,11 +84,10 @@ class SpektorServerApiCodegen(
             .build()
     }
 
-    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName, bodyTypeName: TypeName?): TypeSpec {
-        val nestedClassName = response.statusCode.toResponseClassName()
+    private fun generateResponseClass(response: SpektorPath.Response, parentInterfaceClass: ClassName, bodyTypeName: TypeName?,): TypeSpec {
+        val nestedClassName = ResponseStatusClassNameGenerator.generate(response.statusCode)
         return if (bodyTypeName != null) {
             TypeSpec.classBuilder(nestedClassName)
-                .addModifiers(KModifier.PRIVATE)
                 .addSuperinterface(parentInterfaceClass)
                 .primaryConstructor(
                     FunSpec.constructorBuilder()
@@ -105,7 +95,7 @@ class SpektorServerApiCodegen(
                         .build()
                 )
                 .addProperty(
-                    PropertySpec.builder("body", bodyTypeName, KModifier.PRIVATE)
+                    PropertySpec.builder("body", bodyTypeName)
                         .initializer("body")
                         .build()
                 )
@@ -114,28 +104,13 @@ class SpektorServerApiCodegen(
                         .initializer("%T.fromValue(%L)", HTTP_STATUS_CODE_TYPENAME, response.statusCode)
                         .build()
                 )
-                .addFunction(
-                    FunSpec.builder("respondTo")
-                        .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-                        .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
-                        .addCode(CodeBlock.of("call.respond(statusCode, body)\n"))
-                        .build()
-                )
                 .build()
         } else {
             TypeSpec.objectBuilder(nestedClassName)
-                .addModifiers(KModifier.PRIVATE)
                 .addSuperinterface(parentInterfaceClass)
                 .addProperty(
                     PropertySpec.builder("statusCode", HTTP_STATUS_CODE_TYPENAME, KModifier.OVERRIDE)
                         .initializer("%T.fromValue(%L)", HTTP_STATUS_CODE_TYPENAME, response.statusCode)
-                        .build()
-                )
-                .addFunction(
-                    FunSpec.builder("respondTo")
-                        .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-                        .addParameter("call", KTOR_APPLICATION_CALL_TYPENAME)
-                        .addCode(CodeBlock.of("call.respond(statusCode)\n"))
                         .build()
                 )
                 .build()
@@ -182,64 +157,5 @@ class SpektorServerApiCodegen(
         private val UNIT_TYPENAME = Unit::class.asClassName()
         private val KTOR_APPLICATION_CALL_TYPENAME = ClassName("io.ktor.server.application", "ApplicationCall")
         private val HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
-        private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
-
-        private val STATUS_CLASS_NAMES = mapOf(
-            100 to "Continue",
-            101 to "SwitchingProtocols",
-            102 to "Processing",
-            200 to "Ok",
-            201 to "Created",
-            202 to "Accepted",
-            203 to "NonAuthoritativeInformation",
-            204 to "NoContent",
-            205 to "ResetContent",
-            206 to "PartialContent",
-            207 to "MultiStatus",
-            300 to "MultipleChoices",
-            301 to "MovedPermanently",
-            302 to "Found",
-            303 to "SeeOther",
-            304 to "NotModified",
-            305 to "UseProxy",
-            306 to "SwitchProxy",
-            307 to "TemporaryRedirect",
-            308 to "PermanentRedirect",
-            400 to "BadRequest",
-            401 to "Unauthorized",
-            402 to "PaymentRequired",
-            403 to "Forbidden",
-            404 to "NotFound",
-            405 to "MethodNotAllowed",
-            406 to "NotAcceptable",
-            407 to "ProxyAuthenticationRequired",
-            408 to "RequestTimeout",
-            409 to "Conflict",
-            410 to "Gone",
-            411 to "LengthRequired",
-            412 to "PreconditionFailed",
-            413 to "PayloadTooLarge",
-            414 to "RequestUriTooLong",
-            415 to "UnsupportedMediaType",
-            416 to "RequestedRangeNotSatisfiable",
-            417 to "ExpectationFailed",
-            422 to "UnprocessableEntity",
-            423 to "Locked",
-            424 to "FailedDependency",
-            425 to "TooEarly",
-            426 to "UpgradeRequired",
-            429 to "TooManyRequests",
-            431 to "RequestHeaderFieldTooLarge",
-            500 to "InternalServerError",
-            501 to "NotImplemented",
-            502 to "BadGateway",
-            503 to "ServiceUnavailable",
-            504 to "GatewayTimeout",
-            505 to "VersionNotSupported",
-            506 to "VariantAlsoNegotiates",
-            507 to "InsufficientStorage",
-        )
-
-        private fun Int.toResponseClassName(): String = STATUS_CLASS_NAMES[this] ?: "Status$this"
     }
 }

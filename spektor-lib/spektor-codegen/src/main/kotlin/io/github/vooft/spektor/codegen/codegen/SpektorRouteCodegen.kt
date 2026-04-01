@@ -48,13 +48,14 @@ class SpektorRouteCodegen(
                 .build()
         )
         .also {
+            val serverApiClassName = config.classNameForServerApi(tagAndFile)
             for (path in paths) {
-                it.addFunction(generateMethod(path))
+                it.addFunction(generateMethod(path, serverApiClassName))
             }
         }
         .build()
 
-    private fun generateMethod(path: SpektorPath): FunSpec = FunSpec.builder(path.operationId)
+    private fun generateMethod(path: SpektorPath, serverApiClassName: ClassName): FunSpec = FunSpec.builder(path.operationId)
         .contextParameter("route", KTOR_ROUTE_CLASS)
         .addCode(
             CodeBlock.builder()
@@ -109,7 +110,18 @@ class SpektorRouteCodegen(
                     if (path.responses.isEmpty()) {
                         add("  call.respond(%T.NoContent)\n", KTOR_HTTP_STATUS_CODE_TYPENAME)
                     } else {
-                        add("  response.respondTo(call)\n")
+                        val responseInterfaceName = ResponseClassNameGenerator.generate(path.operationId)
+                        add("  when (response) {\n")
+                        for (response in path.responses) {
+                            val nestedClassName = ResponseStatusClassNameGenerator.generate(response.statusCode)
+                            val qualifiedName = serverApiClassName.nestedClass(responseInterfaceName).nestedClass(nestedClassName)
+                            if (response.body != null) {
+                                add("    is %T -> call.respond(response.statusCode, response.body)\n", qualifiedName)
+                            } else {
+                                add("    is %T -> call.respond(response.statusCode)\n", qualifiedName)
+                            }
+                        }
+                        add("  }\n")
                     }
 
                     add("}\n")

@@ -4,7 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
-class ResponseNameGeneratorTest {
+class ResponseClassNameGeneratorTest {
     @Test
     fun `should generate when operationId is camelCase`() {
         ResponseClassNameGenerator.generate("searchBooks") shouldBe "SearchBooksResponse"

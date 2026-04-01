@@ -25,6 +25,8 @@ object Mappers {
         imageLink = imageLink,
         author = authors.single { it.id == authorId }.toDto(),
         price = price,
+        countryPrices = countryPrices,
+        metadata = metadata,
         createdAt = createdAt,
         yearMonth = yearMonth,
         referenceLinks = referenceLinks,

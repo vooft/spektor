@@ -60,6 +60,8 @@ components:
           format: uuid
         price:
           $ref: "./money.yaml#/components/schemas/Money"
+        countryPrices:
+          $ref: "./country-prices.yaml#/components/schemas/CountryPrices"
       required:
         - title
         - authorId

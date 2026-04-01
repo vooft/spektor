@@ -38,6 +38,12 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
     private fun resolveObject(schema: Schema<*>): SpektorType.Object? {
         val required = schema.required?.toSet() ?: emptySet()
         val properties = schema.properties ?: run {
+            val additionalProps = schema.additionalProperties
+            if (additionalProps is Schema<*>) {
+                val valueType = resolve(additionalProps)
+                    ?: error("Cannot resolve additionalProperties type: $additionalProps")
+                return SpektorType.Object.AdditionalProperties(valueType)
+            }
             return SpektorType.Object.FreeForm
         }
 

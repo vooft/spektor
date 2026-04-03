@@ -69,7 +69,7 @@ class SpektorMerger(
     private fun buildUnifiedSpec(): OpenAPI {
         logger.debug { "Building synthetic root OpenAPI spec YAML" }
         val openapi = OpenAPI().apply {
-            openapi = "3.0.1"
+            openapi = "3.1.0"
             info = Info().apply {
                 title = unifiedSpecTitle
                 description = unifiedSpecDescription

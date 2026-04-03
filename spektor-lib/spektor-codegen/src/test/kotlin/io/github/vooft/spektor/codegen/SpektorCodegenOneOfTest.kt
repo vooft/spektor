@@ -1,11 +1,14 @@
 package io.github.vooft.spektor.codegen
 
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.TypeSpec
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.parser.SpektorParser
+import io.github.vooft.spektor.test.TestFiles.listEventFile
 import io.github.vooft.spektor.test.TestFiles.listOwnerFile
 import io.github.vooft.spektor.test.TestFiles.rootPath
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
@@ -99,5 +102,23 @@ class SpektorCodegenOneOfTest {
         val business = ownerType.typeSpecs.single { it.name == "BusinessDto" }
         val businessAnnotations = business.annotations.map { it.typeName.toString() }
         businessAnnotations shouldContain "kotlinx.serialization.SerialName"
+    }
+
+    @Test
+    fun `should generate object for variant with no fields besides discriminator`() {
+        val schema = parser.parse(listOf(listEventFile))
+        val context = codegen.generate(schema)
+
+        val eventType = context.generatedTypeSpecs.values
+            .single { it.className.simpleName == "EventDto" }
+            .type
+
+        val pingEvent = eventType.typeSpecs.single { it.name == "PingEventDto" }
+        pingEvent.modifiers shouldNotContain KModifier.DATA
+        pingEvent.kind shouldBe TypeSpec.Kind.OBJECT
+        pingEvent.propertySpecs.map { it.name } shouldNotContain "type"
+
+        val clickEvent = eventType.typeSpecs.single { it.name == "ClickEventDto" }
+        clickEvent.modifiers shouldContain KModifier.DATA
     }
 }

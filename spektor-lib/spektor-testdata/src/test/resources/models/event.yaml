@@ -1,0 +1,36 @@
+openapi: 3.0.1
+info:
+  title: Event Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    Event:
+      oneOf:
+        - $ref: '#/components/schemas/ClickEvent'
+        - $ref: '#/components/schemas/PingEvent'
+      discriminator:
+        propertyName: type
+        mapping:
+          CLICK: '#/components/schemas/ClickEvent'
+          PING: '#/components/schemas/PingEvent'
+    ClickEvent:
+      type: object
+      properties:
+        type:
+          type: string
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - type
+        - x
+        - y
+    PingEvent:
+      type: object
+      properties:
+        type:
+          type: string
+      required:
+        - type

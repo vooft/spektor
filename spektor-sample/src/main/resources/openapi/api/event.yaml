@@ -1,0 +1,17 @@
+openapi: 3.0.1
+info:
+  title: Event API
+  version: 1.0.0
+paths:
+  /event:
+    get:
+      tags:
+        - Event
+      operationId: list
+      responses:
+        200:
+          description: List is returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/event.yaml#/components/schemas/EventsList'

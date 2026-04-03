@@ -2,6 +2,7 @@ package io.github.vooft.spektor.sample.ktor
 
 import io.github.vooft.spektor.sample.apis.AuthorRestService
 import io.github.vooft.spektor.sample.apis.BookRestService
+import io.github.vooft.spektor.sample.apis.EventRestService
 import io.github.vooft.spektor.sample.apis.OwnerRestService
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
@@ -9,6 +10,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.dependencies
 import spektor.example.api.author.AuthorRoutes
 import spektor.example.api.book.BookRoutes
+import spektor.example.api.event.EventRoutes
 import spektor.example.api.owner.OwnerRoutes
 
 fun Application.configureDependencyInjection() {
@@ -19,9 +21,11 @@ fun Application.configureDependencyInjection() {
         provide { AuthorRestService(resolve(), resolve()) }
         provide { BookRestService(resolve(), resolve()) }
         provide { OwnerRestService() }
+        provide { EventRestService() }
 
         provide { AuthorRoutes(resolve()) }
         provide { BookRoutes(resolve()) }
         provide { OwnerRoutes(resolve()) }
+        provide { EventRoutes(resolve()) }
     }
 }

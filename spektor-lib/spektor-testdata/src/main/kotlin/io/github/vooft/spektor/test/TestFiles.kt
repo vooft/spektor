@@ -27,4 +27,6 @@ object TestFiles {
     val moneyModelFile: Path = rootPath.resolve("models/money.yaml")
     val countryPricesModelFile: Path = rootPath.resolve("models/country-prices.yaml")
     val ownerModelFile: Path = rootPath.resolve("models/owner.yaml")
+    val listEventFile: Path = rootPath.resolve("api/list-event.yaml")
+    val eventModelFile: Path = rootPath.resolve("models/event.yaml")
 }

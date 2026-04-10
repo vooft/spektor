@@ -59,13 +59,13 @@ class SpektorTypeDtoCodegen(
             )
 
         for (variant in resolvedVariants) {
-            builder.addType(generateVariantDataClass(variant, sealedClassName, oneOfType.discriminatorPropertyName))
+            builder.addType(generateVariantType(variant, sealedClassName, oneOfType.discriminatorPropertyName))
         }
 
         return builder.build()
     }
 
-    private fun generateVariantDataClass(
+    private fun generateVariantType(
         variant: SpektorType.OneOf.ResolvedVariant,
         sealedParent: ClassName,
         discriminatorPropertyName: String,
@@ -82,14 +82,23 @@ class SpektorTypeDtoCodegen(
                 )
             }
 
-        return TypeSpec.classBuilder(config.classNameFor(variant.ref).simpleName)
+        val variantName = config.classNameFor(variant.ref).simpleName
+        val serialNameAnnotation = AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
+            .addMember("%S", variant.discriminatorValue)
+            .build()
+
+        if (fields.isEmpty()) {
+            return TypeSpec.objectBuilder(variantName)
+                .addAnnotation(SERIALIZABLE_ANNOTATION)
+                .addAnnotation(serialNameAnnotation)
+                .addSuperinterface(sealedParent)
+                .build()
+        }
+
+        return TypeSpec.classBuilder(variantName)
             .addModifiers(KModifier.DATA)
             .addAnnotation(SERIALIZABLE_ANNOTATION)
-            .addAnnotation(
-                AnnotationSpec.builder(SERIAL_NAME_ANNOTATION)
-                    .addMember("%S", variant.discriminatorValue)
-                    .build()
-            )
+            .addAnnotation(serialNameAnnotation)
             .addSuperinterface(sealedParent)
             .primaryConstructor(
                 FunSpec.constructorBuilder()

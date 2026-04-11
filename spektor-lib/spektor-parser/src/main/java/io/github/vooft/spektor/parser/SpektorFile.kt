@@ -14,7 +14,7 @@ class SpektorFile(private val file: Path, allRefs: MutableSet<SpektorType.Ref>) 
 
     init {
         require(file.isAbsolute) { "File path must be absolute: $file" }
-        require(parsed.specVersion == SpecVersion.V30) { "Only OpenAPI 3.0 is supported, but got ${parsed.specVersion} in file $file" }
+        require(parsed.specVersion == SpecVersion.V31) { "Only OpenAPI 3.1 is supported, but got ${parsed.specVersion} in file $file" }
     }
 
     private val typeResolver = SpektorTypeResolver(file, allRefs)

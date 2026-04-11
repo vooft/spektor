@@ -3,9 +3,9 @@ package io.github.vooft.spektor.sample.apis
 import io.github.vooft.spektor.sample.models.AuthorModel
 import io.github.vooft.spektor.sample.models.BookModel
 import io.github.vooft.spektor.sample.repository.AuthorRepository
-import spektor.example.models.author.AuthorCountryDto
 import spektor.example.models.author.AuthorDto
 import spektor.example.models.book.BookDto
+import spektor.example.models.country.CountryDto
 
 object Mappers {
     fun AuthorModel.toDto() = AuthorDto(
@@ -13,7 +13,7 @@ object Mappers {
         name = name,
         dateOfBirth = dateOfBirth,
         dateOfDeath = dateOfDeath,
-        country = AuthorCountryDto.valueOf(country),
+        country = CountryDto.valueOf(country),
         createdAt = createdAt,
         additionalDetails = additionalDetails,
     )

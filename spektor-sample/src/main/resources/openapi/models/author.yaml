@@ -5,10 +5,6 @@ info:
 paths: { }
 components:
   schemas:
-    AuthorCountry:
-      title: AuthorCountry
-      type: string
-      enum: [ US, DE, JP ]
     Author:
       title: Author
       type: object
@@ -27,7 +23,7 @@ components:
           type: string
           format: date
         country:
-          $ref: '#/components/schemas/AuthorCountry'
+          $ref: "./country.yaml#/components/schemas/Country"
         createdAt:
           type: string
           format: date-time
@@ -57,7 +53,7 @@ components:
           type: string
           format: date
         country:
-          $ref: '#/components/schemas/AuthorCountry'
+          $ref: "./country.yaml#/components/schemas/Country"
         dateOfDeath:
           type: string
           format: date

@@ -3,6 +3,7 @@ package io.github.vooft.spektor
 import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.apis.BookTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
+import io.github.vooft.spektor.test.models.AuthorCountryTestDto
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.models.BookRequestTestDto
 import io.github.vooft.spektor.test.models.MoneyTestDto
@@ -28,7 +29,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -64,7 +65,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -96,7 +97,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -121,7 +122,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -147,7 +148,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -170,7 +171,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -193,7 +194,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id
@@ -220,7 +221,7 @@ class BookTest {
         val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorRequestTestDto.Country.JP,
+                country = AuthorCountryTestDto.JP,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         ).body().id

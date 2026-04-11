@@ -112,6 +112,12 @@ listOf(
             "Instant" to "kotlinx.datetime.Instant",
         )
 
+        inlineSchemaOptions.set(
+            mapOf(
+                "RESOLVE_INLINE_ENUMS" to "true",
+            )
+        )
+
         configOptions.set(
             mapOf(
                 "interfaceOnly" to "true",

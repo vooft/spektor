@@ -4,6 +4,7 @@ import io.github.vooft.spektor.test.apis.OwnerTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.BusinessTestDto
 import io.github.vooft.spektor.test.models.IndividualTestDto
+import io.github.vooft.spektor.test.models.OwnerTypeTestDto
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -22,13 +23,13 @@ class OwnerTest {
         owners shouldHaveSize 2
 
         owners.map { it.actualInstance }.filterIsInstance<IndividualTestDto>().single().run {
-            type shouldBe IndividualTestDto.Type.INDIVIDUAL
+            type shouldBe OwnerTypeTestDto.INDIVIDUAL
             firstName shouldBe "John"
             lastName shouldBe "Doe"
         }
 
         owners.map { it.actualInstance }.filterIsInstance<BusinessTestDto>().single().run {
-            type shouldBe BusinessTestDto.Type.BUSINESS
+            type shouldBe OwnerTypeTestDto.BUSINESS
             name shouldBe "Acme Corp"
         }
     }

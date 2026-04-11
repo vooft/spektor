@@ -5,6 +5,11 @@ info:
 paths: { }
 components:
   schemas:
+    EventType:
+      type: string
+      enum:
+        - CLICK
+        - PING
     Event:
       oneOf:
         - $ref: '#/components/schemas/ClickEvent'
@@ -18,7 +23,7 @@ components:
       type: object
       properties:
         type:
-          type: string
+          $ref: '#/components/schemas/EventType'
         x:
           type: integer
         y:
@@ -31,7 +36,7 @@ components:
       type: object
       properties:
         type:
-          type: string
+          $ref: '#/components/schemas/EventType'
       required:
         - type
     EventsList:

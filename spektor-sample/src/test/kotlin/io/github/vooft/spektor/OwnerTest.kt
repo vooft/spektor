@@ -1,33 +1,36 @@
 package io.github.vooft.spektor
 
+import io.github.vooft.spektor.test.apis.OwnerTestApi
+import io.github.vooft.spektor.test.infrastructure.ApiClient
+import io.github.vooft.spektor.test.models.BusinessTestDto
+import io.github.vooft.spektor.test.models.IndividualTestDto
+import io.github.vooft.spektor.test.models.OwnerTypeTestDto
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.Test
 
 class OwnerTest {
 
     @Test
-    fun `should list owners with discriminator`() = testClient("admin") { client ->
-        val response = client.get("/owner")
-        response.status shouldBe HttpStatusCode.OK
+    fun `should list owners`() = testClient("admin") { client ->
+        val api = OwnerTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
 
-        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
-        val owners = body["owners"].shouldNotBeNull().jsonArray
+        val response = api.list()
+
+        response.status shouldBe 200
+
+        val owners = response.body().owners
         owners shouldHaveSize 2
 
-        val individual = owners.first { it.jsonObject["type"].shouldNotBeNull().jsonPrimitive.content == "INDIVIDUAL" }.jsonObject
-        individual["firstName"].shouldNotBeNull().jsonPrimitive.content shouldBe "John"
-        individual["lastName"].shouldNotBeNull().jsonPrimitive.content shouldBe "Doe"
+        owners.map { it.actualInstance }.filterIsInstance<IndividualTestDto>().single().run {
+            type shouldBe OwnerTypeTestDto.INDIVIDUAL
+            firstName shouldBe "John"
+            lastName shouldBe "Doe"
+        }
 
-        val business = owners.first { it.jsonObject["type"].shouldNotBeNull().jsonPrimitive.content == "BUSINESS" }.jsonObject
-        business["name"].shouldNotBeNull().jsonPrimitive.content shouldBe "Acme Corp"
+        owners.map { it.actualInstance }.filterIsInstance<BusinessTestDto>().single().run {
+            type shouldBe OwnerTypeTestDto.BUSINESS
+            name shouldBe "Acme Corp"
+        }
     }
 }

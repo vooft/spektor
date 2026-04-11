@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: Owner Models
   version: 1.0.0
@@ -6,11 +6,13 @@ paths: { }
 components:
   schemas:
     OwnerType:
+      title: OwnerType
       type: string
       enum:
         - BUSINESS
         - INDIVIDUAL
     Owner:
+      title: Owner
       oneOf:
         - $ref: '#/components/schemas/Individual'
         - $ref: '#/components/schemas/Business'
@@ -20,6 +22,7 @@ components:
           INDIVIDUAL: '#/components/schemas/Individual'
           BUSINESS: '#/components/schemas/Business'
     Individual:
+      title: Individual
       type: object
       properties:
         type:
@@ -37,6 +40,7 @@ components:
         - firstName
         - lastName
     Business:
+      title: Business
       type: object
       properties:
         type:
@@ -51,6 +55,7 @@ components:
         - id
         - name
     OwnersList:
+      title: OwnersList
       type: object
       properties:
         owners:

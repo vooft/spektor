@@ -3,7 +3,6 @@ package io.github.vooft.spektor
 import io.github.vooft.spektor.test.apis.EventTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.ClickEventTestDto
-import io.github.vooft.spektor.test.models.EventTypeTestDto
 import io.github.vooft.spektor.test.models.PingEventTestDto
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -23,13 +22,13 @@ class EventTest {
         events shouldHaveSize 2
 
         events.map { it.actualInstance }.filterIsInstance<ClickEventTestDto>().single().run {
-            type shouldBe EventTypeTestDto.CLICK
+            type shouldBe ClickEventTestDto.Type.CLICK
             x shouldBe 10
             y shouldBe 20
         }
 
         events.map { it.actualInstance }.filterIsInstance<PingEventTestDto>().single().run {
-            type shouldBe EventTypeTestDto.PING
+            type shouldBe PingEventTestDto.Type.PING
         }
     }
 }

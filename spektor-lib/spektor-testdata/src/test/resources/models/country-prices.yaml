@@ -7,5 +7,7 @@ components:
   schemas:
     CountryPrices:
       type: object
+      propertyNames:
+        $ref: "./country.yaml#/components/schemas/Country"
       additionalProperties:
         $ref: "./money.yaml#/components/schemas/Money"

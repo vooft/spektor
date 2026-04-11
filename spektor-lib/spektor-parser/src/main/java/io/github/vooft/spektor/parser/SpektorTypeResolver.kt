@@ -2,6 +2,8 @@ package io.github.vooft.spektor.parser
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType
+import io.github.vooft.spektor.model.SpektorType.MicroType.StringFormat
 import io.swagger.v3.oas.models.media.Schema
 import java.net.URI
 import java.nio.file.Path
@@ -15,7 +17,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
             type == "object" -> resolveObject(schema)
             type == "array" -> resolveArray(schema)
             type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
-            type != null -> SpektorType.MicroType.from(type, schema.format)
+            type != null -> MicroType.from(type, schema.format)
             schema.oneOf != null && schema.discriminator != null -> resolveOneOf(schema)
             else -> {
                 logger.warn { "Schema in file $file is of invalid type ${schema.types}: $schema" }
@@ -49,9 +51,13 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         val properties = schema.properties ?: run {
             val additionalProps = schema.additionalProperties
             if (additionalProps is Schema<*>) {
+                val keyType = resolvePropertyNamesKeyType(schema)
                 val valueType = resolve(additionalProps)
                     ?: error("Cannot resolve additionalProperties type: $additionalProps")
-                return SpektorType.Object.AdditionalProperties(valueType)
+                return SpektorType.Object.AdditionalProperties(
+                    keyType = keyType,
+                    valueType = valueType,
+                )
             }
             return SpektorType.Object.FreeForm
         }
@@ -68,7 +74,20 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         return SpektorType.Object.WithProperties(props)
     }
 
-    private fun resolveOneOf(schema: Schema<*>): SpektorType.OneOf? {
+    private fun resolvePropertyNamesKeyType(schema: Schema<*>): SpektorType = schema.propertyNames?.let {
+        when (val type = resolve(it)) {
+            is SpektorType.Ref,
+            is MicroType -> type
+
+            null,
+            is SpektorType.Enum,
+            is SpektorType.Object,
+            is SpektorType.Array,
+            is SpektorType.OneOf -> error("propertyNames cannot be $type")
+        }
+    } ?: MicroType.StringMicroType(StringFormat.PLAIN)
+
+    private fun resolveOneOf(schema: Schema<*>): SpektorType.OneOf {
         val discriminator = schema.discriminator
 
         val propertyName = discriminator.propertyName

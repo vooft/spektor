@@ -11,6 +11,7 @@ import io.github.vooft.spektor.model.SpektorType.MicroType.StringMicroType
 import io.github.vooft.spektor.model.TagAndFile
 import io.github.vooft.spektor.test.TestFiles.authorModelFile
 import io.github.vooft.spektor.test.TestFiles.bookModelFile
+import io.github.vooft.spektor.test.TestFiles.countryModelFile
 import io.github.vooft.spektor.test.TestFiles.countryPricesModelFile
 import io.github.vooft.spektor.test.TestFiles.listFile
 import io.github.vooft.spektor.test.TestFiles.moneyModelFile
@@ -217,8 +218,16 @@ private val expected = SpektorSchema(
             valueType = SpektorType.Ref(
                 file = moneyModelFile.toAbsolutePath().normalize(),
                 modelName = "Money"
+            ),
+            keyType = SpektorType.Ref(
+                file = countryModelFile.toAbsolutePath().normalize(),
+                modelName = "Country"
             )
         ),
+        SpektorType.Ref(
+            file = countryModelFile.toAbsolutePath().normalize(),
+            modelName = "Country"
+        ) to SpektorType.Enum(values = listOf("US", "DE", "JP")),
         SpektorType.Ref(
             file = bookModelFile.toAbsolutePath().normalize(),
             modelName = "Book"

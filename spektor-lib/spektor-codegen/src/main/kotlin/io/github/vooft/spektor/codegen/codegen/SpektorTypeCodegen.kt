@@ -52,7 +52,11 @@ class SpektorTypeCodegen(
             }
 
             is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
-            is SpektorType.Object.AdditionalProperties -> MAP.plusParameter(STRING).plusParameter(generate(type.valueType))
+            is SpektorType.Object.AdditionalProperties -> {
+                val keyTypeName = generate(type.keyType)
+                MAP.plusParameter(keyTypeName).plusParameter(generate(type.valueType))
+            }
+
             is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
             is SpektorType.OneOf -> error("Generating oneOf directly is not supported $type")
@@ -74,7 +78,8 @@ class SpektorTypeCodegen(
 
         val target = context.refs.getValue(lastRef)
         if (target is SpektorType.Object.AdditionalProperties) {
-            val mapType = MAP.plusParameter(STRING).plusParameter(generate(target.valueType))
+            val keyTypeName = generate(target.keyType)
+            val mapType = MAP.plusParameter(keyTypeName).plusParameter(generate(target.valueType))
             refsTrace.forEach { context.resolvedTypes[it] = mapType }
             return mapType
         }

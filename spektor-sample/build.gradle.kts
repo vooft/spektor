@@ -124,7 +124,7 @@ listOf(
                 "useTags" to "true",
                 "enumPropertyNaming" to "original",
                 "skipDefaultInterface" to "true",
-                "apiSuffix" to "TestApi"
+                "apiSuffix" to "TestApi",
             )
         )
     }

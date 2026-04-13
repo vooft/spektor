@@ -2,8 +2,8 @@ package io.github.vooft.spektor
 
 import io.github.vooft.spektor.test.apis.AuthorTestApi
 import io.github.vooft.spektor.test.infrastructure.ApiClient
-import io.github.vooft.spektor.test.models.AuthorCountryTestDto
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
+import io.github.vooft.spektor.test.models.CountryTestDto
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotlinx.datetime.LocalDate
@@ -25,7 +25,7 @@ class AuthorTest {
             AuthorRequestTestDto(
                 name = name,
                 dateOfBirth = dob,
-                country = AuthorCountryTestDto.DE,
+                country = CountryTestDto.DE,
                 dateOfDeath = dod,
                 additionalDetails = buildJsonObject {
                     put("ref", "some-ref")
@@ -49,7 +49,7 @@ class AuthorTest {
         val response = api.create(
             AuthorRequestTestDto(
                 name = "test",
-                country = AuthorCountryTestDto.US,
+                country = CountryTestDto.US,
                 dateOfBirth = LocalDate.parse("1800-01-01"),
             )
         )
@@ -74,7 +74,7 @@ class AuthorTest {
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
-                country = AuthorCountryTestDto.DE,
+                country = CountryTestDto.DE,
                 dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
             )
         )
@@ -83,7 +83,7 @@ class AuthorTest {
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
-                country = AuthorCountryTestDto.US,
+                country = CountryTestDto.US,
                 dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
             )
         )
@@ -92,15 +92,15 @@ class AuthorTest {
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
-                country = AuthorCountryTestDto.JP,
+                country = CountryTestDto.JP,
                 dateOfDeath = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
             )
         )
 
-        val response = api.list(countries = listOf(AuthorCountryTestDto.US, AuthorCountryTestDto.JP))
+        val response = api.list(countries = listOf(CountryTestDto.US, CountryTestDto.JP))
 
         response.status shouldBe 200
 
-        response.body().authors.map { it.country } shouldContainExactlyInAnyOrder listOf(AuthorCountryTestDto.US, AuthorCountryTestDto.JP)
+        response.body().authors.map { it.country } shouldContainExactlyInAnyOrder listOf(CountryTestDto.US, CountryTestDto.JP)
     }
 }

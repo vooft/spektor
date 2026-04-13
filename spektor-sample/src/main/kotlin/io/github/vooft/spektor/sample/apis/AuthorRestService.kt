@@ -11,15 +11,15 @@ import spektor.example.api.author.AuthorServerApi.CreateResponse
 import spektor.example.api.author.AuthorServerApi.GetResponse
 import spektor.example.api.author.AuthorServerApi.ListResponse
 import spektor.example.api.author.AuthorServerApi.SearchBooksResponse
-import spektor.example.models.author.AuthorCountryDto
 import spektor.example.models.author.AuthorRequestDto
 import spektor.example.models.author.AuthorsListDto
 import spektor.example.models.book.BooksListDto
+import spektor.example.models.country.CountryDto
 import java.time.Instant
 import java.util.UUID
 
 class AuthorRestService(private val authors: AuthorRepository, private val books: BookRepository) : AuthorServerApi {
-    override suspend fun list(countries: List<AuthorCountryDto>?, call: ApplicationCall): ListResponse {
+    override suspend fun list(countries: List<CountryDto>?, call: ApplicationCall): ListResponse {
         val countryNames = countries?.map { it.name } ?: emptyList()
         val filteredAuthors = if (countryNames.isNotEmpty()) {
             authors.filter { it.country in countryNames }

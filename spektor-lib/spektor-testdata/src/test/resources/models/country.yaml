@@ -1,0 +1,13 @@
+openapi: 3.1.0
+info:
+  title: Country Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    Country:
+      type: string
+      enum:
+        - US
+        - DE
+        - JP

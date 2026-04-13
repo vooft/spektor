@@ -75,16 +75,11 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
     }
 
     private fun resolvePropertyNamesKeyType(schema: Schema<*>): SpektorType = schema.propertyNames?.let {
-        when (val type = resolve(it)) {
-            is SpektorType.Ref,
-            is MicroType -> type
-
-            null,
-            is SpektorType.Enum,
-            is SpektorType.Object,
-            is SpektorType.Array,
-            is SpektorType.OneOf -> error("propertyNames cannot be $type")
+        val type = resolve(it)
+        require(type is SpektorType.Ref || type is MicroType.StringMicroType) {
+            "propertyNames must be a \$ref to a string-based type, but got $type in file $file"
         }
+        type
     } ?: MicroType.StringMicroType(StringFormat.PLAIN)
 
     private fun resolveOneOf(schema: Schema<*>): SpektorType.OneOf {

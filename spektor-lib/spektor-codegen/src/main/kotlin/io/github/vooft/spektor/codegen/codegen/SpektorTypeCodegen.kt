@@ -53,6 +53,7 @@ class SpektorTypeCodegen(
 
             is SpektorType.Object.FreeForm -> JSON_OBJECT_CLASS
             is SpektorType.Object.AdditionalProperties -> {
+                validatePropertyNamesKeyType(type.keyType)
                 val keyTypeName = generate(type.keyType)
                 MAP.plusParameter(keyTypeName).plusParameter(generate(type.valueType))
             }
@@ -72,12 +73,23 @@ class SpektorTypeCodegen(
         }
     }
 
+    private fun validatePropertyNamesKeyType(keyType: SpektorType) {
+        require(keyType is SpektorType.Ref) {
+            "propertyNames key must be a \$ref to a string-based type, but got $keyType"
+        }
+        val target = context.refs.getValue(keyType.traceRefs().last())
+        require(target is SpektorType.MicroType.StringMicroType || target is SpektorType.Enum) {
+            "propertyNames key \$ref $keyType must resolve to a string-based type, but resolves to $target"
+        }
+    }
+
     private fun generateRef(ref: SpektorType.Ref): TypeName {
         val refsTrace = ref.traceRefs()
         val lastRef = refsTrace.last()
 
         val target = context.refs.getValue(lastRef)
         if (target is SpektorType.Object.AdditionalProperties) {
+            validatePropertyNamesKeyType(target.keyType)
             val keyTypeName = generate(target.keyType)
             val mapType = MAP.plusParameter(keyTypeName).plusParameter(generate(target.valueType))
             refsTrace.forEach { context.resolvedTypes[it] = mapType }

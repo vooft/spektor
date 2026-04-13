@@ -8,9 +8,9 @@ import io.github.vooft.spektor.test.TestFiles.listEventFile
 import io.github.vooft.spektor.test.TestFiles.listOwnerFile
 import io.github.vooft.spektor.test.TestFiles.rootPath
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class SpektorCodegenOneOfTest {

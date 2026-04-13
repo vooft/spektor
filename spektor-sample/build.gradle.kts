@@ -79,7 +79,8 @@ tasks.withType<FormatTask> {
 listOf(
     "src/main/resources/openapi/api/author.yaml",
     "src/main/resources/openapi/api/book.yaml",
-    "src/main/resources/openapi/api/owner.yaml"
+    "src/main/resources/openapi/api/owner.yaml",
+    "src/main/resources/openapi/api/event.yaml",
 ).forEachIndexed { index, specPath ->
     val taskName = "generateTestClientOpenApi$index"
     tasks.register<GenerateTask>(taskName) {
@@ -97,12 +98,24 @@ listOf(
         additionalProperties.set(
             mapOf(
                 "dateLibrary" to "kotlinx-datetime",
+                "generateOneOfAnyOfWrappers" to "true",
             )
         )
 
+        typeMappings = mapOf(
+            "object" to "JsonObject",
+            "DateTime" to "Instant",
+        )
+
         importMappings = mapOf(
-            "AuthorRequestTestDto" to "io.github.vooft.spektor.models.AuthorRequestTestDto",
-            "AuthorTestDto" to "io.github.vooft.spektor.models.AuthorTestDto",
+            "JsonObject" to "kotlinx.serialization.json.JsonObject",
+            "Instant" to "kotlinx.datetime.Instant",
+        )
+
+        inlineSchemaOptions.set(
+            mapOf(
+                "RESOLVE_INLINE_ENUMS" to "true",
+            )
         )
 
         configOptions.set(
@@ -111,7 +124,7 @@ listOf(
                 "useTags" to "true",
                 "enumPropertyNaming" to "original",
                 "skipDefaultInterface" to "true",
-                "apiSuffix" to "TestApi"
+                "apiSuffix" to "TestApi",
             )
         )
     }

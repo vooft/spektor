@@ -8,17 +8,26 @@ import java.nio.file.Path
 
 class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSet<SpektorType.Ref>) {
 
-    fun resolve(schema: Schema<*>): SpektorType? = when {
-        schema.`$ref` != null -> resolveRef(schema.`$ref`)?.also { allRefs.add(it) }
-        schema.type == "object" -> resolveObject(schema)
-        schema.type == "array" -> resolveArray(schema)
-        schema.type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
-        schema.type != null -> SpektorType.MicroType.from(schema.type, schema.format)
-        schema.oneOf != null && schema.discriminator != null -> resolveOneOf(schema)
-        else -> {
-            logger.warn { "Schema in file $file is of invalid type ${schema.type}: $schema" }
-            null
+    fun resolve(schema: Schema<*>): SpektorType? {
+        val type = schema.singleType()
+        return when {
+            schema.`$ref` != null -> resolveRef(schema.`$ref`)?.also { allRefs.add(it) }
+            type == "object" -> resolveObject(schema)
+            type == "array" -> resolveArray(schema)
+            type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
+            type != null -> SpektorType.MicroType.from(type, schema.format)
+            schema.oneOf != null && schema.discriminator != null -> resolveOneOf(schema)
+            else -> {
+                logger.warn { "Schema in file $file is of invalid type ${schema.types}: $schema" }
+                null
+            }
         }
+    }
+
+    private fun Schema<*>.singleType(): String? {
+        val types = this.types ?: return null
+        require(types.size == 1) { "Expected exactly one type, but got $types in file $file" }
+        return types.single()
     }
 
     private fun resolveArray(schema: Schema<*>): SpektorType.Array? {

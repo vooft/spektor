@@ -1,11 +1,18 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: Event Models
   version: 1.0.0
 paths: { }
 components:
   schemas:
+    EventType:
+      title: EventType
+      type: string
+      enum:
+        - CLICK
+        - PING
     Event:
+      title: Event
       oneOf:
         - $ref: '#/components/schemas/ClickEvent'
         - $ref: '#/components/schemas/PingEvent'
@@ -15,10 +22,11 @@ components:
           CLICK: '#/components/schemas/ClickEvent'
           PING: '#/components/schemas/PingEvent'
     ClickEvent:
+      title: ClickEvent
       type: object
       properties:
         type:
-          type: string
+          $ref: '#/components/schemas/EventType'
         x:
           type: integer
         y:
@@ -28,13 +36,15 @@ components:
         - x
         - y
     PingEvent:
+      title: PingEvent
       type: object
       properties:
         type:
-          type: string
+          $ref: '#/components/schemas/EventType'
       required:
         - type
     EventsList:
+      title: EventsList
       type: object
       properties:
         events:

@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: Book Models
   version: 1.0.0
@@ -6,6 +6,7 @@ paths: { }
 components:
   schemas:
     Book:
+      title: Book
       type: object
       properties:
         id:
@@ -49,6 +50,7 @@ components:
         - referenceLinks
         - countryPrices
     BooksList:
+      title: BooksList
       type: object
       properties:
         books:
@@ -58,6 +60,7 @@ components:
       required:
         - books
     BookRequest:
+      title: BookRequest
       type: object
       properties:
         title:
@@ -77,6 +80,7 @@ components:
         - title
         - authorId
     BookUpdateRequest:
+      title: BookUpdateRequest
       type: object
       properties:
         title:

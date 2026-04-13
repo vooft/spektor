@@ -1,0 +1,11 @@
+openapi: 3.1.0
+info:
+  title: Plain Prices Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    PlainPrices:
+      type: object
+      additionalProperties:
+        $ref: "./money.yaml#/components/schemas/Money"

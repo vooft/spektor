@@ -1,0 +1,17 @@
+openapi: 3.1.0
+info:
+  title: Notification API
+  version: 1.0.0
+paths:
+  /notification/settings:
+    get:
+      tags:
+        - Notification
+      operationId: getSettings
+      responses:
+        200:
+          description: Notification settings are returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/notification.yaml#/components/schemas/NotificationSettings'

@@ -7,6 +7,7 @@ import io.ktor.server.routing.routing
 import spektor.example.api.author.AuthorRoutes
 import spektor.example.api.book.BookRoutes
 import spektor.example.api.event.EventRoutes
+import spektor.example.api.notification.NotificationRoutes
 import spektor.example.api.owner.OwnerRoutes
 
 fun Application.configureRouting() {
@@ -14,6 +15,7 @@ fun Application.configureRouting() {
     val bookRoutes: BookRoutes by dependencies
     val ownerRoutes: OwnerRoutes by dependencies
     val eventRoutes: EventRoutes by dependencies
+    val notificationRoutes: NotificationRoutes by dependencies
 
     routing {
         authenticate("admin") {
@@ -29,6 +31,7 @@ fun Application.configureRouting() {
             authorRoutes.searchBooks()
             ownerRoutes.list()
             eventRoutes.list()
+            notificationRoutes.getSettings()
         }
     }
 }

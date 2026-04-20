@@ -81,11 +81,12 @@ listOf(
     "src/main/resources/openapi/api/book.yaml",
     "src/main/resources/openapi/api/owner.yaml",
     "src/main/resources/openapi/api/event.yaml",
+    "src/main/resources/openapi/api/notification.yaml",
 ).forEachIndexed { index, specPath ->
     val taskName = "generateTestClientOpenApi$index"
     tasks.register<GenerateTask>(taskName) {
         generatorName.set("kotlin")
-        library.set("multiplatform")
+        library.set("jvm-ktor")
         skipOverwrite.set(true)
 
         inputSpec.set(file(specPath).absolutePath)
@@ -99,6 +100,7 @@ listOf(
             mapOf(
                 "dateLibrary" to "kotlinx-datetime",
                 "generateOneOfAnyOfWrappers" to "true",
+                "serializationLibrary" to "kotlinx_serialization",
             )
         )
 
@@ -138,4 +140,4 @@ listOf(
     }
 }
 
-kotlin.sourceSets["test"].kotlin.srcDir("${layout.buildDirectory.get().asFile.absolutePath}/test-generated/src/commonMain/kotlin")
+kotlin.sourceSets["test"].kotlin.srcDir("${layout.buildDirectory.get().asFile.absolutePath}/test-generated/src/main/kotlin")

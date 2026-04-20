@@ -18,6 +18,7 @@ object TestFiles {
     val pathParamRefFile: Path = rootPath.resolve("api/path-param-ref.yaml")
     val queryParamRefFile: Path = rootPath.resolve("api/query-param-ref.yaml")
     val listOwnerFile: Path = rootPath.resolve("api/list-owner.yaml")
+    val plainPricesApiFile: Path = rootPath.resolve("api/plain-prices.yaml")
 
     /**
      * Models
@@ -27,6 +28,7 @@ object TestFiles {
     val moneyModelFile: Path = rootPath.resolve("models/money.yaml")
     val countryModelFile: Path = rootPath.resolve("models/country.yaml")
     val countryPricesModelFile: Path = rootPath.resolve("models/country-prices.yaml")
+    val plainPricesModelFile: Path = rootPath.resolve("models/plain-prices.yaml")
     val ownerModelFile: Path = rootPath.resolve("models/owner.yaml")
     val listEventFile: Path = rootPath.resolve("api/list-event.yaml")
     val eventModelFile: Path = rootPath.resolve("models/event.yaml")

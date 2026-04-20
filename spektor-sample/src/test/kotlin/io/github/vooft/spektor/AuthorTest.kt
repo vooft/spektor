@@ -1,11 +1,10 @@
 package io.github.vooft.spektor
 
-import io.github.vooft.spektor.test.apis.AuthorTestApi
-import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.models.CountryTestDto
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import io.ktor.client.request.get
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -15,13 +14,11 @@ import java.util.concurrent.ThreadLocalRandom
 
 class AuthorTest {
     @Test
-    fun `should create author`() = testClient("admin") { client ->
-        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
+    fun `should create author`() = testClient("admin") {
         val name = UUID.randomUUID().toString()
         val dob = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000))
         val dod = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000))
-        val response = api.create(
+        val response = api.author.create(
             AuthorRequestTestDto(
                 name = name,
                 dateOfBirth = dob,
@@ -43,10 +40,8 @@ class AuthorTest {
     }
 
     @Test
-    fun `should fail to create author with 401`() = testClient("not admin") { client ->
-        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val response = api.create(
+    fun `should fail to create author with 401`() = testClient("not admin") {
+        val response = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.US,
@@ -58,19 +53,15 @@ class AuthorTest {
     }
 
     @Test
-    fun `should fail to get author with invalid id`() = testClient("admin") { client ->
-        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
+    fun `should fail to get author with invalid id`() = testClient("admin") {
+        val response = client.get("/author/not-a-valid-uuid")
 
-        val response = api.get("not-a-valid-uuid")
-
-        response.status shouldBe 400
+        response.status.value shouldBe 400
     }
 
     @Test
-    fun `should list authors for countries`() = testClient("admin") { client ->
-        val api = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        api.create(
+    fun `should list authors for countries`() = testClient("admin") {
+        api.author.create(
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
@@ -79,7 +70,7 @@ class AuthorTest {
             )
         )
 
-        api.create(
+        api.author.create(
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
@@ -88,7 +79,7 @@ class AuthorTest {
             )
         )
 
-        api.create(
+        api.author.create(
             AuthorRequestTestDto(
                 name = UUID.randomUUID().toString(),
                 dateOfBirth = LocalDate.fromEpochDays(ThreadLocalRandom.current().nextInt(1000)),
@@ -97,7 +88,7 @@ class AuthorTest {
             )
         )
 
-        val response = api.list(countries = listOf(CountryTestDto.US, CountryTestDto.JP))
+        val response = api.author.list(countries = listOf(CountryTestDto.US, CountryTestDto.JP))
 
         response.status shouldBe 200
 

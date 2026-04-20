@@ -22,49 +22,51 @@ fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json(
             Json {
-                serializersModule = SerializersModule {
-                    contextual(
-                        kClass = Instant::class,
-                        serializer = object : KSerializer<Instant> {
-                            override val descriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-                            override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
-                            override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
-                        }
-                    )
-                    contextual(
-                        kClass = LocalDate::class,
-                        serializer = object : KSerializer<LocalDate> {
-                            override val descriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
-                            override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
-                            override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
-                        }
-                    )
-                    contextual(
-                        kClass = YearMonth::class,
-                        serializer = object : KSerializer<YearMonth> {
-                            override val descriptor = PrimitiveSerialDescriptor("YearMonth", PrimitiveKind.STRING)
-                            override fun serialize(encoder: Encoder, value: YearMonth) = encoder.encodeString(value.toString())
-                            override fun deserialize(decoder: Decoder): YearMonth = YearMonth.parse(decoder.decodeString())
-                        }
-                    )
-                    contextual(
-                        kClass = UUID::class,
-                        serializer = object : KSerializer<UUID> {
-                            override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
-                            override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
-                            override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
-                        }
-                    )
-                    contextual(
-                        kClass = URI::class,
-                        serializer = object : KSerializer<URI> {
-                            override val descriptor = PrimitiveSerialDescriptor("URI", STRING)
-                            override fun deserialize(decoder: Decoder): URI = URI(decoder.decodeString())
-                            override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString(value.toString())
-                        }
-                    )
-                }
+                serializersModule = serializersModule()
             }
         )
     }
+}
+
+fun serializersModule() = SerializersModule {
+    contextual(
+        kClass = Instant::class,
+        serializer = object : KSerializer<Instant> {
+            override val descriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
+            override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
+            override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
+        }
+    )
+    contextual(
+        kClass = LocalDate::class,
+        serializer = object : KSerializer<LocalDate> {
+            override val descriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
+            override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
+            override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
+        }
+    )
+    contextual(
+        kClass = YearMonth::class,
+        serializer = object : KSerializer<YearMonth> {
+            override val descriptor = PrimitiveSerialDescriptor("YearMonth", PrimitiveKind.STRING)
+            override fun serialize(encoder: Encoder, value: YearMonth) = encoder.encodeString(value.toString())
+            override fun deserialize(decoder: Decoder): YearMonth = YearMonth.parse(decoder.decodeString())
+        }
+    )
+    contextual(
+        kClass = UUID::class,
+        serializer = object : KSerializer<UUID> {
+            override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+            override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
+            override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString())
+        }
+    )
+    contextual(
+        kClass = URI::class,
+        serializer = object : KSerializer<URI> {
+            override val descriptor = PrimitiveSerialDescriptor("URI", STRING)
+            override fun deserialize(decoder: Decoder): URI = URI(decoder.decodeString())
+            override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString(value.toString())
+        }
+    )
 }

@@ -1,8 +1,5 @@
 package io.github.vooft.spektor
 
-import io.github.vooft.spektor.test.apis.AuthorTestApi
-import io.github.vooft.spektor.test.apis.BookTestApi
-import io.github.vooft.spektor.test.infrastructure.ApiClient
 import io.github.vooft.spektor.test.models.AuthorRequestTestDto
 import io.github.vooft.spektor.test.models.BookRequestTestDto
 import io.github.vooft.spektor.test.models.CountryTestDto
@@ -23,10 +20,8 @@ import java.util.concurrent.ThreadLocalRandom
 
 class BookTest {
     @Test
-    fun `should create book`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should create book`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -37,7 +32,7 @@ class BookTest {
         val title = UUID.randomUUID().toString()
         val minorUnits = ThreadLocalRandom.current().nextInt(1000)
         val currency = "USD"
-        val response = api.create(
+        val response = api.book.create(
             BookRequestTestDto(
                 title = title,
                 authorId = authorId,
@@ -59,10 +54,8 @@ class BookTest {
     }
 
     @Test
-    fun `should create book with countryPrices`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should create book with countryPrices`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -75,7 +68,7 @@ class BookTest {
             "US" to MoneyTestDto(minorUnits = 999, currency = "USD"),
             "DE" to MoneyTestDto(minorUnits = 899, currency = "EUR"),
         )
-        val response = api.create(
+        val response = api.book.create(
             BookRequestTestDto(
                 title = title,
                 authorId = authorId,
@@ -91,10 +84,8 @@ class BookTest {
     }
 
     @Test
-    fun `should create book without countryPrices`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should create book without countryPrices`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -103,7 +94,7 @@ class BookTest {
         ).body().id
 
         val title = UUID.randomUUID().toString()
-        val response = api.create(
+        val response = api.book.create(
             BookRequestTestDto(
                 title = title,
                 authorId = authorId,
@@ -118,8 +109,8 @@ class BookTest {
     }
 
     @Test
-    fun `should create book with metadata`() = testClient("admin") { client ->
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should create book with metadata`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -142,10 +133,8 @@ class BookTest {
     }
 
     @Test
-    fun `should create book without metadata`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should create book without metadata`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -153,7 +142,7 @@ class BookTest {
             )
         ).body().id
 
-        val response = api.create(
+        val response = api.book.create(
             BookRequestTestDto(
                 title = UUID.randomUUID().toString(),
                 authorId = authorId,
@@ -165,10 +154,8 @@ class BookTest {
     }
 
     @Test
-    fun `should delete book`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should delete book`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -176,22 +163,20 @@ class BookTest {
             )
         ).body().id
 
-        val bookId = api.create(
+        val bookId = api.book.create(
             BookRequestTestDto(
                 title = UUID.randomUUID().toString(),
                 authorId = authorId,
             )
         ).body().id
 
-        val response = api.delete(bookId)
+        val response = api.book.delete(bookId)
         response.status shouldBe 204
     }
 
     @Test
-    fun `should update book with body`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should update book with body`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -199,7 +184,7 @@ class BookTest {
             )
         ).body().id
 
-        val bookId = api.create(
+        val bookId = api.book.create(
             BookRequestTestDto(
                 title = "original title",
                 authorId = authorId,
@@ -215,10 +200,8 @@ class BookTest {
     }
 
     @Test
-    fun `should update book without body`() = testClient("admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val authorId = AuthorTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client).create(
+    fun `should update book without body`() = testClient("admin") {
+        val authorId = api.author.create(
             AuthorRequestTestDto(
                 name = "test",
                 country = CountryTestDto.JP,
@@ -226,7 +209,7 @@ class BookTest {
             )
         ).body().id
 
-        val bookId = api.create(
+        val bookId = api.book.create(
             BookRequestTestDto(
                 title = "original title",
                 authorId = authorId,
@@ -239,13 +222,11 @@ class BookTest {
     }
 
     @Test
-    fun `should fail to create author with 401`() = testClient("not admin") { client ->
-        val api = BookTestApi(baseUrl = ApiClient.BASE_URL, httpClient = client)
-
-        val response = api.create(
+    fun `should fail to create author with 401`() = testClient("not admin") {
+        val response = api.book.create(
             BookRequestTestDto(
                 title = "test",
-                authorId = UUID.randomUUID().toString(),
+                authorId = UUID.randomUUID(),
             )
         )
 

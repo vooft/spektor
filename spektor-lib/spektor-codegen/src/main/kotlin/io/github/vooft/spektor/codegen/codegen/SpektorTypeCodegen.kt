@@ -74,12 +74,14 @@ class SpektorTypeCodegen(
     }
 
     private fun validatePropertyNamesKeyType(keyType: SpektorType) {
-        require(keyType is SpektorType.Ref) {
-            "propertyNames key must be a \$ref to a string-based type, but got $keyType"
+        require(keyType is SpektorType.Ref || keyType is SpektorType.MicroType.StringMicroType) {
+            "propertyNames key must be a string-based type or a \$ref to one, but got $keyType"
         }
-        val target = context.refs.getValue(keyType.traceRefs().last())
-        require(target is SpektorType.MicroType.StringMicroType || target is SpektorType.Enum) {
-            "propertyNames key \$ref $keyType must resolve to a string-based type, but resolves to $target"
+        if (keyType is SpektorType.Ref) {
+            val target = context.refs.getValue(keyType.traceRefs().last())
+            require(target is SpektorType.MicroType.StringMicroType || target is SpektorType.Enum) {
+                "propertyNames key \$ref $keyType must resolve to a string-based type, but resolves to $target"
+            }
         }
     }
 

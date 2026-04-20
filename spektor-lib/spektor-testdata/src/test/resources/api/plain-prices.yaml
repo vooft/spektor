@@ -1,0 +1,17 @@
+openapi: 3.1.0
+info:
+  title: Plain Prices API
+  version: 1.0.0
+paths:
+  /plain-prices:
+    get:
+      tags:
+        - PlainPrices
+      operationId: getPlainPrices
+      responses:
+        200:
+          description: Plain prices are returned
+          content:
+            application/json:
+              schema:
+                $ref: '../models/plain-prices.yaml#/components/schemas/PlainPrices'

@@ -18,7 +18,7 @@ kotlinpoet = { module = "com.squareup:kotlinpoet", version = "2.3.0" }
 
 kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
 kotest-runner = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version = "5.14.3" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version = "5.14.4" }
 
 kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "8.0.01" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }

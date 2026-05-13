@@ -21,7 +21,7 @@ kotest-runner = { module = "io.kotest:kotest-runner-junit5", version.ref = "kote
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version = "5.14.4" }
 
 kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "8.0.02" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "2.0.18" }
 kotlinx-dateime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0" }
 
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }

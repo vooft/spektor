@@ -20,7 +20,7 @@ kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.r
 kotest-runner = { module = "io.kotest:kotest-runner-junit6", version.ref = "kotest" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version = "6.1.0" }
 
-kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "8.0.03" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "8.0.4" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version = "2.0.18" }
 kotlinx-dateime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0" }
 

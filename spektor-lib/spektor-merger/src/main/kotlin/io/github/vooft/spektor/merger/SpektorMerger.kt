@@ -40,7 +40,7 @@ class SpektorMerger(
             }
         ).apply {
             findAndRegisterModules()
-            setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
         }
 
         fun Path.isYaml() = extension == "yaml" || extension == "yml"

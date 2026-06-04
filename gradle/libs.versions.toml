@@ -40,7 +40,7 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
 
-buildconfig = { id = "com.github.gmazzo.buildconfig", version = "6.0.9" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version = "6.0.10" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 openapi = { id = "org.openapi.generator", version = "7.22.0" }

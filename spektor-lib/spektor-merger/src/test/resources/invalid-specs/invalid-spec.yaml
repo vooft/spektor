@@ -1,0 +1,11 @@
+openapi: 3.1.0
+info:
+  title: Invalid API
+  version: 1.0.0
+paths:
+  /book:
+    get:
+      tags:
+        - Book
+      operationId: List
+      responses: this-should-be-an-object

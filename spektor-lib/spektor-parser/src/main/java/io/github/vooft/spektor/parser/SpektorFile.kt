@@ -8,11 +8,21 @@ import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.core.models.ParseOptions
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.readText
 
 class SpektorFile(private val file: Path, allRefs: MutableSet<SpektorType.Ref>) {
-    private val parsed = OpenAPIV3Parser().read(file.absolutePathString(), null, ParseOptions().apply { isResolve = false })
+    private val parseResult = OpenAPIV3Parser().readContents(
+        file.readText(),
+        null,
+        ParseOptions().apply { isResolve = false },
+        file.absolutePathString()
+    )
+
+    private val parsed = parseResult.openAPI
 
     init {
+        val parseResultMessages = parseResult.messages?.takeIf { it.isNotEmpty() }
+        require(parseResultMessages == null) { "Failed to parse OpenAPI spec file $file: ${parseResultMessages?.joinToString("; ")}" }
         require(file.isAbsolute) { "File path must be absolute: $file" }
         require(parsed.specVersion == SpecVersion.V31) { "Only OpenAPI 3.1 is supported, but got ${parsed.specVersion} in file $file" }
     }

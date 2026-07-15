@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: Book API
+  version: 1.0.0
+paths:
+  /book:
+    get:
+      tags:
+        - Book
+      # deliberately matches the operationId in sub/author.yaml:
+      # spektor scopes operationIds per tag, merged validation must tolerate duplicates
+      operationId: get
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string

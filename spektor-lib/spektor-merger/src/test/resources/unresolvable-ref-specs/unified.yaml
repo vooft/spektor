@@ -1,0 +1,7 @@
+openapi: 3.1.0
+info:
+  title: Unified API
+  version: 1.0.0
+paths:
+  /book:
+    $ref: './does-not-exist.yaml#/paths/~1book'

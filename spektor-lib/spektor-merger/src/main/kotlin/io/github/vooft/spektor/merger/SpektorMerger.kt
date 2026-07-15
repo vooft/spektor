@@ -10,12 +10,10 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.servers.Server
-import io.swagger.v3.parser.OpenAPIV3Parser
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
-import kotlin.io.path.walk
 import kotlin.io.path.writeText
 
 class SpektorMerger(
@@ -80,22 +78,8 @@ class SpektorMerger(
         }
 
         logger.debug { "Walking $specRoot" }
-        val pathFiles = specRoot.walk()
-            .filter { it.isYaml() && it.isNotExcluded(listOf(unifiedSpecName)) }
-            .flatMap { file ->
-                logger.debug { "Processing $file" }
-                val tree = OpenAPIV3Parser().read(file.toAbsolutePath().toUri().toString())
-
-                tree.paths?.let {
-                    it.entries.map { (key, _) -> key to file }
-                } ?: emptyList()
-            }.groupBy(
-                { (pathKey, _) -> pathKey },
-                { (_, file) -> file }
-            ).also {
-                val duplicates = it.filter { (_, entries) -> entries.size > 1 }
-                require(duplicates.isEmpty()) { "Duplicate paths in api files: $duplicates" }
-            }.mapValues { (_, entries) -> entries.single() }
+        val pathFiles = SpektorMergeTraverser(specRoot)
+            .resolveAllSpecFiles(unifiedSpecName)
             .toSortedMap()
 
         logger.debug { "Merging paths" }

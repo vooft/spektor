@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+  title: Author API
+  version: 1.0.0
+paths:
+  /author/{id}:
+    get:
+      tags:
+        - Author
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string

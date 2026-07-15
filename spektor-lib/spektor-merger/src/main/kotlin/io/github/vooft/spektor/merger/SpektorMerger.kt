@@ -54,15 +54,27 @@ class SpektorMerger(
 
     fun merge() = runCatching {
         val unifiedSpec = buildUnifiedSpec()
+        val unifiedSpecYaml = yamlMapper.writeValueAsString(unifiedSpec)
 
         val yamlOut = outputPath.resolve("$unifiedSpecName.yaml")
 
         logger.debug { "Writing unified OpenAPI spec to $yamlOut" }
-        yamlOut.writeText(yamlMapper.writeValueAsString(unifiedSpec))
+        yamlOut.writeText(unifiedSpecYaml)
+
+        logger.debug { "Validating unified OpenAPI spec" }
+        OpenApiValidatingParser.parseAndValidate(
+            content = unifiedSpecYaml,
+            location = specRoot.resolve("$unifiedSpecName.yaml"),
+        )
+
+        Unit
     }.onFailure { logger.error(it) { "Failed to merge OpenAPI specs" } }
 
-    private fun escapeJsonPointerSegment(segment: String): String = segment.replace("~", "~0")
+    private fun escapeJsonPointerSegment(segment: String): String = segment
+        .replace("~", "~0")
         .replace("/", "~1")
+        .replace("{", "%7B")
+        .replace("}", "%7D")
 
     private fun buildUnifiedSpec(): OpenAPI {
         logger.debug { "Building synthetic root OpenAPI spec YAML" }

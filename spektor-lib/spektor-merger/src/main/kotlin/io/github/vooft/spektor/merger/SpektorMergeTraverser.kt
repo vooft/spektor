@@ -3,10 +3,7 @@ package io.github.vooft.spektor.merger
 import io.github.oshai.kotlinlogging.KotlinLogging.logger
 import io.github.vooft.spektor.merger.SpektorMerger.Companion.isNotExcluded
 import io.github.vooft.spektor.merger.SpektorMerger.Companion.isYaml
-import io.swagger.v3.parser.OpenAPIV3Parser
-import io.swagger.v3.parser.core.models.ParseOptions
 import java.nio.file.Path
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.readText
 import kotlin.io.path.walk
 
@@ -19,18 +16,7 @@ class SpektorMergeTraverser(
         .flatMap { file ->
             logger.debug { "Processing $file" }
 
-            val parseResult = OpenAPIV3Parser().readContents(
-                file.readText(),
-                listOf(),
-                ParseOptions().apply { isResolve = true },
-                file.absolutePathString()
-            )
-
-            parseResult.messages?.takeIf { it.isNotEmpty() }?.let {
-                throw InvalidOpenApiSpecException(file, it)
-            }
-
-            val tree = parseResult.openAPI
+            val tree = OpenApiValidatingParser.parseAndValidate(file.readText(), file)
 
             tree.paths?.let {
                 it.entries.map { (key, _) -> key to file }

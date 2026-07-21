@@ -9,6 +9,7 @@ import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Content
+import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.responses.ApiResponses
 import java.nio.file.Path
@@ -125,24 +126,31 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private data class ResolvedContent(val contentType: SpektorContentType, val type: SpektorType)
 
     private fun Content.findContent(): ResolvedContent? {
-        if (isEmpty()) return null
+        val jsonSchema = get(SpektorContentType.JSON.mediaType)?.schema
+        val textPlainSchema = get(SpektorContentType.TEXT_PLAIN.mediaType)?.schema
 
-        get(SpektorContentType.JSON.mediaType)?.schema?.let { schema ->
-            return typeResolver.resolve(schema)?.let { ResolvedContent(SpektorContentType.JSON, it) }
-        }
-
-        get(SpektorContentType.TEXT_PLAIN.mediaType)?.schema?.let { schema ->
-            val resolved = typeResolver.resolve(schema) ?: return null
-            if (resolved != SpektorType.MicroType.StringMicroType(SpektorType.MicroType.StringFormat.PLAIN)) {
-                logger.warn { "Only plain string schema is supported for ${SpektorContentType.TEXT_PLAIN.mediaType}, but got $resolved" }
-                return null
+        return when {
+            isEmpty() -> null
+            jsonSchema != null -> resolveJsonContent(jsonSchema)
+            textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
+            else -> {
+                logger.warn { "Only ${SpektorContentType.entries.map { it.mediaType }} are supported, but present $keys" }
+                null
             }
-
-            return ResolvedContent(SpektorContentType.TEXT_PLAIN, resolved)
         }
+    }
 
-        logger.warn { "Only ${SpektorContentType.entries.map { it.mediaType }} are supported, but present $keys" }
-        return null
+    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent? {
+        return typeResolver.resolve(schema)?.let { ResolvedContent(SpektorContentType.JSON, it) }
+    }
+
+    private fun resolveTextPlainContent(schema: Schema<*>): ResolvedContent? {
+        val resolved = typeResolver.resolve(schema) ?: return null
+        if (resolved != SpektorType.MicroType.StringMicroType(SpektorType.MicroType.StringFormat.PLAIN)) {
+            logger.warn { "Only plain string schema is supported for ${SpektorContentType.TEXT_PLAIN.mediaType}, but got $resolved" }
+            return null
+        }
+        return ResolvedContent(SpektorContentType.TEXT_PLAIN, resolved)
     }
 
     enum class ParameterLocation(val value: String) {

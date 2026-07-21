@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import io.github.vooft.spektor.codegen.SpektorCodegenContext
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.codegen.common.TypeAndClass
+import io.github.vooft.spektor.model.SpektorContentType
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
@@ -76,11 +77,20 @@ class SpektorRouteCodegen(
                     // reading request body
                     val requestBody = path.requestBody
                     if (requestBody != null) {
+                        val isTextPlain = path.requestBodyContentType == SpektorContentType.TEXT_PLAIN
                         if (requestBody.required) {
-                            add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                            if (isTextPlain) {
+                                add("  val request = call.receiveText()\n")
+                            } else {
+                                add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                            }
                         } else {
                             add("  val request = if ((call.request.contentLength() ?: 0) > 0) {\n")
-                            add("    call.receiveNullable<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                            if (isTextPlain) {
+                                add("    call.receiveText()\n")
+                            } else {
+                                add("    call.receiveNullable<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
+                            }
                             add("  } else {\n")
                             add("    null\n")
                             add("  }\n")
@@ -115,10 +125,15 @@ class SpektorRouteCodegen(
                         for (response in path.responses) {
                             val nestedClassName = ResponseStatusClassNameGenerator.generate(response.statusCode)
                             val qualifiedName = serverApiClassName.nestedClass(responseInterfaceName).nestedClass(nestedClassName)
-                            if (response.body != null) {
-                                add("    is %T -> call.respond(response.statusCode, response.body)\n", qualifiedName)
-                            } else {
-                                add("    is %T -> call.respond(response.statusCode)\n", qualifiedName)
+                            when {
+                                response.body == null -> add("    is %T -> call.respond(response.statusCode)\n", qualifiedName)
+                                response.contentType == SpektorContentType.TEXT_PLAIN -> add(
+                                    "    is %T -> call.respondText(text = response.body, contentType = %T.Text.Plain, status = response.statusCode)\n",
+                                    qualifiedName,
+                                    KTOR_CONTENT_TYPE_TYPENAME,
+                                )
+
+                                else -> add("    is %T -> call.respond(response.statusCode, response.body)\n", qualifiedName)
                             }
                         }
                         add("  }\n")
@@ -283,6 +298,7 @@ class SpektorRouteCodegen(
         private val KTOR_BAD_REQUEST_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "BadRequestException")
         private val KTOR_PARAMETER_CONVERSION_EXCEPTION_CLASS = ClassName("io.ktor.server.plugins", "ParameterConversionException")
         private val KTOR_HTTP_STATUS_CODE_TYPENAME = ClassName("io.ktor.http", "HttpStatusCode")
+        private val KTOR_CONTENT_TYPE_TYPENAME = ClassName("io.ktor.http", "ContentType")
 
         private const val API_SERVICE_FIELD = "apiService"
 
@@ -292,8 +308,10 @@ class SpektorRouteCodegen(
 
         private val KTOR_RECEIVE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receive")
         private val KTOR_RECEIVE_NULLABLE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveNullable")
+        private val KTOR_RECEIVE_TEXT_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveText")
         private val KTOR_CONTENT_LENGTH_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "contentLength")
         private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
+        private val KTOR_RESPOND_TEXT_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respondText")
 
         /**
          * Required for ktor 2.x versions
@@ -304,8 +322,10 @@ class SpektorRouteCodegen(
             addAll(KTOR_METHOD_IMPORTS)
             add(KTOR_RECEIVE_METHOD_IMPORT)
             add(KTOR_RECEIVE_NULLABLE_METHOD_IMPORT)
+            add(KTOR_RECEIVE_TEXT_METHOD_IMPORT)
             add(KTOR_CONTENT_LENGTH_METHOD_IMPORT)
             add(KTOR_RESPOND_METHOD_IMPORT)
+            add(KTOR_RESPOND_TEXT_METHOD_IMPORT)
             add(KTOR_CALL_EXTENSION_IMPORT)
         }
 

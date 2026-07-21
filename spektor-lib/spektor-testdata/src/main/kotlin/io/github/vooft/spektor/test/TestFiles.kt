@@ -19,6 +19,8 @@ object TestFiles {
     val queryParamRefFile: Path = rootPath.resolve("api/query-param-ref.yaml")
     val listOwnerFile: Path = rootPath.resolve("api/list-owner.yaml")
     val plainPricesApiFile: Path = rootPath.resolve("api/plain-prices.yaml")
+    val pingApiFile: Path = rootPath.resolve("api/ping.yaml")
+    val echoApiFile: Path = rootPath.resolve("api/echo.yaml")
 
     /**
      * Models

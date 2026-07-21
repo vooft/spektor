@@ -1,0 +1,40 @@
+openapi: 3.1.0
+info:
+  title: Echo API
+  version: 1.0.0
+paths:
+  /echo:
+    post:
+      tags:
+        - Echo
+      operationId: echo
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        200:
+          description: Echoed text is returned
+          content:
+            text/plain:
+              schema:
+                type: string
+  /echo/optional:
+    post:
+      tags:
+        - Echo
+      operationId: echoOptional
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        200:
+          description: Echoed text is returned
+          content:
+            text/plain:
+              schema:
+                type: string

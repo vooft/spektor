@@ -5,6 +5,7 @@ data class SpektorPath(
     val operationId: String,
     val path: String,
     val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
+    val requestBodyContentType: SpektorContentType = SpektorContentType.JSON,
     val responses: List<Response>,
     val pathVariables: List<PathVariable>,
     val queryVariables: List<QueryVariable>,
@@ -13,6 +14,7 @@ data class SpektorPath(
     data class Response(
         val statusCode: Int,
         val body: SpektorType.RequiredWrapper<SpektorType>?,
+        val contentType: SpektorContentType = SpektorContentType.JSON,
     )
 
     init {

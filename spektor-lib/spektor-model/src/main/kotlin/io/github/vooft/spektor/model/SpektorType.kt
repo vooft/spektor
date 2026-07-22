@@ -22,7 +22,7 @@ sealed interface SpektorType {
     }
 
     data class Ref(val file: Path, val modelName: String) : QueryVariableType, PathVariableType
-    
+
     data object Multipart : SpektorType
 
     data object Binary : SpektorType

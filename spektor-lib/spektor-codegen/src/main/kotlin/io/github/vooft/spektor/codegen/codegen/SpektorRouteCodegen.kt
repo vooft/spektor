@@ -77,28 +77,7 @@ class SpektorRouteCodegen(
                     // reading request body
                     val requestBody = path.requestBody
                     if (requestBody != null) {
-                        val isTextPlain = path.requestBodyContentType == SpektorContentType.TEXT_PLAIN
-                        val isMultipart = path.requestBodyContentType == SpektorContentType.MULTIPART_FORM_DATA
-                        if (isMultipart) {
-                            require(requestBody.required) { "Multipart request body must be required in operation ${path.operationId}" }
-                            add("  val request = call.receiveMultipart()\n")
-                        } else if (requestBody.required) {
-                            if (isTextPlain) {
-                                add("  val request = call.receiveText()\n")
-                            } else {
-                                add("  val request = call.receive<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
-                            }
-                        } else {
-                            add("  val request = if ((call.request.contentLength() ?: 0) > 0) {\n")
-                            if (isTextPlain) {
-                                add("    call.receiveText()\n")
-                            } else {
-                                add("    call.receiveNullable<%T>()\n", context.resolvedTypes.getValue(requestBody.type))
-                            }
-                            add("  } else {\n")
-                            add("    null\n")
-                            add("  }\n")
-                        }
+                        addRequestBody(path, requestBody)
                     }
 
                     // adding actual call
@@ -148,6 +127,36 @@ class SpektorRouteCodegen(
                 .build()
         )
         .build()
+
+    private fun CodeBlock.Builder.addRequestBody(path: SpektorPath, requestBody: SpektorType.RequiredWrapper<SpektorType>) {
+        val receiveCall = receiveCall(path, requestBody)
+        if (requestBody.required) {
+            add("  val request = %L\n", receiveCall)
+        } else {
+            add("  val request = if ((call.request.contentLength() ?: 0) > 0) {\n")
+            add("    %L\n", receiveCall)
+            add("  } else {\n")
+            add("    null\n")
+            add("  }\n")
+        }
+    }
+
+    private fun receiveCall(path: SpektorPath, requestBody: SpektorType.RequiredWrapper<SpektorType>): CodeBlock =
+        when (path.requestBodyContentType) {
+            SpektorContentType.MULTIPART_FORM_DATA -> {
+                require(requestBody.required) { "Multipart request body must be required in operation ${path.operationId}" }
+                CodeBlock.of("call.receiveMultipart()")
+            }
+
+            SpektorContentType.TEXT_PLAIN -> CodeBlock.of("call.receiveText()")
+
+            SpektorContentType.JSON,
+            SpektorContentType.BINARY -> if (requestBody.required) {
+                CodeBlock.of("call.receive<%T>()", context.resolvedTypes.getValue(requestBody.type))
+            } else {
+                CodeBlock.of("call.receiveNullable<%T>()", context.resolvedTypes.getValue(requestBody.type))
+            }
+        }
 
     private fun CodeBlock.Builder.addPathVariable(pathVariable: SpektorPath.PathVariable) {
         add(

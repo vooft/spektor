@@ -29,7 +29,7 @@ class MultipartRestService : MultipartServerApi {
 
                 else -> Unit
             }
-            part.dispose()
+            part.release()
         }
 
         return UploadFileResponse.ok(

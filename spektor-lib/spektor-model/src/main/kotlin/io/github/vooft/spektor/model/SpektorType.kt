@@ -22,15 +22,9 @@ sealed interface SpektorType {
     }
 
     data class Ref(val file: Path, val modelName: String) : QueryVariableType, PathVariableType
-
-    /**
-     * Marker for a multipart/form-data request body, the schema itself is not resolved.
-     */
+    
     data object Multipart : SpektorType
 
-    /**
-     * Marker for a binary request body of any media type, the schema itself is not resolved.
-     */
     data object Binary : SpektorType
 
     data class Enum(val values: List<String>) : SpektorType

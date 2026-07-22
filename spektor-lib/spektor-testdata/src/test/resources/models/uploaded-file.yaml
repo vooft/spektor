@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info:
+  title: UploadedFile Models
+  version: 1.0.0
+paths: { }
+components:
+  schemas:
+    UploadedFile:
+      type: object
+      required:
+        - name
+        - size
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+          format: int64
+        description:
+          type: string

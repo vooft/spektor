@@ -21,6 +21,8 @@ object TestFiles {
     val plainPricesApiFile: Path = rootPath.resolve("api/plain-prices.yaml")
     val pingApiFile: Path = rootPath.resolve("api/ping.yaml")
     val echoApiFile: Path = rootPath.resolve("api/echo.yaml")
+    val multipartApiFile: Path = rootPath.resolve("api/multipart.yaml")
+    val imageApiFile: Path = rootPath.resolve("api/image.yaml")
 
     /**
      * Models
@@ -34,4 +36,5 @@ object TestFiles {
     val ownerModelFile: Path = rootPath.resolve("models/owner.yaml")
     val listEventFile: Path = rootPath.resolve("api/list-event.yaml")
     val eventModelFile: Path = rootPath.resolve("models/event.yaml")
+    val uploadedFileModelFile: Path = rootPath.resolve("models/uploaded-file.yaml")
 }

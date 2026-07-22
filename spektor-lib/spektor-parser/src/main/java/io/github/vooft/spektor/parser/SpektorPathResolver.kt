@@ -20,12 +20,14 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private val operationIdCounter = AtomicInteger()
 
     fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath {
-        val requestContent = operation.requestBody?.content?.findContent()
+        val requestContent = operation.requestBody?.content?.findContent(isRequestBody = true)
         return SpektorPath(
             tagAndFile = TagAndFile(operation.resolveTag(), file),
             operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
             path = path,
-            requestBody = requestContent?.let { SpektorType.RequiredWrapper(it.type, operation.requestBody?.required ?: false) },
+            requestBody = requestContent?.let {
+                SpektorType.RequiredWrapper(it.type, it.resolveRequired(operation))
+            },
             requestBodyContentType = requestContent?.contentType ?: SpektorContentType.JSON,
             responses = operation.responses?.responses() ?: emptyList(),
             pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
@@ -65,6 +67,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     is SpektorType.Enum,
                     is SpektorType.OneOf,
                     is SpektorType.Array,
+                    is SpektorType.Multipart,
+                    is SpektorType.Binary,
                     is SpektorType.Object -> {
                         logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
                         null
@@ -92,6 +96,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
                     is SpektorType.Enum,
                     is SpektorType.OneOf,
+                    is SpektorType.Multipart,
+                    is SpektorType.Binary,
                     is SpektorType.Object -> {
                         logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
                         null
@@ -125,23 +131,68 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
     private data class ResolvedContent(val contentType: SpektorContentType, val type: SpektorType)
 
-    private fun Content.findContent(): ResolvedContent? {
-        val jsonSchema = get(SpektorContentType.JSON.mediaType)?.schema
-        val textPlainSchema = get(SpektorContentType.TEXT_PLAIN.mediaType)?.schema
+    private fun ResolvedContent.resolveRequired(operation: Operation): Boolean {
+        val required = operation.requestBody?.required ?: false
+        if (contentType == SpektorContentType.MULTIPART_FORM_DATA && !required) {
+            logger.warn {
+                "Optional ${SpektorContentType.MULTIPART_FORM_DATA.mediaType} request body is not supported " +
+                    "in operation ${operation.operationId}, treating as required"
+            }
+            return true
+        }
+        return required
+    }
+
+    private fun Content.findContent(isRequestBody: Boolean = false): ResolvedContent? {
+        val jsonSchema = findSchema(SpektorContentType.JSON)
+        val textPlainSchema = findSchema(SpektorContentType.TEXT_PLAIN)
+        val multipartSchema = findSchema(SpektorContentType.MULTIPART_FORM_DATA)
+        val binarySchema = values.firstOrNull { it.schema.isBinarySchema() }?.schema
 
         return when {
             isEmpty() -> null
             jsonSchema != null -> resolveJsonContent(jsonSchema)
             textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
+            multipartSchema != null || binarySchema != null -> {
+                if (!isRequestBody) {
+                    logger.warn {
+                        "${SpektorContentType.MULTIPART_FORM_DATA.mediaType} and binary content types " +
+                            "are only supported in request bodies, skipping $keys"
+                    }
+                    null
+                } else if (multipartSchema != null) {
+                    resolveMultipartContent(multipartSchema)
+                } else {
+                    ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
+                }
+            }
+
             else -> {
-                logger.warn { "Only ${SpektorContentType.entries.map { it.mediaType }} are supported, but present $keys" }
+                logger.warn {
+                    "Only ${SpektorContentType.entries.mapNotNull { it.mediaType }} and binary bodies " +
+                        "(schema with 'format: $BINARY_FORMAT' or 'contentMediaType') are supported, but present $keys"
+                }
                 null
             }
         }
     }
 
-    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent? {
-        return typeResolver.resolve(schema)?.let { ResolvedContent(SpektorContentType.JSON, it) }
+    private fun Content.findSchema(contentType: SpektorContentType): Schema<*>? = contentType.mediaType?.let { get(it) }?.schema
+
+    private fun Schema<*>?.isBinarySchema(): Boolean = this != null && (format == BINARY_FORMAT || contentMediaType != null)
+
+    private fun resolveMultipartContent(schema: Schema<*>): ResolvedContent {
+        if (schema.types?.singleOrNull() != OBJECT_TYPE) {
+            logger.warn {
+                "Expected '$OBJECT_TYPE' schema for ${SpektorContentType.MULTIPART_FORM_DATA.mediaType}, " +
+                    "but got ${schema.types}, schema is not validated"
+            }
+        }
+        return ResolvedContent(SpektorContentType.MULTIPART_FORM_DATA, SpektorType.Multipart)
+    }
+
+    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent? = typeResolver.resolve(schema)?.let {
+        ResolvedContent(SpektorContentType.JSON, it)
     }
 
     private fun resolveTextPlainContent(schema: Schema<*>): ResolvedContent? {
@@ -164,5 +215,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         private val logger = KotlinLogging.logger { }
         private const val TAG_PLACEHOLDER = "SpektorDefault"
         private const val OPERATION_PLACEHOLDER = "DoOperation"
+        private const val BINARY_FORMAT = "binary"
+        private const val OBJECT_TYPE = "object"
     }
 }

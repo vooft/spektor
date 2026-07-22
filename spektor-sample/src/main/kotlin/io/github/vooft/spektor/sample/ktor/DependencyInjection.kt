@@ -4,6 +4,8 @@ import io.github.vooft.spektor.sample.apis.AuthorRestService
 import io.github.vooft.spektor.sample.apis.BookRestService
 import io.github.vooft.spektor.sample.apis.EchoRestService
 import io.github.vooft.spektor.sample.apis.EventRestService
+import io.github.vooft.spektor.sample.apis.ImageRestService
+import io.github.vooft.spektor.sample.apis.MultipartRestService
 import io.github.vooft.spektor.sample.apis.NotificationRestService
 import io.github.vooft.spektor.sample.apis.OwnerRestService
 import io.github.vooft.spektor.sample.apis.PingRestService
@@ -15,6 +17,8 @@ import spektor.example.api.author.AuthorRoutes
 import spektor.example.api.book.BookRoutes
 import spektor.example.api.echo.EchoRoutes
 import spektor.example.api.event.EventRoutes
+import spektor.example.api.image.ImageRoutes
+import spektor.example.api.multipart.MultipartRoutes
 import spektor.example.api.notification.NotificationRoutes
 import spektor.example.api.owner.OwnerRoutes
 import spektor.example.api.ping.PingRoutes
@@ -31,6 +35,8 @@ fun Application.configureDependencyInjection() {
         provide { NotificationRestService() }
         provide { PingRestService() }
         provide { EchoRestService() }
+        provide { MultipartRestService() }
+        provide { ImageRestService() }
 
         provide { AuthorRoutes(resolve()) }
         provide { BookRoutes(resolve()) }
@@ -39,5 +45,7 @@ fun Application.configureDependencyInjection() {
         provide { NotificationRoutes(resolve()) }
         provide { PingRoutes(resolve()) }
         provide { EchoRoutes(resolve()) }
+        provide { MultipartRoutes(resolve()) }
+        provide { ImageRoutes(resolve()) }
     }
 }

@@ -2,6 +2,7 @@ package io.github.vooft.spektor.codegen.codegen
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.BOOLEAN
+import com.squareup.kotlinpoet.BYTE_ARRAY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
@@ -61,6 +62,8 @@ class SpektorTypeCodegen(
             is SpektorType.Object.WithProperties -> error("Generating object directly is not supported $type")
             is SpektorType.Enum -> error("Generating enum directly is not supported $type")
             is SpektorType.OneOf -> error("Generating oneOf directly is not supported $type")
+            is SpektorType.Multipart -> MULTIPART_DATA_CLASS
+            is SpektorType.Binary -> BYTE_ARRAY
             is SpektorType.Ref -> generateRef(type)
         }.also { context.resolvedTypes[type] = it }
     }
@@ -121,6 +124,8 @@ class SpektorTypeCodegen(
             is SpektorType.MicroType,
             is SpektorType.Object.AdditionalProperties,
             is SpektorType.Object.FreeForm,
+            is SpektorType.Multipart,
+            is SpektorType.Binary,
             is SpektorType.Ref -> error(
                 "Only object with properties, enum, and oneOf references are supported, but got $target for ref $lastRef"
             )
@@ -159,5 +164,6 @@ class SpektorTypeCodegen(
     companion object {
         private val JSON_OBJECT_CLASS = ClassName("kotlinx.serialization.json", "JsonObject")
         private val CONTEXTUAL_ANNOTATION = ClassName("kotlinx.serialization", "Contextual")
+        private val MULTIPART_DATA_CLASS = ClassName("io.ktor.http.content", "MultiPartData")
     }
 }

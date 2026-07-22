@@ -78,7 +78,11 @@ class SpektorRouteCodegen(
                     val requestBody = path.requestBody
                     if (requestBody != null) {
                         val isTextPlain = path.requestBodyContentType == SpektorContentType.TEXT_PLAIN
-                        if (requestBody.required) {
+                        val isMultipart = path.requestBodyContentType == SpektorContentType.MULTIPART_FORM_DATA
+                        if (isMultipart) {
+                            require(requestBody.required) { "Multipart request body must be required in operation ${path.operationId}" }
+                            add("  val request = call.receiveMultipart()\n")
+                        } else if (requestBody.required) {
                             if (isTextPlain) {
                                 add("  val request = call.receiveText()\n")
                             } else {
@@ -234,6 +238,8 @@ class SpektorRouteCodegen(
         is SpektorType.Ref -> context.refs[type]?.let { typeNameForConversion(it) } ?: type.modelName
         is SpektorType.Object,
         is SpektorType.OneOf,
+        is SpektorType.Multipart,
+        is SpektorType.Binary,
         is SpektorType.Array -> error("Unsupported type for conversion: $type")
     }
 
@@ -272,6 +278,8 @@ class SpektorRouteCodegen(
                     is SpektorType.Object,
                     is SpektorType.OneOf,
                     is SpektorType.Array,
+                    is SpektorType.Multipart,
+                    is SpektorType.Binary,
                     is SpektorType.Ref,
                     null -> error("Parsing from string is not supported for $type which refers to $spektorType")
                 }
@@ -289,6 +297,8 @@ class SpektorRouteCodegen(
 
             is SpektorType.Object,
             is SpektorType.OneOf,
+            is SpektorType.Multipart,
+            is SpektorType.Binary,
             is SpektorType.Array -> error("Parsing from string is not supported for $type")
         }
     }
@@ -309,6 +319,7 @@ class SpektorRouteCodegen(
         private val KTOR_RECEIVE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receive")
         private val KTOR_RECEIVE_NULLABLE_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveNullable")
         private val KTOR_RECEIVE_TEXT_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveText")
+        private val KTOR_RECEIVE_MULTIPART_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "receiveMultipart")
         private val KTOR_CONTENT_LENGTH_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "contentLength")
         private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
         private val KTOR_RESPOND_TEXT_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respondText")
@@ -323,6 +334,7 @@ class SpektorRouteCodegen(
             add(KTOR_RECEIVE_METHOD_IMPORT)
             add(KTOR_RECEIVE_NULLABLE_METHOD_IMPORT)
             add(KTOR_RECEIVE_TEXT_METHOD_IMPORT)
+            add(KTOR_RECEIVE_MULTIPART_METHOD_IMPORT)
             add(KTOR_CONTENT_LENGTH_METHOD_IMPORT)
             add(KTOR_RESPOND_METHOD_IMPORT)
             add(KTOR_RESPOND_TEXT_METHOD_IMPORT)

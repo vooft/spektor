@@ -18,16 +18,18 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private val contentResolver = SpektorContentResolver(typeResolver)
     private val operationIdCounter = AtomicInteger()
 
-    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
-        tagAndFile = TagAndFile(operation.resolveTag(), file),
-        operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
-        path = path,
-        requestBody = operation.resolveRequestBody(),
-        responses = operation.responses?.responses() ?: emptyList(),
-        pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
-        queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
-        method = method
-    )
+    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath {
+        return SpektorPath(
+            tagAndFile = TagAndFile(operation.resolveTag(), file),
+            operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
+            path = path,
+            requestBody = operation.resolveRequestBody(),
+            responses = operation.responses?.responses() ?: emptyList(),
+            pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
+            queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
+            method = method
+        )
+    }
 
     private fun Operation.resolveTag(): String {
         val tagsVal = this.tags ?: return TAG_PLACEHOLDER
@@ -124,7 +126,10 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
     private fun Operation.resolveRequestBody(): SpektorPath.RequestBody? {
         val content = requestBody?.content ?: return null
-        val resolved = contentResolver.resolve(content, isRequestBody = true) ?: return null
+        val resolved = contentResolver.resolve(
+            content = content,
+            isRequestBody = true,
+        ) ?: return null
         return SpektorPath.RequestBody(
             type = resolved.type,
             required = resolved.resolveRequired(this),
@@ -137,8 +142,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         contentType != SpektorContentType.MULTIPART_FORM_DATA -> false
         else -> {
             logger.warn {
-                "Optional ${contentType.mediaType} request body is not supported " +
-                    "in operation ${operation.operationId}, treating as required"
+                "Optional ${contentType.mediaType} request body is not supported in operation ${operation.operationId}, treating as required"
             }
             true
         }

@@ -18,19 +18,16 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private val contentResolver = SpektorContentResolver(typeResolver)
     private val operationIdCounter = AtomicInteger()
 
-    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath {
-        val requestContent = operation.requestBody?.content?.let { contentResolver.resolve(it, isRequestBody = true) }
-        return SpektorPath(
-            tagAndFile = TagAndFile(operation.resolveTag(), file),
-            operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
-            path = path,
-            requestBody = requestContent?.toRequestBody(operation),
-            responses = operation.responses?.responses() ?: emptyList(),
-            pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
-            queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
-            method = method
-        )
-    }
+    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
+        tagAndFile = TagAndFile(operation.resolveTag(), file),
+        operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
+        path = path,
+        requestBody = operation.resolveRequestBody(),
+        responses = operation.responses?.responses() ?: emptyList(),
+        pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
+        queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
+        method = method
+    )
 
     private fun Operation.resolveTag(): String {
         val tagsVal = this.tags ?: return TAG_PLACEHOLDER
@@ -125,8 +122,15 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         )
     }
 
-    private fun SpektorContentResolver.ResolvedContent.toRequestBody(operation: Operation): SpektorPath.RequestBody =
-        SpektorPath.RequestBody(type = type, required = resolveRequired(operation), contentType = contentType)
+    private fun Operation.resolveRequestBody(): SpektorPath.RequestBody? {
+        val content = requestBody?.content ?: return null
+        val resolved = contentResolver.resolve(content, isRequestBody = true) ?: return null
+        return SpektorPath.RequestBody(
+            type = resolved.type,
+            required = resolved.resolveRequired(this),
+            contentType = resolved.contentType,
+        )
+    }
 
     private fun SpektorContentResolver.ResolvedContent.resolveRequired(operation: Operation): Boolean = when {
         operation.requestBody?.required == true -> true

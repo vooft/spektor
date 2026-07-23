@@ -20,10 +20,19 @@ class SpektorParserBinaryTest {
     }
 
     @Test
-    fun `should parse octet stream binary format request body`() {
+    fun `should ignore legacy binary format request body`() {
         val schema = parser.parse(listOf(imageApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "uploadImageRaw" }
+        path.requestBody shouldBe null
+        path.requestBodyContentType shouldBe SpektorContentType.JSON
+    }
+
+    @Test
+    fun `should parse wildcard media type without schema as binary request body`() {
+        val schema = parser.parse(listOf(imageApiFile))
+
+        val path = schema.paths.values.single().single { it.operationId == "uploadImageAny" }
         path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Binary, true)
         path.requestBodyContentType shouldBe SpektorContentType.BINARY
     }

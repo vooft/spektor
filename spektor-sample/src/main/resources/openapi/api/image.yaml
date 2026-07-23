@@ -11,9 +11,7 @@ paths:
       requestBody:
         required: true
         content:
-          image/png:
-            schema:
-              contentMediaType: image/png
+          image/*: { }
       responses:
         200:
           description: Uploaded image info

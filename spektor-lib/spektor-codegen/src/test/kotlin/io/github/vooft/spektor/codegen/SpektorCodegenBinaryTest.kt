@@ -28,7 +28,7 @@ class SpektorCodegenBinaryTest {
             .single { it.className.simpleName == "ImageServerApi" }
             .type
 
-        for (operationId in listOf("uploadImage", "uploadImageRaw")) {
+        for (operationId in listOf("uploadImage", "uploadImageAny")) {
             val parameter = serverApiType.funSpecs
                 .single { it.name == operationId }
                 .parameters

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 class ImageTest {
 
     @Test
-    fun `should upload binary image`() = testClient("user") {
+    fun `should upload png image`() = testClient("user") {
         val response = client.post("/images") {
             contentType(ContentType.Image.PNG)
             setBody(byteArrayOf(1, 2, 3))
@@ -27,5 +27,19 @@ class ImageTest {
         val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
         body.getValue("name").jsonPrimitive.content shouldBe "image/png"
         body.getValue("size").jsonPrimitive.long shouldBe 3L
+    }
+
+    @Test
+    fun `should upload jpeg image`() = testClient("user") {
+        val response = client.post("/images") {
+            contentType(ContentType.Image.JPEG)
+            setBody(byteArrayOf(1, 2, 3, 4))
+        }
+
+        response.status shouldBe HttpStatusCode.OK
+
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        body.getValue("name").jsonPrimitive.content shouldBe "image/jpeg"
+        body.getValue("size").jsonPrimitive.long shouldBe 4L
     }
 }

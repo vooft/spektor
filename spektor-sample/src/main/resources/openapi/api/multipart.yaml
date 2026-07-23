@@ -28,3 +28,32 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'
+  /files/batch:
+    post:
+      tags:
+        - Multipart
+      operationId: uploadFiles
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - files
+              properties:
+                files:
+                  type: array
+                  description: Document files, each part's filename becomes the document name
+                  items:
+                    type: string
+                    contentMediaType: application/octet-stream
+      responses:
+        200:
+          description: Uploaded files info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'

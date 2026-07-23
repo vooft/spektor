@@ -8,6 +8,7 @@ import io.ktor.utils.io.readRemaining
 import kotlinx.io.readByteArray
 import spektor.example.api.multipart.MultipartServerApi
 import spektor.example.api.multipart.MultipartServerApi.UploadFileResponse
+import spektor.example.api.multipart.MultipartServerApi.UploadFilesResponse
 import spektor.example.models.uploadedfile.UploadedFileDto
 
 class MultipartRestService : MultipartServerApi {
@@ -39,5 +40,22 @@ class MultipartRestService : MultipartServerApi {
                 description = description,
             )
         )
+    }
+
+    override suspend fun uploadFiles(request: MultiPartData, call: ApplicationCall): UploadFilesResponse {
+        val files = mutableListOf<UploadedFileDto>()
+
+        request.forEachPart { part ->
+            if (part is PartData.FileItem && part.name == "files") {
+                files += UploadedFileDto(
+                    name = part.originalFileName ?: "unknown",
+                    size = part.provider().readRemaining().readByteArray().size.toLong(),
+                    description = null,
+                )
+            }
+            part.release()
+        }
+
+        return UploadFilesResponse.ok(files)
     }
 }

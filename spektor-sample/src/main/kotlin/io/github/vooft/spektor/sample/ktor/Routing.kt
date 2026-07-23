@@ -31,6 +31,7 @@ fun Application.configureRouting() {
         pingRoutes.ping()
         echoRoutes.echo()
         multipartRoutes.uploadFile()
+        multipartRoutes.uploadFiles()
         imageRoutes.uploadPng()
         imageRoutes.uploadAnyImage()
         documentRoutes.uploadDocument()

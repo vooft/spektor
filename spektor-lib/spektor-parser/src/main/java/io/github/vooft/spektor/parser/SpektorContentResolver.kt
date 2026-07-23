@@ -21,18 +21,21 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
             content.isEmpty() -> null
             jsonSchema != null -> resolveJsonContent(jsonSchema)
             textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
-            multipartSchema != null || hasBinaryContent -> {
-                if (!isRequestBody) {
-                    logger.warn {
-                        "${SpektorContentType.MULTIPART_FORM_DATA.mediaType} and binary content types " +
-                            "are only supported in request bodies, skipping ${content.keys}"
-                    }
-                    null
-                } else if (multipartSchema != null) {
-                    resolveMultipartContent(multipartSchema)
-                } else {
-                    ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
+            multipartSchema != null -> if (isRequestBody) {
+                resolveMultipartContent(multipartSchema)
+            } else {
+                logger.warn {
+                    "${SpektorContentType.MULTIPART_FORM_DATA.mediaType} is only supported in request bodies, " +
+                        "skipping ${content.keys}"
                 }
+                null
+            }
+
+            hasBinaryContent -> if (isRequestBody) {
+                ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
+            } else {
+                logger.warn { "Binary content is only supported in request bodies, skipping ${content.keys}" }
+                null
             }
 
             else -> {

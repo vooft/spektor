@@ -25,7 +25,6 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
             operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
             path = path,
             requestBody = requestContent?.toRequestBody(operation),
-            requestBodyContentType = requestContent?.contentType ?: SpektorContentType.JSON,
             responses = operation.responses?.responses() ?: emptyList(),
             pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
             queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
@@ -126,8 +125,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         )
     }
 
-    private fun SpektorContentResolver.ResolvedContent.toRequestBody(operation: Operation): SpektorType.RequiredWrapper<SpektorType> =
-        SpektorType.RequiredWrapper(type, resolveRequired(operation))
+    private fun SpektorContentResolver.ResolvedContent.toRequestBody(operation: Operation): SpektorPath.RequestBody =
+        SpektorPath.RequestBody(type = type, required = resolveRequired(operation), contentType = contentType)
 
     private fun SpektorContentResolver.ResolvedContent.resolveRequired(operation: Operation): Boolean = when {
         operation.requestBody?.required == true -> true

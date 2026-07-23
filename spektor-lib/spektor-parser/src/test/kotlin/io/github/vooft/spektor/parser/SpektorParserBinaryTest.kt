@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.parser
 
 import io.github.vooft.spektor.model.SpektorContentType
+import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.test.TestFiles.imageApiFile
 import io.kotest.matchers.shouldBe
@@ -15,8 +16,7 @@ class SpektorParserBinaryTest {
         val schema = parser.parse(listOf(imageApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "uploadImage" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Binary, true)
-        path.requestBodyContentType shouldBe SpektorContentType.BINARY
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Binary, true, SpektorContentType.BINARY)
     }
 
     @Test
@@ -24,7 +24,6 @@ class SpektorParserBinaryTest {
         val schema = parser.parse(listOf(imageApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "uploadImageAny" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Binary, true)
-        path.requestBodyContentType shouldBe SpektorContentType.BINARY
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Binary, true, SpektorContentType.BINARY)
     }
 }

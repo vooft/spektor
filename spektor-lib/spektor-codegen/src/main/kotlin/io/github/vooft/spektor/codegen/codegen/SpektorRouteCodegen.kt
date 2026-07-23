@@ -128,7 +128,7 @@ class SpektorRouteCodegen(
         )
         .build()
 
-    private fun CodeBlock.Builder.addRequestBody(path: SpektorPath, requestBody: SpektorType.RequiredWrapper<SpektorType>) {
+    private fun CodeBlock.Builder.addRequestBody(path: SpektorPath, requestBody: SpektorPath.RequestBody) {
         val receiveCall = receiveCall(path, requestBody)
         if (requestBody.required) {
             add("  val request = %L\n", receiveCall)
@@ -141,22 +141,21 @@ class SpektorRouteCodegen(
         }
     }
 
-    private fun receiveCall(path: SpektorPath, requestBody: SpektorType.RequiredWrapper<SpektorType>): CodeBlock =
-        when (path.requestBodyContentType) {
-            SpektorContentType.MULTIPART_FORM_DATA -> {
-                require(requestBody.required) { "Multipart request body must be required in operation ${path.operationId}" }
-                CodeBlock.of("call.receiveMultipart()")
-            }
-
-            SpektorContentType.TEXT_PLAIN -> CodeBlock.of("call.receiveText()")
-
-            SpektorContentType.JSON,
-            SpektorContentType.BINARY -> if (requestBody.required) {
-                CodeBlock.of("call.receive<%T>()", context.resolvedTypes.getValue(requestBody.type))
-            } else {
-                CodeBlock.of("call.receiveNullable<%T>()", context.resolvedTypes.getValue(requestBody.type))
-            }
+    private fun receiveCall(path: SpektorPath, requestBody: SpektorPath.RequestBody): CodeBlock = when (requestBody.contentType) {
+        SpektorContentType.MULTIPART_FORM_DATA -> {
+            require(requestBody.required) { "Multipart request body must be required in operation ${path.operationId}" }
+            CodeBlock.of("call.receiveMultipart()")
         }
+
+        SpektorContentType.TEXT_PLAIN -> CodeBlock.of("call.receiveText()")
+
+        SpektorContentType.JSON,
+        SpektorContentType.BINARY -> if (requestBody.required) {
+            CodeBlock.of("call.receive<%T>()", context.resolvedTypes.getValue(requestBody.type))
+        } else {
+            CodeBlock.of("call.receiveNullable<%T>()", context.resolvedTypes.getValue(requestBody.type))
+        }
+    }
 
     private fun CodeBlock.Builder.addPathVariable(pathVariable: SpektorPath.PathVariable) {
         add(

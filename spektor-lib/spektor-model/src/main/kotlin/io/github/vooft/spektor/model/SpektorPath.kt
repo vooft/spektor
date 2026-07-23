@@ -4,13 +4,18 @@ data class SpektorPath(
     val tagAndFile: TagAndFile,
     val operationId: String,
     val path: String,
-    val requestBody: SpektorType.RequiredWrapper<SpektorType>?,
-    val requestBodyContentType: SpektorContentType = SpektorContentType.JSON,
+    val requestBody: RequestBody?,
     val responses: List<Response>,
     val pathVariables: List<PathVariable>,
     val queryVariables: List<QueryVariable>,
     val method: Method,
 ) {
+    data class RequestBody(
+        val type: SpektorType,
+        val required: Boolean,
+        val contentType: SpektorContentType = SpektorContentType.JSON,
+    )
+
     data class Response(
         val statusCode: Int,
         val body: SpektorType.RequiredWrapper<SpektorType>?,

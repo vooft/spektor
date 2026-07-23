@@ -43,8 +43,7 @@ class SpektorParserTextPlainTest {
         val schema = parser.parse(listOf(echoApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "echo" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(StringMicroType(StringFormat.PLAIN), true)
-        path.requestBodyContentType shouldBe SpektorContentType.TEXT_PLAIN
+        path.requestBody shouldBe SpektorPath.RequestBody(StringMicroType(StringFormat.PLAIN), true, SpektorContentType.TEXT_PLAIN)
     }
 
     @Test
@@ -52,7 +51,6 @@ class SpektorParserTextPlainTest {
         val schema = parser.parse(listOf(echoApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "echoOptional" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(StringMicroType(StringFormat.PLAIN), false)
-        path.requestBodyContentType shouldBe SpektorContentType.TEXT_PLAIN
+        path.requestBody shouldBe SpektorPath.RequestBody(StringMicroType(StringFormat.PLAIN), false, SpektorContentType.TEXT_PLAIN)
     }
 }

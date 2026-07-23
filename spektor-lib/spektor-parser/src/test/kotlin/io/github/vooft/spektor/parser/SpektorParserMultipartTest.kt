@@ -1,6 +1,7 @@
 package io.github.vooft.spektor.parser
 
 import io.github.vooft.spektor.model.SpektorContentType
+import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.test.TestFiles.multipartApiFile
 import io.kotest.matchers.collections.shouldContainExactly
@@ -16,8 +17,7 @@ class SpektorParserMultipartTest {
         val schema = parser.parse(listOf(multipartApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "uploadFile" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Multipart, true)
-        path.requestBodyContentType shouldBe SpektorContentType.MULTIPART_FORM_DATA
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Multipart, true, SpektorContentType.MULTIPART_FORM_DATA)
     }
 
     @Test
@@ -25,8 +25,7 @@ class SpektorParserMultipartTest {
         val schema = parser.parse(listOf(multipartApiFile))
 
         val path = schema.paths.values.single().single { it.operationId == "uploadFileOptional" }
-        path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Multipart, true)
-        path.requestBodyContentType shouldBe SpektorContentType.MULTIPART_FORM_DATA
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Multipart, true, SpektorContentType.MULTIPART_FORM_DATA)
     }
 
     @Test

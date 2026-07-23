@@ -19,3 +19,19 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'
+  /images/any:
+    post:
+      tags:
+        - Image
+      operationId: uploadAny
+      requestBody:
+        required: true
+        content:
+          '*/*': { }
+      responses:
+        200:
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'

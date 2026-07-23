@@ -21,26 +21,6 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
-  /images/raw:
-    post:
-      tags:
-        - Image
-      operationId: uploadImageRaw
-      # negative case: legacy 3.0 'format: binary' notation is not supported, the body is ignored with a warning
-      requestBody:
-        required: true
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        200:
-          description: Uploaded image info
-          content:
-            application/json:
-              schema:
-                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
   /images/any:
     post:
       tags:

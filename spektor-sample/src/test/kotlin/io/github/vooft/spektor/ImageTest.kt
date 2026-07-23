@@ -30,6 +30,20 @@ class ImageTest {
     }
 
     @Test
+    fun `should upload any content type`() = testClient("user") {
+        val response = client.post("/images/any") {
+            contentType(ContentType.Application.Pdf)
+            setBody(byteArrayOf(1, 2, 3, 4, 5))
+        }
+
+        response.status shouldBe HttpStatusCode.OK
+
+        val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+        body.getValue("name").jsonPrimitive.content shouldBe "application/pdf"
+        body.getValue("size").jsonPrimitive.long shouldBe 5L
+    }
+
+    @Test
     fun `should upload jpeg image`() = testClient("user") {
         val response = client.post("/images") {
             contentType(ContentType.Image.JPEG)

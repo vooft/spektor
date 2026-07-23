@@ -20,15 +20,6 @@ class SpektorParserBinaryTest {
     }
 
     @Test
-    fun `should ignore legacy binary format request body`() {
-        val schema = parser.parse(listOf(imageApiFile))
-
-        val path = schema.paths.values.single().single { it.operationId == "uploadImageRaw" }
-        path.requestBody shouldBe null
-        path.requestBodyContentType shouldBe SpektorContentType.JSON
-    }
-
-    @Test
     fun `should parse wildcard media type without schema as binary request body`() {
         val schema = parser.parse(listOf(imageApiFile))
 

@@ -30,6 +30,7 @@ fun Application.configureRouting() {
         echoRoutes.echo()
         multipartRoutes.uploadFile()
         imageRoutes.uploadImage()
+        imageRoutes.uploadAny()
 
         authenticate("admin") {
             authorRoutes.create()

@@ -37,3 +37,20 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /images/optional:
+    post:
+      tags:
+        - Image
+      operationId: uploadImageOptional
+      requestBody:
+        content:
+          image/png:
+            schema:
+              contentMediaType: image/png
+      responses:
+        200:
+          description: Uploaded image info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'

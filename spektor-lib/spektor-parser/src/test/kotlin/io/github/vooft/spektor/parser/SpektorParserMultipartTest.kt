@@ -29,6 +29,14 @@ class SpektorParserMultipartTest {
     }
 
     @Test
+    fun `should parse multipart request body without schema`() {
+        val schema = parser.parse(listOf(multipartApiFile))
+
+        val path = schema.paths.values.single().single { it.operationId == "uploadFileAny" }
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Multipart, true, SpektorContentType.MULTIPART_FORM_DATA)
+    }
+
+    @Test
     fun `should not collect refs from multipart schema`() {
         val schema = parser.parse(listOf(multipartApiFile))
 

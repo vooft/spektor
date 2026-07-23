@@ -14,15 +14,15 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
     fun resolve(content: Content, isRequestBody: Boolean = false): ResolvedContent? {
         val jsonSchema = content.findSchema(SpektorContentType.JSON)
         val textPlainSchema = content.findSchema(SpektorContentType.TEXT_PLAIN)
-        val multipartSchema = content.findSchema(SpektorContentType.MULTIPART_FORM_DATA)
+        val multipartMedia = content.findMedia(SpektorContentType.MULTIPART_FORM_DATA)
         val hasBinaryContent = content.any { (mediaType, media) -> mediaType !in KNOWN_MEDIA_TYPES && media.isBinaryContent() }
 
         return when {
             content.isEmpty() -> null
             jsonSchema != null -> resolveJsonContent(jsonSchema)
             textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
-            multipartSchema != null -> if (isRequestBody) {
-                resolveMultipartContent(multipartSchema)
+            multipartMedia != null -> if (isRequestBody) {
+                resolveMultipartContent(multipartMedia.schema)
             } else {
                 logger.warn {
                     "${SpektorContentType.MULTIPART_FORM_DATA.mediaType} is only supported in request bodies, " +
@@ -49,7 +49,9 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
         }
     }
 
-    private fun Content.findSchema(contentType: SpektorContentType): Schema<*>? = contentType.mediaType?.let { get(it) }?.schema
+    private fun Content.findMedia(contentType: SpektorContentType): MediaType? = contentType.mediaType?.let { get(it) }
+
+    private fun Content.findSchema(contentType: SpektorContentType): Schema<*>? = findMedia(contentType)?.schema
 
     /**
      * A binary body is either explicitly marked as such with `contentMediaType`, or has an empty or missing schema,
@@ -62,11 +64,16 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
 
     private fun Schema<*>.isEmptySchema(): Boolean = types == null && `$ref` == null && oneOf == null
 
-    private fun resolveMultipartContent(schema: Schema<*>): ResolvedContent {
-        if (schema.types?.singleOrNull() != OBJECT_TYPE) {
+    /**
+     * The multipart schema is only documentation, so a missing, empty or `$ref` schema is accepted silently,
+     * only an explicit non-object type is suspicious enough to warn about.
+     */
+    private fun resolveMultipartContent(schema: Schema<*>?): ResolvedContent {
+        val types = schema?.types
+        if (types != null && types.singleOrNull() != OBJECT_TYPE) {
             logger.warn {
                 "Expected '$OBJECT_TYPE' schema for ${SpektorContentType.MULTIPART_FORM_DATA.mediaType}, " +
-                    "but got ${schema.types}, schema is not validated"
+                    "but got $types, schema is not validated"
             }
         }
         return ResolvedContent(SpektorContentType.MULTIPART_FORM_DATA, SpektorType.Multipart)

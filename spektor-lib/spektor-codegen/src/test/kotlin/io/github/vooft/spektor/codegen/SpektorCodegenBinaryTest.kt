@@ -51,4 +51,33 @@ class SpektorCodegenBinaryTest {
         code shouldNotContain "receiveMultipart"
         code shouldNotContain "receiveText"
     }
+
+    @Test
+    fun `should generate nullable ByteArray request parameter for optional binary request body`() {
+        val schema = parser.parse(listOf(imageApiFile))
+        val context = codegen.generate(schema)
+
+        val parameter = context.generatedPathSpecs.values
+            .single { it.className.simpleName == "ImageServerApi" }
+            .type
+            .funSpecs
+            .single { it.name == "uploadImageOptional" }
+            .parameters
+            .single { it.name == "request" }
+        parameter.type.toString() shouldBe "kotlin.ByteArray?"
+    }
+
+    @Test
+    fun `should receive nullable ByteArray for optional binary request body`() {
+        val schema = parser.parse(listOf(imageApiFile))
+        val context = codegen.generate(schema)
+
+        val routesType = context.generatedRouteSpecs.values
+            .single { it.className.simpleName == "ImageRoutes" }
+            .type
+
+        val code = routesType.funSpecs.single { it.name == "uploadImageOptional" }.body.toString()
+        code shouldContain "call.receiveNullable<kotlin.ByteArray>()"
+        code shouldContain "call.request.contentLength()"
+    }
 }

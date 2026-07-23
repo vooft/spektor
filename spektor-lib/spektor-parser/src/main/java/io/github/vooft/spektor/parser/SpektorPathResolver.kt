@@ -18,18 +18,16 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     private val contentResolver = SpektorContentResolver(typeResolver)
     private val operationIdCounter = AtomicInteger()
 
-    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath {
-        return SpektorPath(
-            tagAndFile = TagAndFile(operation.resolveTag(), file),
-            operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
-            path = path,
-            requestBody = operation.resolveRequestBody(),
-            responses = operation.responses?.responses() ?: emptyList(),
-            pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
-            queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
-            method = method
-        )
-    }
+    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
+        tagAndFile = TagAndFile(operation.resolveTag(), file),
+        operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
+        path = path,
+        requestBody = operation.resolveRequestBody(),
+        responses = operation.responses?.responses() ?: emptyList(),
+        pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
+        queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
+        method = method
+    )
 
     private fun Operation.resolveTag(): String {
         val tagsVal = this.tags ?: return TAG_PLACEHOLDER

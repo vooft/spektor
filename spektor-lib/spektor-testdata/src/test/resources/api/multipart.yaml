@@ -48,3 +48,19 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /files/any:
+    post:
+      tags:
+        - Multipart
+      operationId: uploadFileAny
+      requestBody:
+        required: true
+        content:
+          multipart/form-data: { }
+      responses:
+        200:
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'

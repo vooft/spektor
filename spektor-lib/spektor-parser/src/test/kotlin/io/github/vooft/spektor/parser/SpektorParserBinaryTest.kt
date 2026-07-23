@@ -26,4 +26,12 @@ class SpektorParserBinaryTest {
         val path = schema.paths.values.single().single { it.operationId == "uploadImageAny" }
         path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Binary, true, SpektorContentType.BINARY)
     }
+
+    @Test
+    fun `should parse optional binary request body`() {
+        val schema = parser.parse(listOf(imageApiFile))
+
+        val path = schema.paths.values.single().single { it.operationId == "uploadImageOptional" }
+        path.requestBody shouldBe SpektorPath.RequestBody(SpektorType.Binary, false, SpektorContentType.BINARY)
+    }
 }

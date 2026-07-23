@@ -17,7 +17,7 @@ class ImageTest {
 
     @Test
     fun `should upload png image`() = testClient("user") {
-        val response = client.post("/images") {
+        val response = client.post("/images/png") {
             contentType(ContentType.Image.PNG)
             setBody(byteArrayOf(1, 2, 3))
         }
@@ -30,8 +30,8 @@ class ImageTest {
     }
 
     @Test
-    fun `should upload jpeg image`() = testClient("user") {
-        val response = client.post("/images") {
+    fun `should upload any image format`() = testClient("user") {
+        val response = client.post("/images/any") {
             contentType(ContentType.Image.JPEG)
             setBody(byteArrayOf(1, 2, 3, 4))
         }

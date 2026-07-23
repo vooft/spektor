@@ -31,7 +31,8 @@ fun Application.configureRouting() {
         pingRoutes.ping()
         echoRoutes.echo()
         multipartRoutes.uploadFile()
-        imageRoutes.uploadImage()
+        imageRoutes.uploadPng()
+        imageRoutes.uploadAnyImage()
         uploadRoutes.upload()
 
         authenticate("admin") {

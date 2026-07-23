@@ -3,11 +3,29 @@ info:
   title: Image API
   version: 1.0.0
 paths:
-  /images:
+  /images/png:
     post:
       tags:
         - Image
-      operationId: uploadImage
+      operationId: uploadPng
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              contentMediaType: image/png
+      responses:
+        200:
+          description: Uploaded image info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'
+  /images/any:
+    post:
+      tags:
+        - Image
+      operationId: uploadAnyImage
       requestBody:
         required: true
         content:

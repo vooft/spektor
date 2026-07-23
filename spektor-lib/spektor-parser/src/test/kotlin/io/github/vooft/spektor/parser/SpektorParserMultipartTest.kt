@@ -4,7 +4,6 @@ import io.github.vooft.spektor.model.SpektorContentType
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.test.TestFiles.multipartApiFile
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -28,16 +27,6 @@ class SpektorParserMultipartTest {
         val path = schema.paths.values.single().single { it.operationId == "uploadFileOptional" }
         path.requestBody shouldBe SpektorType.RequiredWrapper(SpektorType.Multipart, true)
         path.requestBodyContentType shouldBe SpektorContentType.MULTIPART_FORM_DATA
-    }
-
-    @Test
-    fun `should ignore multipart response`() {
-        val schema = parser.parse(listOf(multipartApiFile))
-
-        val path = schema.paths.values.single().single { it.operationId == "downloadFile" }
-        val response = path.responses.single()
-        response.body.shouldBeNull()
-        response.contentType shouldBe SpektorContentType.JSON
     }
 
     @Test

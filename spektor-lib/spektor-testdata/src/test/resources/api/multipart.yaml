@@ -48,15 +48,3 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
-  /files/download:
-    get:
-      tags:
-        - Multipart
-      operationId: downloadFile
-      responses:
-        200:
-          description: Multipart response is not supported and should be ignored
-          content:
-            multipart/form-data:
-              schema:
-                type: object

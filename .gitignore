@@ -40,3 +40,7 @@ bin/
 .DS_Store
 
 spektor-lib/generated
+
+### JVM crash artifacts ###
+*.hprof
+hs_err_pid*

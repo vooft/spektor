@@ -128,16 +128,16 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         )
     }
 
-    private fun SpektorContentResolver.ResolvedContent.resolveRequired(operation: Operation): Boolean {
-        val required = operation.requestBody?.required ?: false
-        if (contentType == SpektorContentType.MULTIPART_FORM_DATA && !required) {
+    private fun SpektorContentResolver.ResolvedContent.resolveRequired(operation: Operation): Boolean = when {
+        operation.requestBody?.required == true -> true
+        contentType != SpektorContentType.MULTIPART_FORM_DATA -> false
+        else -> {
             logger.warn {
-                "Optional ${SpektorContentType.MULTIPART_FORM_DATA.mediaType} request body is not supported " +
+                "Optional ${contentType.mediaType} request body is not supported " +
                     "in operation ${operation.operationId}, treating as required"
             }
-            return true
+            true
         }
-        return required
     }
 
     enum class ParameterLocation(val value: String) {

@@ -1,20 +1,20 @@
 openapi: 3.1.0
 info:
-  title: Upload API
+  title: Document API
   version: 1.0.0
 paths:
-  /uploads:
+  /documents:
     post:
       tags:
-        - Upload
-      operationId: upload
+        - Document
+      operationId: uploadDocument
       requestBody:
         required: true
         content:
           '*/*': { }
       responses:
         200:
-          description: Uploaded file info
+          description: Uploaded document info
           content:
             application/json:
               schema:

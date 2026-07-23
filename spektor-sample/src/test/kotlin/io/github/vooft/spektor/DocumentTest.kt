@@ -13,11 +13,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import org.junit.jupiter.api.Test
 
-class UploadTest {
+class DocumentTest {
 
     @Test
-    fun `should upload any content type`() = testClient("user") {
-        val response = client.post("/uploads") {
+    fun `should upload document of any content type`() = testClient("user") {
+        val response = client.post("/documents") {
             contentType(ContentType.Application.Pdf)
             setBody(byteArrayOf(1, 2, 3, 4, 5))
         }

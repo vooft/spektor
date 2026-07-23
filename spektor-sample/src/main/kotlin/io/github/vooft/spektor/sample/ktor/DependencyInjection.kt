@@ -9,6 +9,7 @@ import io.github.vooft.spektor.sample.apis.MultipartRestService
 import io.github.vooft.spektor.sample.apis.NotificationRestService
 import io.github.vooft.spektor.sample.apis.OwnerRestService
 import io.github.vooft.spektor.sample.apis.PingRestService
+import io.github.vooft.spektor.sample.apis.UploadRestService
 import io.github.vooft.spektor.sample.repository.AuthorRepository
 import io.github.vooft.spektor.sample.repository.BookRepository
 import io.ktor.server.application.Application
@@ -22,6 +23,7 @@ import spektor.example.api.multipart.MultipartRoutes
 import spektor.example.api.notification.NotificationRoutes
 import spektor.example.api.owner.OwnerRoutes
 import spektor.example.api.ping.PingRoutes
+import spektor.example.api.upload.UploadRoutes
 
 fun Application.configureDependencyInjection() {
     dependencies {
@@ -37,6 +39,7 @@ fun Application.configureDependencyInjection() {
         provide { EchoRestService() }
         provide { MultipartRestService() }
         provide { ImageRestService() }
+        provide { UploadRestService() }
 
         provide { AuthorRoutes(resolve()) }
         provide { BookRoutes(resolve()) }
@@ -47,5 +50,6 @@ fun Application.configureDependencyInjection() {
         provide { EchoRoutes(resolve()) }
         provide { MultipartRoutes(resolve()) }
         provide { ImageRoutes(resolve()) }
+        provide { UploadRoutes(resolve()) }
     }
 }

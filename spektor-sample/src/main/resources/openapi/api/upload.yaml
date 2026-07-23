@@ -1,20 +1,20 @@
 openapi: 3.1.0
 info:
-  title: Image API
+  title: Upload API
   version: 1.0.0
 paths:
-  /images:
+  /uploads:
     post:
       tags:
-        - Image
-      operationId: uploadImage
+        - Upload
+      operationId: upload
       requestBody:
         required: true
         content:
-          image/*: { }
+          '*/*': { }
       responses:
         200:
-          description: Uploaded image info
+          description: Uploaded file info
           content:
             application/json:
               schema:

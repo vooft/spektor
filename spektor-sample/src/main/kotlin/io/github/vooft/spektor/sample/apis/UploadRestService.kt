@@ -2,12 +2,12 @@ package io.github.vooft.spektor.sample.apis
 
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.contentType
-import spektor.example.api.image.ImageServerApi
-import spektor.example.api.image.ImageServerApi.UploadImageResponse
+import spektor.example.api.upload.UploadServerApi
+import spektor.example.api.upload.UploadServerApi.UploadResponse
 import spektor.example.models.uploadedfile.UploadedFileDto
 
-class ImageRestService : ImageServerApi {
-    override suspend fun uploadImage(request: ByteArray, call: ApplicationCall): UploadImageResponse = UploadImageResponse.ok(
+class UploadRestService : UploadServerApi {
+    override suspend fun upload(request: ByteArray, call: ApplicationCall): UploadResponse = UploadResponse.ok(
         UploadedFileDto(
             name = call.request.contentType().toString(),
             size = request.size.toLong(),

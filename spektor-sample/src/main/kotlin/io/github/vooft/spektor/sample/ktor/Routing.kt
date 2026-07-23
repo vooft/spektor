@@ -13,6 +13,7 @@ import spektor.example.api.multipart.MultipartRoutes
 import spektor.example.api.notification.NotificationRoutes
 import spektor.example.api.owner.OwnerRoutes
 import spektor.example.api.ping.PingRoutes
+import spektor.example.api.upload.UploadRoutes
 
 fun Application.configureRouting() {
     val authorRoutes: AuthorRoutes by dependencies
@@ -24,13 +25,14 @@ fun Application.configureRouting() {
     val echoRoutes: EchoRoutes by dependencies
     val multipartRoutes: MultipartRoutes by dependencies
     val imageRoutes: ImageRoutes by dependencies
+    val uploadRoutes: UploadRoutes by dependencies
 
     routing {
         pingRoutes.ping()
         echoRoutes.echo()
         multipartRoutes.uploadFile()
         imageRoutes.uploadImage()
-        imageRoutes.uploadAny()
+        uploadRoutes.upload()
 
         authenticate("admin") {
             authorRoutes.create()

@@ -30,7 +30,7 @@ class SpektorFile(private val file: Path, allRefs: MutableSet<SpektorType.Ref>) 
     private val typeResolver = SpektorTypeResolver(file, allRefs)
     private val pathResolver = SpektorPathResolver(typeResolver)
 
-    fun parseModel(ref: SpektorType.Ref): SpektorType? {
+    fun parseModel(ref: SpektorType.Ref): SpektorType {
         require(ref.file == file) { "Can only parse models from the same file, expected $file, got ${ref.file}" }
 
         val schema = parsed.components?.schemas?.get(ref.modelName) ?: error("Model ${ref.modelName} not found in file $file")

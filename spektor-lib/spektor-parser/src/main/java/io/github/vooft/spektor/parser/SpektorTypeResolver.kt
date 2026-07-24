@@ -1,6 +1,5 @@
 package io.github.vooft.spektor.parser
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.SpektorType.MicroType
 import io.github.vooft.spektor.model.SpektorType.MicroType.StringFormat
@@ -10,19 +9,16 @@ import java.nio.file.Path
 
 class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSet<SpektorType.Ref>) {
 
-    fun resolve(schema: Schema<*>): SpektorType? {
+    fun resolve(schema: Schema<*>): SpektorType {
         val type = schema.singleType()
         return when {
-            schema.`$ref` != null -> resolveRef(schema.`$ref`)?.also { allRefs.add(it) }
+            schema.`$ref` != null -> resolveRef(schema.`$ref`).also { allRefs.add(it) }
             type == "object" -> resolveObject(schema)
             type == "array" -> resolveArray(schema)
             type == "string" && schema.enum != null -> SpektorType.Enum(schema.enum.map { it.toString() })
             type != null -> MicroType.from(type, schema.format)
             schema.oneOf != null && schema.discriminator != null -> resolveOneOf(schema)
-            else -> {
-                logger.warn { "Schema in file $file is of invalid type ${schema.types}: $schema" }
-                null
-            }
+            else -> error("Schema in file $file is of invalid type ${schema.types}: $schema")
         }
     }
 
@@ -32,43 +28,27 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         return types.single()
     }
 
-    private fun resolveArray(schema: Schema<*>): SpektorType.Array? {
-        val itemsRef = schema.items ?: run {
-            logger.warn { "Array schema has no items: $schema" }
-            return null
-        }
-
-        val itemType = resolve(itemsRef) ?: run {
-            logger.warn { "Cannot resolve item type in array schema: $itemsRef" }
-            return null
-        }
-
-        return SpektorType.Array(itemType)
+    private fun resolveArray(schema: Schema<*>): SpektorType.Array {
+        val itemsRef = schema.items ?: error("Array schema has no items: $schema")
+        return SpektorType.Array(resolve(itemsRef))
     }
 
-    private fun resolveObject(schema: Schema<*>): SpektorType.Object? {
+    private fun resolveObject(schema: Schema<*>): SpektorType.Object {
         val required = schema.required?.toSet() ?: emptySet()
         val properties = schema.properties ?: run {
             val additionalProps = schema.additionalProperties
             if (additionalProps is Schema<*>) {
                 val keyType = resolvePropertyNamesKeyType(schema)
-                val valueType = resolve(additionalProps)
-                    ?: error("Cannot resolve additionalProperties type: $additionalProps")
                 return SpektorType.Object.AdditionalProperties(
                     keyType = keyType,
-                    valueType = valueType,
+                    valueType = resolve(additionalProps),
                 )
             }
             return SpektorType.Object.FreeForm
         }
 
         val props = properties.mapValues { (propName, propSchema) ->
-            val propertyModel = resolve(propSchema) ?: run {
-                logger.warn { "Cannot resolve model for property $propName: $propSchema" }
-                return null
-            }
-
-            SpektorType.RequiredWrapper(propertyModel, required.contains(propName))
+            SpektorType.RequiredWrapper(resolve(propSchema), required.contains(propName))
         }
 
         return SpektorType.Object.WithProperties(props)
@@ -92,9 +72,7 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
             ?: error("oneOf schema in $file has no discriminator mapping")
 
         val variants = mapping.mapValues { (_, refString) ->
-            resolveRef(refString)
-                ?.also { allRefs.add(it) }
-                ?: error("Cannot resolve ref $refString in oneOf discriminator mapping in $file")
+            resolveRef(refString).also { allRefs.add(it) }
         }
 
         return SpektorType.OneOf(
@@ -103,25 +81,21 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         )
     }
 
-    private fun resolveRef(rawRef: String): SpektorType.Ref? {
+    private fun resolveRef(rawRef: String): SpektorType.Ref {
         // check if a URI reference
-        try {
-            val uri = URI(rawRef)
-            if (uri.scheme != null) {
-                logger.warn { "Found a URI reference in file $file, which is not supported: $rawRef" }
-                return null
-            }
+        val uriScheme = try {
+            URI(rawRef).scheme
         } catch (_: Exception) {
             // ignore, not a valid URI
+            null
         }
+        require(uriScheme == null) { "Found a URI reference in file $file, which is not supported: $rawRef" }
 
         // then probably it is either a file reference or a local one
-        val refPath = rawRef.extractFilePath() ?: run {
-            logger.warn { "Found invalid reference $rawRef in file $file, expected to start with #/ or a valid file path" }
-            return null
-        }
+        val refPath = rawRef.extractFilePath()
+            ?: error("Found invalid reference $rawRef in file $file, expected to start with #/ or a valid file path")
 
-        val refName = rawRef.substringAfter("#/").extractRefName() ?: return null
+        val refName = rawRef.substringAfter("#/").extractRefName()
 
         return SpektorType.Ref(file.parent.resolve(refPath), refName)
     }
@@ -140,17 +114,12 @@ class SpektorTypeResolver(private val file: Path, private val allRefs: MutableSe
         return file.parent.resolve(take(fileSeparatorIndex)).toRealPath()
     }
 
-    private fun String.extractRefName(): String? {
+    private fun String.extractRefName(): String {
         val refNameStartIndex = lastIndexOf('/') + 1
-        if (take(refNameStartIndex) != "components/schemas/") {
-            logger.warn { "Found invalid reference #/$this, expected to start with #/components/schemas/" }
-            return null
+        require(take(refNameStartIndex) == "components/schemas/") {
+            "Found invalid reference #/$this, expected to start with #/components/schemas/"
         }
 
         return substring(refNameStartIndex)
-    }
-
-    companion object Companion {
-        private val logger = KotlinLogging.logger { }
     }
 }

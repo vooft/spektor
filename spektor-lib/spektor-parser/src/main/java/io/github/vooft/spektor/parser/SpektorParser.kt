@@ -1,6 +1,5 @@
 package io.github.vooft.spektor.parser
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorPath
 import io.github.vooft.spektor.model.SpektorSchema
 import io.github.vooft.spektor.model.SpektorType
@@ -24,13 +23,7 @@ class SpektorParser {
             allRefs.remove(ref)
 
             val file = spektorFiles.computeIfAbsent(ref.file) { SpektorFile(it, allRefs) }
-            val type = file.parseModel(ref)
-            if (type == null) {
-                logger.warn { "Cannot resolve reference $ref in file ${ref.file}" }
-                continue
-            }
-
-            resultRefs[ref] = type
+            resultRefs[ref] = file.parseModel(ref)
 
             allRefs.removeAll(resultRefs.keys)
         }
@@ -48,9 +41,5 @@ class SpektorParser {
         require(multipleFilesPerTag.isEmpty()) {
             "Paths with the same tag should be in the same file, but got: $multipleFilesPerTag"
         }
-    }
-
-    companion object {
-        private val logger = KotlinLogging.logger { }
     }
 }

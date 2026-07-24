@@ -43,15 +43,14 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
     private fun Collection<Parameter>.extractPathParameters(location: ParameterLocation): List<PathVariable> {
         return filter { it.`in` == location.value }
-            .mapNotNull { parameter ->
-                val type = parameter.findParameterSpektorType() ?: run {
-                    logger.warn { "Path parameter ${parameter.name} has no valid type, skipping" }
-                    return@mapNotNull null
-                }
+            .map { parameter ->
+                val type = parameter.findParameterSpektorType()
+                    ?: error("Path parameter ${parameter.name} has no valid type")
 
-                return@mapNotNull when (type) {
+                when (type) {
                     is SpektorType.MicroType,
-                    is SpektorType.Ref -> PathVariable(
+                    is SpektorType.Ref,
+                        -> PathVariable(
                         name = parameter.name,
                         type = type,
                         required = parameter.required ?: false
@@ -62,26 +61,23 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     is SpektorType.Array,
                     is SpektorType.Multipart,
                     is SpektorType.Binary,
-                    is SpektorType.Object -> {
-                        logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
-                        null
-                    }
+                    is SpektorType.Object,
+                        -> error("Path parameter ${parameter.name} has unsupported $type")
                 }
             }
     }
 
     private fun Collection<Parameter>.extractQueryParameters(location: ParameterLocation): List<QueryVariable> {
         return filter { it.`in` == location.value }
-            .mapNotNull { parameter ->
-                val type = parameter.findParameterSpektorType() ?: run {
-                    logger.warn { "Query parameter ${parameter.name} has no valid type, skipping" }
-                    return@mapNotNull null
-                }
+            .map { parameter ->
+                val type = parameter.findParameterSpektorType()
+                    ?: error("Query parameter ${parameter.name} has no valid type")
 
-                return@mapNotNull when (type) {
+                when (type) {
                     is SpektorType.MicroType,
                     is SpektorType.Array,
-                    is SpektorType.Ref -> QueryVariable(
+                    is SpektorType.Ref,
+                        -> QueryVariable(
                         name = parameter.name,
                         type = type,
                         required = parameter.required ?: false
@@ -91,10 +87,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     is SpektorType.OneOf,
                     is SpektorType.Multipart,
                     is SpektorType.Binary,
-                    is SpektorType.Object -> {
-                        logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
-                        null
-                    }
+                    is SpektorType.Object,
+                        -> error("Query parameter ${parameter.name} has unsupported $type")
                 }
             }
     }
@@ -106,10 +100,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         return when {
             schemaVal != null -> typeResolver.resolve(schemaVal)
             contentVal != null -> contentResolver.resolve(contentVal)?.type
-            else -> {
-                logger.warn { "Parameter has neither schema nor content: $this" }
-                null
-            }
+            else -> error("Parameter has neither schema nor content: $this")
         }
     }
 

@@ -3,6 +3,8 @@ package io.github.vooft.spektor.parser
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.vooft.spektor.model.SpektorContentType
 import io.github.vooft.spektor.model.SpektorType
+import io.github.vooft.spektor.model.SpektorType.MicroType.StringFormat
+import io.github.vooft.spektor.model.SpektorType.MicroType.StringMicroType
 import io.swagger.v3.oas.models.media.Content
 import io.swagger.v3.oas.models.media.MediaType
 import io.swagger.v3.oas.models.media.Schema
@@ -21,31 +23,24 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
             content.isEmpty() -> null
             jsonSchema != null -> resolveJsonContent(jsonSchema)
             textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
-            multipartMedia != null -> if (isRequestBody) {
-                resolveMultipartContent(multipartMedia.schema)
-            } else {
-                logger.warn {
+            multipartMedia != null -> {
+                require(isRequestBody) {
                     "${SpektorContentType.MULTIPART_FORM_DATA.mediaType} is only supported in request bodies, " +
-                        "skipping ${content.keys}"
+                        "but present in ${content.keys}"
                 }
-                null
+                resolveMultipartContent(multipartMedia.schema)
             }
 
-            hasBinaryContent -> if (isRequestBody) {
+            hasBinaryContent -> {
+                require(isRequestBody) { "Binary content is only supported in request bodies, but present in ${content.keys}" }
                 ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
-            } else {
-                logger.warn { "Binary content is only supported in request bodies, skipping ${content.keys}" }
-                null
             }
 
-            else -> {
-                logger.warn {
-                    "Only ${SpektorContentType.entries.mapNotNull { it.mediaType }} and binary bodies " +
-                        "(any other media type with 'contentMediaType' or an empty schema) " +
-                        "are supported, but present ${content.keys}"
-                }
-                null
-            }
+            else -> error(
+                "Only ${SpektorContentType.entries.mapNotNull { it.mediaType }} and binary bodies " +
+                    "(any other media type with 'contentMediaType' or an empty schema) " +
+                    "are supported, but present ${content.keys}"
+            )
         }
     }
 
@@ -79,15 +74,15 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
         return ResolvedContent(SpektorContentType.MULTIPART_FORM_DATA, SpektorType.Multipart)
     }
 
-    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent? = typeResolver.resolve(schema)?.let {
-        ResolvedContent(SpektorContentType.JSON, it)
+    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent {
+        val resolved = typeResolver.resolve(schema)
+        return ResolvedContent(contentType = SpektorContentType.JSON, type = resolved)
     }
 
-    private fun resolveTextPlainContent(schema: Schema<*>): ResolvedContent? {
-        val resolved = typeResolver.resolve(schema) ?: return null
-        if (resolved != SpektorType.MicroType.StringMicroType(SpektorType.MicroType.StringFormat.PLAIN)) {
-            logger.warn { "Only plain string schema is supported for ${SpektorContentType.TEXT_PLAIN.mediaType}, but got $resolved" }
-            return null
+    private fun resolveTextPlainContent(schema: Schema<*>): ResolvedContent {
+        val resolved = typeResolver.resolve(schema)
+        require(resolved == PLAIN_TEXT_TYPE) {
+            "Only plain string schema is supported for ${SpektorContentType.TEXT_PLAIN.mediaType}, but got $resolved"
         }
         return ResolvedContent(SpektorContentType.TEXT_PLAIN, resolved)
     }
@@ -96,5 +91,6 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
         private val logger = KotlinLogging.logger { }
         private val KNOWN_MEDIA_TYPES = SpektorContentType.entries.mapNotNull { it.mediaType }.toSet()
         private const val OBJECT_TYPE = "object"
+        private val PLAIN_TEXT_TYPE = StringMicroType(StringFormat.PLAIN)
     }
 }

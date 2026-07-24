@@ -1,0 +1,66 @@
+openapi: 3.1.0
+info:
+  title: Multipart API
+  version: 1.0.0
+paths:
+  /files:
+    post:
+      tags:
+        - Multipart
+      operationId: uploadFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  contentMediaType: application/octet-stream
+                description:
+                  type: string
+      responses:
+        200:
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /files/optional:
+    post:
+      tags:
+        - Multipart
+      operationId: uploadFileOptional
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  contentMediaType: application/octet-stream
+      responses:
+        200:
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /files/any:
+    post:
+      tags:
+        - Multipart
+      operationId: uploadFileAny
+      requestBody:
+        required: true
+        content:
+          multipart/form-data: { }
+      responses:
+        200:
+          description: Uploaded file info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'

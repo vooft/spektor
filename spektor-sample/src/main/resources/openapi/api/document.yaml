@@ -1,0 +1,21 @@
+openapi: 3.1.0
+info:
+  title: Document API
+  version: 1.0.0
+paths:
+  /documents:
+    post:
+      tags:
+        - Document
+      operationId: uploadDocument
+      requestBody:
+        required: true
+        content:
+          '*/*': { }
+      responses:
+        200:
+          description: Uploaded document info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'

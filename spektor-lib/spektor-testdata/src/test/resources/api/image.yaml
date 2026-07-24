@@ -1,0 +1,56 @@
+openapi: 3.1.0
+info:
+  title: Image API
+  version: 1.0.0
+paths:
+  /images:
+    post:
+      tags:
+        - Image
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          image/png:
+            schema:
+              contentMediaType: image/png
+      responses:
+        200:
+          description: Uploaded image info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /images/any:
+    post:
+      tags:
+        - Image
+      operationId: uploadImageAny
+      requestBody:
+        required: true
+        content:
+          image/*: { }
+      responses:
+        200:
+          description: Uploaded image info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'
+  /images/optional:
+    post:
+      tags:
+        - Image
+      operationId: uploadImageOptional
+      requestBody:
+        content:
+          image/png:
+            schema:
+              contentMediaType: image/png
+      responses:
+        200:
+          description: Uploaded image info
+          content:
+            application/json:
+              schema:
+                $ref: '../models/uploaded-file.yaml#/components/schemas/UploadedFile'

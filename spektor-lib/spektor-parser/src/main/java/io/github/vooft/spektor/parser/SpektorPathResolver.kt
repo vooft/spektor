@@ -8,8 +8,6 @@ import io.github.vooft.spektor.model.SpektorPath.QueryVariable
 import io.github.vooft.spektor.model.SpektorType
 import io.github.vooft.spektor.model.TagAndFile
 import io.swagger.v3.oas.models.Operation
-import io.swagger.v3.oas.models.media.Content
-import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.responses.ApiResponses
 import java.nio.file.Path
@@ -17,22 +15,19 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
+    private val contentResolver = SpektorContentResolver(typeResolver)
     private val operationIdCounter = AtomicInteger()
 
-    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath {
-        val requestContent = operation.requestBody?.content?.findContent()
-        return SpektorPath(
-            tagAndFile = TagAndFile(operation.resolveTag(), file),
-            operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
-            path = path,
-            requestBody = requestContent?.let { SpektorType.RequiredWrapper(it.type, operation.requestBody?.required ?: false) },
-            requestBodyContentType = requestContent?.contentType ?: SpektorContentType.JSON,
-            responses = operation.responses?.responses() ?: emptyList(),
-            pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
-            queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
-            method = method
-        )
-    }
+    fun resolve(file: Path, path: String, method: SpektorPath.Method, operation: Operation): SpektorPath = SpektorPath(
+        tagAndFile = TagAndFile(operation.resolveTag(), file),
+        operationId = operation.operationId ?: "$OPERATION_PLACEHOLDER${operationIdCounter.getAndIncrement()}",
+        path = path,
+        requestBody = operation.resolveRequestBody(),
+        responses = operation.responses?.responses() ?: emptyList(),
+        pathVariables = operation.parameters?.extractPathParameters(ParameterLocation.PATH) ?: listOf(),
+        queryVariables = operation.parameters?.extractQueryParameters(ParameterLocation.QUERY) ?: listOf(),
+        method = method
+    )
 
     private fun Operation.resolveTag(): String {
         val tagsVal = this.tags ?: return TAG_PLACEHOLDER
@@ -65,6 +60,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
                     is SpektorType.Enum,
                     is SpektorType.OneOf,
                     is SpektorType.Array,
+                    is SpektorType.Multipart,
+                    is SpektorType.Binary,
                     is SpektorType.Object -> {
                         logger.warn { "Path parameter ${parameter.name} has unsupported $type, skipping" }
                         null
@@ -92,6 +89,8 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
                     is SpektorType.Enum,
                     is SpektorType.OneOf,
+                    is SpektorType.Multipart,
+                    is SpektorType.Binary,
                     is SpektorType.Object -> {
                         logger.warn { "Query parameter ${parameter.name} has unsupported $type, skipping" }
                         null
@@ -106,7 +105,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
 
         return when {
             schemaVal != null -> typeResolver.resolve(schemaVal)
-            contentVal != null -> contentVal.findContent()?.type
+            contentVal != null -> contentResolver.resolve(contentVal)?.type
             else -> {
                 logger.warn { "Parameter has neither schema nor content: $this" }
                 null
@@ -115,7 +114,7 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
     }
 
     private fun ApiResponses.responses(): List<SpektorPath.Response> = map { (code, response) ->
-        val content = response.content?.findContent()
+        val content = response.content?.let { contentResolver.resolve(it) }
         SpektorPath.Response(
             statusCode = code.toInt(),
             body = content?.type?.let { SpektorType.RequiredWrapper(it, true) },
@@ -123,34 +122,28 @@ class SpektorPathResolver(private val typeResolver: SpektorTypeResolver) {
         )
     }
 
-    private data class ResolvedContent(val contentType: SpektorContentType, val type: SpektorType)
+    private fun Operation.resolveRequestBody(): SpektorPath.RequestBody? {
+        val content = requestBody?.content ?: return null
+        val resolved = contentResolver.resolve(
+            content = content,
+            isRequestBody = true,
+        ) ?: return null
+        return SpektorPath.RequestBody(
+            type = resolved.type,
+            required = resolved.resolveRequired(this),
+            contentType = resolved.contentType,
+        )
+    }
 
-    private fun Content.findContent(): ResolvedContent? {
-        val jsonSchema = get(SpektorContentType.JSON.mediaType)?.schema
-        val textPlainSchema = get(SpektorContentType.TEXT_PLAIN.mediaType)?.schema
-
-        return when {
-            isEmpty() -> null
-            jsonSchema != null -> resolveJsonContent(jsonSchema)
-            textPlainSchema != null -> resolveTextPlainContent(textPlainSchema)
-            else -> {
-                logger.warn { "Only ${SpektorContentType.entries.map { it.mediaType }} are supported, but present $keys" }
-                null
+    private fun SpektorContentResolver.ResolvedContent.resolveRequired(operation: Operation): Boolean = when {
+        operation.requestBody?.required == true -> true
+        contentType != SpektorContentType.MULTIPART_FORM_DATA -> false
+        else -> {
+            logger.warn {
+                "Optional ${contentType.mediaType} request body is not supported in operation ${operation.operationId}, treating as required"
             }
+            true
         }
-    }
-
-    private fun resolveJsonContent(schema: Schema<*>): ResolvedContent? {
-        return typeResolver.resolve(schema)?.let { ResolvedContent(SpektorContentType.JSON, it) }
-    }
-
-    private fun resolveTextPlainContent(schema: Schema<*>): ResolvedContent? {
-        val resolved = typeResolver.resolve(schema) ?: return null
-        if (resolved != SpektorType.MicroType.StringMicroType(SpektorType.MicroType.StringFormat.PLAIN)) {
-            logger.warn { "Only plain string schema is supported for ${SpektorContentType.TEXT_PLAIN.mediaType}, but got $resolved" }
-            return null
-        }
-        return ResolvedContent(SpektorContentType.TEXT_PLAIN, resolved)
     }
 
     enum class ParameterLocation(val value: String) {

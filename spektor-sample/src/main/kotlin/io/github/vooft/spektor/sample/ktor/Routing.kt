@@ -6,8 +6,11 @@ import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.routing.routing
 import spektor.example.api.author.AuthorRoutes
 import spektor.example.api.book.BookRoutes
+import spektor.example.api.document.DocumentRoutes
 import spektor.example.api.echo.EchoRoutes
 import spektor.example.api.event.EventRoutes
+import spektor.example.api.image.ImageRoutes
+import spektor.example.api.multipart.MultipartRoutes
 import spektor.example.api.notification.NotificationRoutes
 import spektor.example.api.owner.OwnerRoutes
 import spektor.example.api.ping.PingRoutes
@@ -20,10 +23,18 @@ fun Application.configureRouting() {
     val notificationRoutes: NotificationRoutes by dependencies
     val pingRoutes: PingRoutes by dependencies
     val echoRoutes: EchoRoutes by dependencies
+    val multipartRoutes: MultipartRoutes by dependencies
+    val imageRoutes: ImageRoutes by dependencies
+    val documentRoutes: DocumentRoutes by dependencies
 
     routing {
         pingRoutes.ping()
         echoRoutes.echo()
+        multipartRoutes.uploadFile()
+        multipartRoutes.uploadFiles()
+        imageRoutes.uploadPng()
+        imageRoutes.uploadAnyImage()
+        documentRoutes.uploadDocument()
 
         authenticate("admin") {
             authorRoutes.create()

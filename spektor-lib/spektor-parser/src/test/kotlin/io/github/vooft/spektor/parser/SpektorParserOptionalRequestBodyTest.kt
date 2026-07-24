@@ -21,7 +21,7 @@ class SpektorParserOptionalRequestBodyTest {
             tagAndFile = TagAndFile("OptionalRequestBodyBook", optionalRequestBodyFile.toAbsolutePath().normalize()),
             operationId = "update",
             path = "/book/update",
-            requestBody = SpektorType.RequiredWrapper(
+            requestBody = SpektorPath.RequestBody(
                 type = SpektorType.Ref(
                     file = bookModelFile.toAbsolutePath().normalize(),
                     modelName = "BookRequest"

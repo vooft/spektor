@@ -95,6 +95,7 @@ listOf(
         packageName.set("io.github.vooft.spektor.test")
 
         modelNameSuffix.set("TestDto")
+        apiNameSuffix.set("TestApi")
 
         additionalProperties.set(
             mapOf(
@@ -126,7 +127,6 @@ listOf(
                 "useTags" to "true",
                 "enumPropertyNaming" to "original",
                 "skipDefaultInterface" to "true",
-                "apiSuffix" to "TestApi",
             )
         )
     }

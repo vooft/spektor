@@ -19,3 +19,15 @@ paths:
             application/json:
               schema:
                 $ref: '../models/uploadedFile.yaml#/components/schemas/UploadedFile'
+  /documents/sample:
+    get:
+      tags:
+        - Document
+      operationId: downloadDocument
+      responses:
+        200:
+          description: Sample document content
+          content:
+            application/octet-stream:
+              schema:
+                contentMediaType: application/octet-stream

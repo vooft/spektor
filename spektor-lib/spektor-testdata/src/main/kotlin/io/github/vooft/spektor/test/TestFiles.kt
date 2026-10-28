@@ -23,6 +23,8 @@ object TestFiles {
     val echoApiFile: Path = rootPath.resolve("api/echo.yaml")
     val multipartApiFile: Path = rootPath.resolve("api/multipart.yaml")
     val imageApiFile: Path = rootPath.resolve("api/image.yaml")
+    val octetStreamApiFile: Path = rootPath.resolve("api/octet-stream.yaml")
+    val binaryImageResponseApiFile: Path = rootPath.resolve("invalid-api/binary-image-response.yaml")
 
     /**
      * Models

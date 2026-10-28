@@ -35,6 +35,7 @@ fun Application.configureRouting() {
         imageRoutes.uploadPng()
         imageRoutes.uploadAnyImage()
         documentRoutes.uploadDocument()
+        documentRoutes.downloadDocument()
 
         authenticate("admin") {
             authorRoutes.create()

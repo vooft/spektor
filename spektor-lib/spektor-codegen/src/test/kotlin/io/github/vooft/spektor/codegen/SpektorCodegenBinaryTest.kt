@@ -3,6 +3,7 @@ package io.github.vooft.spektor.codegen
 import io.github.vooft.spektor.codegen.common.SpektorCodegenConfig
 import io.github.vooft.spektor.parser.SpektorParser
 import io.github.vooft.spektor.test.TestFiles.imageApiFile
+import io.github.vooft.spektor.test.TestFiles.octetStreamApiFile
 import io.github.vooft.spektor.test.TestFiles.rootPath
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -79,5 +80,41 @@ class SpektorCodegenBinaryTest {
         val code = routesType.funSpecs.single { it.name == "uploadImageOptional" }.body.toString()
         code shouldContain "call.receiveNullable<kotlin.ByteArray>()"
         code shouldContain "call.request.contentLength()"
+    }
+
+    @Test
+    fun `should generate ByteArray body for octet stream response`() {
+        val schema = parser.parse(listOf(octetStreamApiFile))
+        val context = codegen.generate(schema)
+
+        val serverApiType = context.generatedPathSpecs.values
+            .single { it.className.simpleName == "OctetStreamServerApi" }
+            .type
+
+        for (responseName in listOf("DownloadEmptySchemaResponse", "DownloadContentMediaTypeResponse")) {
+            val bodyProperty = serverApiType.typeSpecs
+                .single { it.name == responseName }
+                .typeSpecs
+                .single { it.name == "Ok" }
+                .propertySpecs
+                .single { it.name == "body" }
+            bodyProperty.type.toString() shouldBe "kotlin.ByteArray"
+        }
+    }
+
+    @Test
+    fun `should respond with bytes for octet stream response`() {
+        val schema = parser.parse(listOf(octetStreamApiFile))
+        val context = codegen.generate(schema)
+
+        val routesType = context.generatedRouteSpecs.values
+            .single { it.className.simpleName == "OctetStreamRoutes" }
+            .type
+
+        val code = routesType.funSpecs.single { it.name == "downloadEmptySchema" }.body.toString()
+        code shouldContain "call.respondBytes(bytes = response.body, " +
+                "contentType = io.ktor.http.ContentType.Application.OctetStream, status = response.statusCode)"
+        code shouldContain "call.respond(response.statusCode)"
+        code shouldNotContain "call.respond(response.statusCode, response.body)"
     }
 }

@@ -1,0 +1,15 @@
+openapi: 3.1.0
+info:
+  title: Binary Image Response API
+  version: 1.0.0
+paths:
+  /images/download:
+    get:
+      tags:
+        - BinaryImageResponse
+      operationId: downloadImage
+      responses:
+        200:
+          description: Image content is returned
+          content:
+            image/png: { }

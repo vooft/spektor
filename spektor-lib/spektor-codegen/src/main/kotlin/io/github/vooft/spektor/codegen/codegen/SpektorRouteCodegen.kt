@@ -116,6 +116,13 @@ class SpektorRouteCodegen(
                                     KTOR_CONTENT_TYPE_TYPENAME,
                                 )
 
+                                response.contentType == SpektorContentType.BINARY -> add(
+                                    "    is %T -> call.respondBytes(bytes = response.body, " +
+                                            "contentType = %T.Application.OctetStream, status = response.statusCode)\n",
+                                    qualifiedName,
+                                    KTOR_CONTENT_TYPE_TYPENAME,
+                                )
+
                                 else -> add("    is %T -> call.respond(response.statusCode, response.body)\n", qualifiedName)
                             }
                         }
@@ -331,6 +338,7 @@ class SpektorRouteCodegen(
         private val KTOR_CONTENT_LENGTH_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.request", "contentLength")
         private val KTOR_RESPOND_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respond")
         private val KTOR_RESPOND_TEXT_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respondText")
+        private val KTOR_RESPOND_BYTES_METHOD_IMPORT = TypeAndClass.Import("io.ktor.server.response", "respondBytes")
 
         /**
          * Required for ktor 2.x versions
@@ -346,6 +354,7 @@ class SpektorRouteCodegen(
             add(KTOR_CONTENT_LENGTH_METHOD_IMPORT)
             add(KTOR_RESPOND_METHOD_IMPORT)
             add(KTOR_RESPOND_TEXT_METHOD_IMPORT)
+            add(KTOR_RESPOND_BYTES_METHOD_IMPORT)
             add(KTOR_CALL_EXTENSION_IMPORT)
         }
 

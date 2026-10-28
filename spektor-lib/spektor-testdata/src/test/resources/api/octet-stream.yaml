@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: Octet Stream API
+  version: 1.0.0
+paths:
+  /downloads/empty-schema:
+    get:
+      tags:
+        - OctetStream
+      operationId: downloadEmptySchema
+      responses:
+        200:
+          description: File content is returned
+          content:
+            application/octet-stream: { }
+        404:
+          description: File is not found
+  /downloads/content-media-type:
+    get:
+      tags:
+        - OctetStream
+      operationId: downloadContentMediaType
+      responses:
+        200:
+          description: File content is returned
+          content:
+            application/octet-stream:
+              schema:
+                contentMediaType: application/octet-stream

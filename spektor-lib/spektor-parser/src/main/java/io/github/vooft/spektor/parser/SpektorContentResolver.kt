@@ -31,10 +31,7 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
                 resolveMultipartContent(multipartMedia.schema)
             }
 
-            hasBinaryContent -> {
-                require(isRequestBody) { "Binary content is only supported in request bodies, but present in ${content.keys}" }
-                ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
-            }
+            hasBinaryContent -> resolveBinaryContent(content, isRequestBody)
 
             else -> error(
                 "Only ${SpektorContentType.entries.mapNotNull { it.mediaType }} and binary bodies " +
@@ -42,6 +39,13 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
                     "are supported, but present ${content.keys}"
             )
         }
+    }
+
+    private fun resolveBinaryContent(content: Content, isRequestBody: Boolean): ResolvedContent {
+        require(isRequestBody || content[OCTET_STREAM_MEDIA_TYPE]?.isBinaryContent() == true) {
+            "Only $OCTET_STREAM_MEDIA_TYPE binary content is supported in responses, but present ${content.keys}"
+        }
+        return ResolvedContent(SpektorContentType.BINARY, SpektorType.Binary)
     }
 
     private fun Content.findMedia(contentType: SpektorContentType): MediaType? = contentType.mediaType?.let { get(it) }
@@ -91,6 +95,7 @@ internal class SpektorContentResolver(private val typeResolver: SpektorTypeResol
         private val logger = KotlinLogging.logger { }
         private val KNOWN_MEDIA_TYPES = SpektorContentType.entries.mapNotNull { it.mediaType }.toSet()
         private const val OBJECT_TYPE = "object"
+        private const val OCTET_STREAM_MEDIA_TYPE = "application/octet-stream"
         private val PLAIN_TEXT_TYPE = StringMicroType(StringFormat.PLAIN)
     }
 }
